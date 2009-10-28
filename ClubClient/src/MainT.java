@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,6 +50,8 @@ public class MainT implements Runnable, ActionListener {
 	JList eventJList;
 	JList usersJList;
 	JButton loadUsersB;
+	JButton sendMessB;
+	JTextArea message;
 
 	// -------------------------------------------
 
@@ -121,8 +124,8 @@ public class MainT implements Runnable, ActionListener {
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftEvP = new JPanel();
 		leftEvP.setLayout(new GridLayout(2, 3));
-
 		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
+
 		// TODO caricare eventi dal server
 		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
 				"Halloween Night" };
@@ -134,6 +137,7 @@ public class MainT implements Runnable, ActionListener {
 		eventJList = new JList(events);
 		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eventJList.setBackground(new Color(153, 204, 255));
+		eventJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		JScrollPane eventScrollPane = new JScrollPane(eventJList);
 		leftEvP.add(eventScrollPane);
 
@@ -145,12 +149,28 @@ public class MainT implements Runnable, ActionListener {
 		usersJList
 				.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		usersJList.setBackground(new Color(153, 204, 255));
+		usersJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		JScrollPane usersScrollPane = new JScrollPane(usersJList);
 		leftEvP.add(usersScrollPane);
 
 		// ------------------------ RIGHT -----------------------------------
 		JPanel rightEvP = new JPanel();
+		rightEvP.setLayout(new GridLayout(2, 2));
 		rightEvP.setBorder(BorderFactory.createTitledBorder(""));
+
+		rightEvP.add(new JLabel("Message"));
+		rightEvP.add(new JLabel(""));
+
+		message = new JTextArea("Type here your message...");
+		message.setBackground(new Color(255, 215, 0));
+		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		rightEvP.add(message);
+
+		sendMessB = new JButton("Send Message");
+		sendMessB.addActionListener(this);
+		sendMessB.setEnabled(false);
+
+		rightEvP.add(sendMessB);
 
 		// ------------------------------------------------------------------
 		eventiP.add(leftEvP);
@@ -197,6 +217,7 @@ public class MainT implements Runnable, ActionListener {
 		Object event = e.getSource();
 		if (event == loadUsersB) {
 			if (eventJList.getSelectedValue() != null) {
+				sendMessB.setEnabled(true);
 				String selection = eventJList.getSelectedValue().toString();
 				// TODO collegati al server e ritorna una lista di utenti per
 				// l'evento selezionato
