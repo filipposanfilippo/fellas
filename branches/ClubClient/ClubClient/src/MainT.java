@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,12 +30,12 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 
 public class MainT implements Runnable, ActionListener {
-	final String TITLE = "DIANA: Feel Like Doing... (Club Client)";
+	final String club;
+
+	String TITLE = "DIANA: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
 	final String HELP_ITA = "text/ita.txt"; // TODO creare help
 	final String HELP_ENG = "text/eng.txt"; // TODO creare help
-
-	final String club;
 
 	// --------------Default Operations
 	JFrame mainFrame;
@@ -46,17 +47,24 @@ public class MainT implements Runnable, ActionListener {
 	JMenuItem help;
 	JMenuItem credits;
 
-	// -------------- Events Items ---------------
+	// -------------- Message Items ---------------
 	JList eventJList;
 	JList usersJList;
 	JButton loadUsersB;
 	JButton sendMessB;
 	JTextArea message;
 
+	// -------------- Events Items ---------------
+	JTextArea evDescription;
+	JButton createEvB;
+	JButton modifyEvB;
+	JButton deleteEvB;
+
 	// -------------------------------------------
 
 	public MainT(String club) {
 		this.club = club;
+		this.TITLE = this.TITLE + "(" + club + " Client)";
 	}
 
 	private JMenuBar createMenu() {
@@ -106,33 +114,84 @@ public class MainT implements Runnable, ActionListener {
 		return menuBar;
 	}
 
-	// --------------------- UTENTI PANEL --------------------------------------
+	// ------------------------- MESSAGE PANEL -------------------------------
 
-	private JPanel createUtentiPanel() {
-		JPanel utentiP = new JPanel();
-
-		utentiP.setVisible(true);
-		return utentiP;
-	}
-
-	// ------------------------- EVENTI PANEL -------------------------------
-
-	private JPanel createEventiPanel() {
-		JPanel eventiP = new JPanel();
-		eventiP.setLayout(new GridLayout(1, 2));
+	private JPanel createMessagePanel() {
+		JPanel messageP = new JPanel();
+		messageP.setLayout(new GridLayout(1, 2));
 
 		// ------------------------ LEFT ------------------------------------
-		JPanel leftEvP = new JPanel();
-		leftEvP.setLayout(new GridLayout(2, 3));
-		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
+		JPanel leftMsgP = new JPanel();
+		leftMsgP.setLayout(new GridLayout(2, 3));
+		leftMsgP.setBorder(BorderFactory.createTitledBorder(""));
+
+		leftMsgP.add(new JLabel("Planned Events"));
+		leftMsgP.add(new JLabel(""));
+		leftMsgP.add(new JLabel("Users for Selected Event"));
 
 		// TODO caricare eventi dal server
 		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
 				"Halloween Night" };
 
-		leftEvP.add(new JLabel("Planned Events"));
-		leftEvP.add(new JLabel(""));
-		leftEvP.add(new JLabel("Users for Selected Event"));
+		eventJList = new JList(events);
+		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		eventJList.setBackground(new Color(153, 204, 255));
+		eventJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		JScrollPane eventScrollPane = new JScrollPane(eventJList);
+		leftMsgP.add(eventScrollPane);
+
+		loadUsersB = new JButton("Load Users");
+		loadUsersB.addActionListener(this);
+		leftMsgP.add(loadUsersB);
+
+		usersJList = new JList();
+		usersJList
+				.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		usersJList.setBackground(new Color(153, 204, 255));
+		usersJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		JScrollPane usersScrollPane = new JScrollPane(usersJList);
+		leftMsgP.add(usersScrollPane);
+
+		// ------------------------ RIGHT -----------------------------------
+		JPanel rightMsgP = new JPanel();
+		rightMsgP.setLayout(new GridLayout(2, 2));
+		rightMsgP.setBorder(BorderFactory.createTitledBorder(""));
+
+		rightMsgP.add(new JLabel("Message"));
+		rightMsgP.add(new JLabel(""));
+
+		message = new JTextArea("Type here your message...");
+		message.setBackground(new Color(255, 215, 0));
+		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		rightMsgP.add(message);
+
+		sendMessB = new JButton("Send Message");
+		sendMessB.addActionListener(this);
+		sendMessB.setEnabled(false);
+
+		rightMsgP.add(sendMessB);
+
+		// ------------------------------------------------------------------
+		messageP.add(leftMsgP);
+		messageP.add(rightMsgP);
+
+		messageP.setVisible(true);
+		return messageP;
+	}
+
+	// --------------------- EVENTS PANEL --------------------------------------
+
+	private JPanel createEventsPanel() {
+		JPanel eventsP = new JPanel();
+		eventsP.setLayout(new GridLayout(1, 2));
+
+		// ------------------------ LEFT ------------------------------------
+		JPanel leftEvP = new JPanel();
+		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
+
+		// TODO caricare eventi dal server
+		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
+				"Halloween Night" };
 
 		eventJList = new JList(events);
 		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -141,50 +200,38 @@ public class MainT implements Runnable, ActionListener {
 		JScrollPane eventScrollPane = new JScrollPane(eventJList);
 		leftEvP.add(eventScrollPane);
 
-		loadUsersB = new JButton("Load Users");
-		loadUsersB.addActionListener(this);
-		leftEvP.add(loadUsersB);
-
-		usersJList = new JList();
-		usersJList
-				.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		usersJList.setBackground(new Color(153, 204, 255));
-		usersJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		JScrollPane usersScrollPane = new JScrollPane(usersJList);
-		leftEvP.add(usersScrollPane);
-
-		// ------------------------ RIGHT -----------------------------------
+		// ------------------------ RIGHT ------------------------------------
 		JPanel rightEvP = new JPanel();
-		rightEvP.setLayout(new GridLayout(2, 2));
 		rightEvP.setBorder(BorderFactory.createTitledBorder(""));
+		rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
 
-		rightEvP.add(new JLabel("Message"));
-		rightEvP.add(new JLabel(""));
+		rightEvP.add(new JLabel("Event Name"));
 
-		message = new JTextArea("Type here your message...");
-		message.setBackground(new Color(255, 215, 0));
-		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		rightEvP.add(message);
+		rightEvP.add(new JLabel("Event Description"));
+		evDescription = new JTextArea();
+		JScrollPane descrScrollPane = new JScrollPane(evDescription);
+		rightEvP.add(descrScrollPane);
 
-		sendMessB = new JButton("Send Message");
-		sendMessB.addActionListener(this);
-		sendMessB.setEnabled(false);
+		createEvB = new JButton("Create Event");
+		createEvB.setSize(80, 40);
+		modifyEvB = new JButton("Modify Event");
+		deleteEvB = new JButton("Delete Event");
 
-		rightEvP.add(sendMessB);
+		rightEvP.add(createEvB);
+		rightEvP.add(modifyEvB);
+		rightEvP.add(deleteEvB);
 
-		// ------------------------------------------------------------------
-		eventiP.add(leftEvP);
-		eventiP.add(rightEvP);
-
-		eventiP.setVisible(true);
-		return eventiP;
+		eventsP.add(leftEvP);
+		eventsP.add(rightEvP);
+		eventsP.setVisible(true);
+		return eventsP;
 	}
 
 	// -------------------- CLUB PROFILE PANEL-------------------------------
 
-	public JPanel createProfiloPanel() {
-		JPanel profiloP = new JPanel();
-		return profiloP;
+	public JPanel createProfilePanel() {
+		JPanel profileP = new JPanel();
+		return profileP;
 	}
 
 	// ******************************************************************************
@@ -200,9 +247,9 @@ public class MainT implements Runnable, ActionListener {
 
 		mainFrame.add(tabPanel, BorderLayout.CENTER);
 
-		tabPanel.add("Utenti", createEventiPanel());
-		tabPanel.add("Eventi", createUtentiPanel());
-		tabPanel.add("Profilo", createProfiloPanel());
+		tabPanel.add("Message", createMessagePanel());
+		tabPanel.add("Events", createEventsPanel());
+		tabPanel.add("Profile", createProfilePanel());
 
 		mainFrame.pack();
 		mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -221,7 +268,8 @@ public class MainT implements Runnable, ActionListener {
 				String selection = eventJList.getSelectedValue().toString();
 				// TODO collegati al server e ritorna una lista di utenti per
 				// l'evento selezionato
-				String users[] = { "Pippo", "Pluto", "Paperino", "Minnie" };
+				String users[] = { "selection: " + selection, "Pippo", "Pluto",
+						"Paperino", "Minnie" };
 				usersJList.setListData(users);
 			}
 		}
