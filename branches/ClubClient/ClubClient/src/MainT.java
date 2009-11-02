@@ -23,13 +23,17 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class MainT implements Runnable, ActionListener {
+public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	final String club;
 
 	String TITLE = "DIANA: Feel Like Doing... ";
@@ -59,6 +63,18 @@ public class MainT implements Runnable, ActionListener {
 	JButton createEvB;
 	JButton modifyEvB;
 	JButton deleteEvB;
+	JTextField evName;
+	JList eventJList2;
+
+	// -------------- Profile Items ----------------------------
+	JTextField nameR;
+	JTextField surnameR;
+	JTextField addressR;
+	JTextField telR;
+	JTextField userR;
+	JPasswordField pwdR;
+	JPasswordField confPwdR;
+	JButton modifyProfB;
 
 	// -------------------------------------------
 
@@ -122,13 +138,19 @@ public class MainT implements Runnable, ActionListener {
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftMsgP = new JPanel();
-		leftMsgP.setLayout(new GridLayout(2, 3));
 		leftMsgP.setBorder(BorderFactory.createTitledBorder(""));
+		leftMsgP.setLayout(new BoxLayout(leftMsgP, BoxLayout.Y_AXIS));
 
-		leftMsgP.add(new JLabel("Planned Events"));
-		leftMsgP.add(new JLabel(""));
-		leftMsgP.add(new JLabel("Users for Selected Event"));
+		// leftMsgP.setLayout(new GridLayout(2, 3));
+		JPanel leftUpP = new JPanel();
+		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.X_AXIS));
 
+		leftUpP.add(new JLabel(
+				"Planned Events             "));
+		leftUpP.add(new JLabel(
+				"                 Users for Selected Event"));
+
+		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
 		// TODO caricare eventi dal server
 		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
 				"Halloween Night" };
@@ -138,11 +160,12 @@ public class MainT implements Runnable, ActionListener {
 		eventJList.setBackground(new Color(153, 204, 255));
 		eventJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		JScrollPane eventScrollPane = new JScrollPane(eventJList);
-		leftMsgP.add(eventScrollPane);
+		leftDownP.add(eventScrollPane);
+		eventJList.addListSelectionListener(this);
 
-		loadUsersB = new JButton("Load Users");
-		loadUsersB.addActionListener(this);
-		leftMsgP.add(loadUsersB);
+		// loadUsersB = new JButton("Load Users");
+		// loadUsersB.addActionListener(this);
+		// leftDownP.add(loadUsersB);
 
 		usersJList = new JList();
 		usersJList
@@ -150,26 +173,27 @@ public class MainT implements Runnable, ActionListener {
 		usersJList.setBackground(new Color(153, 204, 255));
 		usersJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		JScrollPane usersScrollPane = new JScrollPane(usersJList);
-		leftMsgP.add(usersScrollPane);
+		leftDownP.add(usersScrollPane);
+
+		leftMsgP.add(leftUpP);
+		leftMsgP.add(leftDownP);
 
 		// ------------------------ RIGHT -----------------------------------
 		JPanel rightMsgP = new JPanel();
-		rightMsgP.setLayout(new GridLayout(2, 2));
+		//rightMsgP.setLayout(new BoxLayout(rightMsgP, BoxLayout.Y_AXIS));
 		rightMsgP.setBorder(BorderFactory.createTitledBorder(""));
-
-		rightMsgP.add(new JLabel("Message"));
-		rightMsgP.add(new JLabel(""));
-
-		message = new JTextArea("Type here your message...");
-		message.setBackground(new Color(255, 215, 0));
-		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		rightMsgP.add(message);
 
 		sendMessB = new JButton("Send Message");
 		sendMessB.addActionListener(this);
 		sendMessB.setEnabled(false);
-
 		rightMsgP.add(sendMessB);
+
+		message = new JTextArea("Type here your message...",13,28);
+		// message.setBackground(new Color(255, 215, 0));
+		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		message.setLineWrap(true);
+		JScrollPane messageScrollPane = new JScrollPane(message);
+		rightMsgP.add(messageScrollPane);
 
 		// ------------------------------------------------------------------
 		messageP.add(leftMsgP);
@@ -188,34 +212,46 @@ public class MainT implements Runnable, ActionListener {
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftEvP = new JPanel();
 		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
+		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 
 		// TODO caricare eventi dal server
 		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
 				"Halloween Night" };
 
-		eventJList = new JList(events);
-		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		eventJList.setBackground(new Color(153, 204, 255));
-		eventJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		JScrollPane eventScrollPane = new JScrollPane(eventJList);
+		eventJList2 = new JList(events);
+		eventJList2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		eventJList2.setBackground(new Color(153, 204, 255));
+		eventJList2.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
+		eventJList2.addListSelectionListener(this);
 		leftEvP.add(eventScrollPane);
 
 		// ------------------------ RIGHT ------------------------------------
 		JPanel rightEvP = new JPanel();
 		rightEvP.setBorder(BorderFactory.createTitledBorder(""));
-		rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
+		// rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
 
-		rightEvP.add(new JLabel("Event Name"));
+		rightEvP.add(new JLabel("Event Name:"));
+		evName = new JTextField();
+		evName.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(evName);
 
-		rightEvP.add(new JLabel("Event Description"));
-		evDescription = new JTextArea();
+		rightEvP.add(new JLabel("Event Description:"));
+		evDescription = new JTextArea(13, 35);
+		evDescription.setLineWrap(true);
 		JScrollPane descrScrollPane = new JScrollPane(evDescription);
 		rightEvP.add(descrScrollPane);
 
 		createEvB = new JButton("Create Event");
-		createEvB.setSize(80, 40);
 		modifyEvB = new JButton("Modify Event");
 		deleteEvB = new JButton("Delete Event");
+
+		modifyEvB.setEnabled(false);
+		deleteEvB.setEnabled(false);
+
+		createEvB.addActionListener(this);
+		modifyEvB.addActionListener(this);
+		deleteEvB.addActionListener(this);
 
 		rightEvP.add(createEvB);
 		rightEvP.add(modifyEvB);
@@ -230,8 +266,79 @@ public class MainT implements Runnable, ActionListener {
 	// -------------------- CLUB PROFILE PANEL-------------------------------
 
 	public JPanel createProfilePanel() {
-		JPanel profileP = new JPanel();
-		return profileP;
+		JPanel leftProfileP = new JPanel();
+		leftProfileP.setLayout(new BoxLayout(leftProfileP, BoxLayout.Y_AXIS));
+		leftProfileP.setBorder(BorderFactory.createTitledBorder("Club Data"));
+		
+		JPanel nP = new JPanel();
+		//nP.setBackground(Color.WHITE);
+		JPanel sP = new JPanel();
+		//sP.setBackground(Color.WHITE);
+		JPanel aP = new JPanel();
+		//aP.setBackground(Color.WHITE);
+		JPanel tP = new JPanel();
+		//tP.setBackground(Color.WHITE);
+		JPanel uP = new JPanel();
+		//uP.setBackground(Color.WHITE);
+		JPanel pP = new JPanel();
+		//pP.setBackground(Color.WHITE);
+		JPanel cP = new JPanel();
+		//cP.setBackground(Color.WHITE);
+		JPanel bP = new JPanel();
+		//bP.setBackground(Color.WHITE);
+		
+		nameR = new JTextField(20);
+		nameR.setBackground(new Color(255,215,0));
+		surnameR = new JTextField(20);
+		surnameR.setBackground(Color.yellow);
+		addressR = new JTextField(20);
+		addressR.setBackground(Color.yellow);
+		telR = new JTextField(20);
+		telR.setBackground(Color.yellow);
+		userR = new JTextField(20);
+		userR.setBackground(Color.yellow);
+		pwdR = new JPasswordField(20);
+		pwdR.setBackground(Color.yellow);
+		confPwdR = new JPasswordField(20);
+		confPwdR.setBackground(Color.yellow);
+		modifyProfB = new JButton("Save Changes");
+		modifyProfB.addActionListener(this);
+
+		//TODO load clubs data from server
+		nP.add(new JLabel("Owner Name:      "));
+		nP.add(nameR);
+		leftProfileP.add(nP);
+
+		sP.add(new JLabel("Owner Surname:"));
+		sP.add(surnameR);
+		leftProfileP.add(sP);
+		
+		aP.add(new JLabel("Club Address:     "));
+		aP.add(addressR);
+		leftProfileP.add(aP);
+		
+		tP.add(new JLabel("Club Tel.:              "));
+		tP.add(telR);
+		leftProfileP.add(tP);
+		
+		uP.add(new JLabel("Club Name:          "));
+		uP.add(userR);
+		leftProfileP.add(uP);
+		
+		pP.add(new JLabel("Password:            "));
+		pP.add(pwdR);
+		leftProfileP.add(pP);
+		
+		cP.add(new JLabel("Confirm Pwd:       "));
+		cP.add(confPwdR);
+		leftProfileP.add(cP);
+		
+		bP.add(new JLabel("                     "));
+		bP.add(modifyProfB);
+		leftProfileP.add(bP);
+
+		leftProfileP.setVisible(true);
+		return leftProfileP;
 	}
 
 	// ******************************************************************************
@@ -240,9 +347,12 @@ public class MainT implements Runnable, ActionListener {
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
+		mainFrame.setPreferredSize(new Dimension(800, 400));
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setJMenuBar(createMenu());
+		mainFrame.setResizable(false);
 
+		mainFrame.setJMenuBar(createMenu());
+		
 		tabPanel = new JTabbedPane();
 
 		mainFrame.add(tabPanel, BorderLayout.CENTER);
@@ -252,7 +362,7 @@ public class MainT implements Runnable, ActionListener {
 		tabPanel.add("Profile", createProfilePanel());
 
 		mainFrame.pack();
-		mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		//mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setVisible(true);
 	}
 
@@ -272,6 +382,31 @@ public class MainT implements Runnable, ActionListener {
 						"Paperino", "Minnie" };
 				usersJList.setListData(users);
 			}
+		}
+		if (event == createEvB) {
+			// TODO sinc with server
+			String newEv = evName.getText();
+			if (newEv.equals("")) {
+				JOptionPane.showMessageDialog(mainFrame,
+						"Type a correct event name to preceed.",
+						"Creation Error!", JOptionPane.ERROR_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
+						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		if (event == modifyEvB) {
+			// TODO sinc with server
+			String selEv = eventJList2.getSelectedValue().toString();
+			JOptionPane.showMessageDialog(mainFrame, "Modified succesfully "
+					+ selEv, "Modified!", JOptionPane.INFORMATION_MESSAGE);
+
+		}
+		if (event == deleteEvB) {
+			// TODO sinc with server
+			String selEv = eventJList2.getSelectedValue().toString();
+			JOptionPane.showMessageDialog(mainFrame, "Deleted succesfully"
+					+ selEv, "Deleted!", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 		if (event == credits) {
@@ -365,7 +500,34 @@ public class MainT implements Runnable, ActionListener {
 		}
 	}
 
+	public void valueChanged(ListSelectionEvent e) {
+		if (e.getSource() == eventJList) {
+			if (eventJList.getSelectedValue() != null) {
+				sendMessB.setEnabled(true);
+				String selection = eventJList.getSelectedValue().toString();
+				// TODO collegati al server e ritorna una lista di utenti per
+				// l'evento selezionato
+				String users[] = { "selection: " + selection, "Pippo", "Pluto",
+						"Paperino", "Minnie" };
+				usersJList.setListData(users);
+			}
+		}
+		// TODO sistemare il controllo..
+		if (e.getSource() == eventJList2) {
+			modifyEvB.setEnabled(true);
+			deleteEvB.setEnabled(true);
+
+			evName.setText(((JList) e.getSource()).getSelectedValue()
+					.toString());
+			// TODO inserire i dati dell'evento prelevati dal server
+			evDescription.setText("Descrizione di "
+					+ ((JList) e.getSource()).getSelectedValue().toString());
+
+		}
+	}
+
 	public static void main(String[] args) {
 		new Thread(new MainT("Barone Rosso")).start();
 	}
+
 }
