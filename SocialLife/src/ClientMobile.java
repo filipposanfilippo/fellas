@@ -31,6 +31,7 @@ class ClientMobile extends UnicastRemoteObject {
 			byte[] receiveData = new byte[1024];
 			byte[] sendData = new byte[1024];
 			int pointer = 0;
+			String serverAnswer = new String();
 			DatagramPacket receivePacket = new DatagramPacket(receiveData,
 					receiveData.length);
 			serverSocket.receive(receivePacket);
@@ -64,7 +65,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nage: " + age);
 				System.out.println("\nstate: " + state);
 				// invoke remote method
-				// client.register(phone, username, password, sex, age);
+				// serverAnswer = client.register(phone, username, password, sex, age);
 				break;
 			case 'e' | 'E':
 				System.out.println("\nEVENTSLIST: ");
@@ -76,7 +77,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckE);
 				System.out.println("\ncriterion: " + criterionE);
 				// invoke remote method
-				// client.eventsList(phoneCheckE, criterionE);
+				// serverAnswer = client.eventsList(phoneCheckE, criterionE);
 				break;
 			case 'j' | 'J':
 				System.out.println("\nJOIN EVENT: ");
@@ -88,7 +89,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckJ);
 				System.out.println("\neventCode: " + eventCode);
 				// invoke remote method
-				// client.joinEvent(phoneCheckJ, eventCode);
+				// serverAnswer = client.joinEvent(phoneCheckJ, eventCode);
 				break;
 			case 'i' | 'I':
 				System.out.println("\nINVITE FRIEND: ");
@@ -100,7 +101,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckI);
 				System.out.println("\nfriendPhone: " + friendPhone);
 				// invoke remote method
-				// client.inviteFriend( phoneCheckI, friendPhone);
+				// serverAnswer = client.inviteFriend( phoneCheckI, friendPhone);
 				break;
 			case 'm' | 'M':
 				System.out.println("\nMY LOCATION: ");
@@ -112,7 +113,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckM);
 				System.out.println("\nmyLocation: " + myLocation);
 				// invoke remote method
-				// client.myLocation(phoneCheckM, myLocation);
+				// serverAnswer = client.myLocation(phoneCheckM, myLocation);
 				break;
 			case 'u' | 'U':
 				System.out.println("\nUSERS LIST: ");
@@ -124,7 +125,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckU);
 				System.out.println("\ncriterion: " + criterionU);
 				// invoke remote method
-				// client.userList(phoneCheckU, criterionU);
+				// serverAnswer = client.userList(phoneCheckU, criterionU);
 				break;
 			case 'b' | 'B':
 				System.out.println("\nBROADCAST MY STATUS: ");
@@ -136,7 +137,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckB);
 				System.out.println("\ncriterion: " + criterionB);
 				// invoke remote method
-				// client.broadcastMyStatus(phoneCheckB, String criterionB);
+				// serverAnswer = client.broadcastMyStatus(phoneCheckB, String criterionB);
 				break;
 			case 'c' | 'C':
 				System.out.println("\nCHAT UP: ");
@@ -148,13 +149,14 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckC);
 				System.out.println("\nnicknameC: " + nicknameC);
 				// invoke remote method
-				// client.chatUp(phoneCheckC, nicknameC);
+				// serverAnswer = client.chatUp(phoneCheckC, nicknameC);
 				break;
 			}
 			InetAddress IPAddress = receivePacket.getAddress();
 			int port = receivePacket.getPort();
-			String capitalizedSentence = sentence.toUpperCase();
-			sendData = capitalizedSentence.getBytes();
+			//String capitalizedSentence = sentence.toUpperCase();
+			//sendData = capitalizedSentence.getBytes();
+			sendData = serverAnswer.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(sendData,
 					sendData.length, IPAddress, port);
 			serverSocket.send(sendPacket);
