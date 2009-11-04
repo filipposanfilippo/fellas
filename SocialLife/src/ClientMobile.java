@@ -16,8 +16,8 @@ class ClientMobile extends UnicastRemoteObject {
 	public static void main(String args[]) throws RemoteException,
 			MalformedURLException, NotBoundException {
 		// invoke remote methods
-		setServer((ClientMobileInterface) Naming.lookup("//" + host
-				+ "/ClnMobile"));
+		setServer((ServerInterface) Naming.lookup("//" + host
+				+ "/SvrMobile"));
 		ClientMobile client = new ClientMobile();
 		// to parser gms
 		DatagramSocket serverSocket = new DatagramSocket(4444); // crea un
