@@ -176,16 +176,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new MyEvent(nameEvent, description);
 	}
 
-	public static void main(String[] args) throws RemoteException,
-			MalformedURLException, NotBoundException {
-		try {
-			Naming.rebind("SvrMobile", new Server());
-			System.out.println("Server is ready");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public boolean broadcastMyStatus(String senderPhone, String criterion)
 			throws RemoteException {
@@ -247,4 +237,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public static void main(String[] args) throws RemoteException,
+			MalformedURLException, NotBoundException {
+		try {
+			Naming.rebind("SvrMobile", new Server());
+			System.out.println("Server is ready");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }
