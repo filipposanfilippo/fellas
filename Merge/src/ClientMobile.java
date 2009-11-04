@@ -1,11 +1,14 @@
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 class ClientMobile extends UnicastRemoteObject {
-	private static ClientMobileInterface client;
+	private static ServerInterface server;
 	private static String host = "localhost";
 
 	protected ClientMobile() throws RemoteException {
@@ -13,11 +16,10 @@ class ClientMobile extends UnicastRemoteObject {
 		// TODO Auto-generated constructor stub
 	}
 
-	public static void main(String args[]) throws RemoteException,
-			MalformedURLException, NotBoundException {
+	public static void main(String args[]) throws NotBoundException,
+			IOException {
 		// invoke remote methods
-		setServer((ServerInterface) Naming.lookup("//" + host
-				+ "/SvrMobile"));
+		server = (ServerInterface) Naming.lookup("//" + host + "/SvrMobile");
 		ClientMobile client = new ClientMobile();
 		// to parser gms
 		DatagramSocket serverSocket = new DatagramSocket(4444); // crea un
@@ -65,7 +67,8 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nage: " + age);
 				System.out.println("\nstate: " + state);
 				// invoke remote method
-				// serverAnswer = client.register(phone, username, password, sex, age);
+				// serverAnswer = client.register(phone, username, password,
+				// sex, age);
 				break;
 			case 'e' | 'E':
 				System.out.println("\nEVENTSLIST: ");
@@ -101,7 +104,8 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckI);
 				System.out.println("\nfriendPhone: " + friendPhone);
 				// invoke remote method
-				// serverAnswer = client.inviteFriend( phoneCheckI, friendPhone);
+				// serverAnswer = client.inviteFriend( phoneCheckI,
+				// friendPhone);
 				break;
 			case 'm' | 'M':
 				System.out.println("\nMY LOCATION: ");
@@ -137,7 +141,8 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckB);
 				System.out.println("\ncriterion: " + criterionB);
 				// invoke remote method
-				// serverAnswer = client.broadcastMyStatus(phoneCheckB, String criterionB);
+				// serverAnswer = client.broadcastMyStatus(phoneCheckB, String
+				// criterionB);
 				break;
 			case 'c' | 'C':
 				System.out.println("\nCHAT UP: ");
@@ -154,8 +159,8 @@ class ClientMobile extends UnicastRemoteObject {
 			}
 			InetAddress IPAddress = receivePacket.getAddress();
 			int port = receivePacket.getPort();
-			//String capitalizedSentence = sentence.toUpperCase();
-			//sendData = capitalizedSentence.getBytes();
+			// String capitalizedSentence = sentence.toUpperCase();
+			// sendData = capitalizedSentence.getBytes();
 			sendData = serverAnswer.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(sendData,
 					sendData.length, IPAddress, port);
