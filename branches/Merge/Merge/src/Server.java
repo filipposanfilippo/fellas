@@ -185,4 +185,66 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public boolean broadcastMyStatus(String senderPhone, String criterion)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean chatUp(String senderPhone, String nickname)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean checkRegistration(String phoneNumber) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String eventsList(String senderPhone, String criterion)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean inviteFriend(String senderPhone, String friendPhone)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean joinEvent(String senderPhone, String eventCode)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean myLocation(String senderPhone, String myLocation)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mobileRegistration(String senderPhone, String username,
+			String password, String sex, String age) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String userList(String senderPhone, String criterion)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
