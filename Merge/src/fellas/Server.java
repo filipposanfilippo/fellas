@@ -1,3 +1,5 @@
+package fellas;
+
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 
 public class Server extends UnicastRemoteObject implements ServerInterface {
 	protected ArrayList<MobileUser> mobileList = new ArrayList<MobileUser>();
@@ -51,7 +54,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean access(String cName, String psw) throws RemoteException {
+	public boolean access(String cName, char[] psw) throws RemoteException {
 		try {
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "' AND psw='"
 					+ psw + "'";
@@ -79,7 +82,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public boolean clubRegistration(String oName, String oSurname,
-			String cAddress, String cTel, String cName, String psw)
+			String cAddress, String cTel, String cName, char[] psw)
 			throws RemoteException {
 		if (isClubExisting(oName))
 			return false;
@@ -93,24 +96,24 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ cAddress
 					+ "','" + cTel + "','" + cName + "','" + psw + "')";
 			statement = connection.createStatement();
-			return statement.execute(query);
+			statement.execute(query);
+			return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 			return false;
 		}
 	}
 
+	// TODO check whether it's working or not...
 	public boolean isClubExisting(String cName) {
 		try {
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next())
-				return true;
-			return false;
+			return rs.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			return true;
 		}
 	}
 
@@ -149,7 +152,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return event;
 	}
 
-	public String showClubEvent(String name, String psw) throws RemoteException {
+	public String showClubEvent(String name, char[] psw) throws RemoteException {
 		// TODO to change, now it's only for debug
 		// if (authenticationClub(name,psw)==false)
 		// return null; //TODO return an error message instead null
@@ -163,7 +166,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return event;
 	}
 
-	public boolean addEvent(String name, String psw, MyEvent e)
+	public boolean addEvent(String name, char[] psw, MyEvent e)
 			throws RemoteException {
 		// TODO Auto-generated method stub
 		// if (authenticationClub(name,psw)==false)
