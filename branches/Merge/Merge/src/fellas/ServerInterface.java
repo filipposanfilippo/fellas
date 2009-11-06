@@ -1,3 +1,5 @@
+package fellas;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -11,19 +13,19 @@ public interface ServerInterface extends Remote {
 
 	public ClubUser[] getClubList(String sqlString) throws RemoteException;
 
-	public boolean access(String name, String psw) throws RemoteException;
+	public boolean access(String name, char[] cs) throws RemoteException;
 
 	public boolean clubRegistration(String oName, String oSurname,
-			String cAddress, String cTel, String cName, String psw)
+			String cAddress, String cTel, String cName, char[] cs)
 			throws RemoteException;
 
 	public String showClub() throws RemoteException;
 
 	public String showEvent() throws RemoteException;
 
-	public String showClubEvent(String name, String psw) throws RemoteException;
+	public String showClubEvent(String name, char[] psw) throws RemoteException;
 
-	public boolean addEvent(String name, String psw, MyEvent e)
+	public boolean addEvent(String name, char[] psw, MyEvent e)
 			throws RemoteException;
 
 	// public boolean registerMobile() throws RemoteException;

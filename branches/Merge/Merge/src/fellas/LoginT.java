@@ -1,9 +1,12 @@
+package fellas;
+
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
 
 public class LoginT implements Runnable, ActionListener {
 	ClientClub currentClub;
@@ -137,7 +141,7 @@ public class LoginT implements Runnable, ActionListener {
 
 		if (event == registerB) {
 			// checks whether confirm psw is the same of psw or not
-			if (!pwdR.getText().equals(confPwdR.getText())) {
+			if (!Arrays.equals(pwdR.getPassword(), confPwdR.getPassword())) {
 				JOptionPane.showMessageDialog(null,
 						"Passwords are different, check and try again!",
 						"Registration Refused", JOptionPane.ERROR_MESSAGE);
@@ -145,18 +149,24 @@ public class LoginT implements Runnable, ActionListener {
 				// TODO collegati al server ed effettua la registrazione
 				boolean isRegistrationCorrect = false;
 				try {
-					isRegistrationCorrect = currentClub.clubRegistration(nameR
-							.getText(), surnameR.getText(), addressR.getText(),
-							telR.getText(), userR.getText(), pwdR.getText());
+					isRegistrationCorrect = currentClub
+							.clubRegistration(nameR.getText(), surnameR
+									.getText(), addressR.getText(), telR
+									.getText(), userR.getText(), pwdR
+									.getPassword());
 					if (isRegistrationCorrect) {
 						JOptionPane.showMessageDialog(null,
 								"Welcome to Diana: Feel Like Doing...",
 								"Registered!", JOptionPane.INFORMATION_MESSAGE);
 					} else {
-						JOptionPane.showMessageDialog(null,
-								"Check Data and Try Again.",
-								"Registration Refused",
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"Registration refused by server.\n"
+												+ "Try to check whether the Club is already"
+												+ " registered and try again.",
+										"Registration Refused",
+										JOptionPane.ERROR_MESSAGE);
 					}
 				} catch (RemoteException e1) {
 					JOptionPane.showMessageDialog(null,
@@ -170,7 +180,8 @@ public class LoginT implements Runnable, ActionListener {
 			// TODO collegati al server ed effettua il login
 			boolean isLogged = false;
 			try {
-				isLogged = currentClub.access(userL.getText(), pwdL.getText());
+				isLogged = currentClub.access(userL.getText(), pwdL
+						.getPassword());
 				// System.out.println("Logged = " + isLogged);
 				if (isLogged) {
 					JOptionPane.showMessageDialog(null,

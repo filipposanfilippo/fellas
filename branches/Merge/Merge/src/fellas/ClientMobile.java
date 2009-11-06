@@ -1,3 +1,4 @@
+package fellas;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -6,6 +7,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
 
 class ClientMobile extends UnicastRemoteObject {
 	private static ServerInterface server;
