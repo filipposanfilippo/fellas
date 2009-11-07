@@ -38,6 +38,8 @@ public class LoginT implements Runnable, ActionListener {
 	JTextField surnameR;
 	JTextField addressR;
 	JTextField telR;
+	JTextField emailR;
+	JTextField typeR;
 	JTextField userR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
@@ -85,13 +87,15 @@ public class LoginT implements Runnable, ActionListener {
 
 	private JPanel createLeftPanel() {
 		JPanel leftP = new JPanel();
-		leftP.setLayout(new GridLayout(8, 2));
+		leftP.setLayout(new GridLayout(10, 2));
 		leftP.setBorder(BorderFactory.createTitledBorder("Registration"));
 
 		nameR = new JTextField(10);
 		surnameR = new JTextField(10);
 		addressR = new JTextField(10);
 		telR = new JTextField(10);
+		emailR = new JTextField(10);
+		typeR = new JTextField(10);
 		userR = new JTextField(10);
 		pwdR = new JPasswordField(10);
 		confPwdR = new JPasswordField(10);
@@ -106,6 +110,10 @@ public class LoginT implements Runnable, ActionListener {
 		leftP.add(addressR);
 		leftP.add(new JLabel("Club Tel.:"));
 		leftP.add(telR);
+		leftP.add(new JLabel("Club E-Mail:"));
+		leftP.add(emailR);
+		leftP.add(new JLabel("Club Type:"));
+		leftP.add(typeR);
 		leftP.add(new JLabel("Club Name:"));
 		leftP.add(userR);
 		leftP.add(new JLabel("Password:"));
@@ -150,8 +158,8 @@ public class LoginT implements Runnable, ActionListener {
 				try {
 					isRegistrationCorrect = currentClub.clubRegistration(nameR
 							.getText(), surnameR.getText(), addressR.getText(),
-							telR.getText(), userR.getText(), new String(pwdR
-									.getPassword()));
+							telR.getText(), emailR.getText(), typeR.getText(),
+							userR.getText(), new String(pwdR.getPassword()));
 					if (isRegistrationCorrect) {
 						JOptionPane.showMessageDialog(null,
 								"Welcome to Diana: Feel Like Doing...",
