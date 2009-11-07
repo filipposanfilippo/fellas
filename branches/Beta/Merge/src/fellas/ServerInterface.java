@@ -2,16 +2,11 @@ package fellas;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.LinkedList;
 
 public interface ServerInterface extends Remote {
 	public boolean authenticationClub(String name, String psw)
 			throws RemoteException;
-
-	public boolean authenticationMobile() throws RemoteException;
-
-	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
-
-	public ClubUser[] getClubList(String sqlString) throws RemoteException;
 
 	public boolean access(String name, String cs) throws RemoteException;
 
@@ -19,11 +14,13 @@ public interface ServerInterface extends Remote {
 			String cAddress, String cTel, String cName, String psw)
 			throws RemoteException;
 
-	public String showClub() throws RemoteException;
+	public Club getClubData(String clubName) throws RemoteException;
 
-	public String showEvent() throws RemoteException;
+	public LinkedList<Club> getClubList() throws RemoteException;
 
-	public String showClubEvent(String name, String psw) throws RemoteException;
+	public boolean authenticationMobile() throws RemoteException;
+
+	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
 
 	public boolean addEvent(String name, String psw, MyEvent e)
 			throws RemoteException;

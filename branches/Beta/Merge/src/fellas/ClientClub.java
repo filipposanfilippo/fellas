@@ -5,15 +5,16 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.LinkedList;
 
 public class ClientClub extends UnicastRemoteObject {
 	private ServerInterface server;
 	private String host = "localhost";
-	private String name = "";
+	private String clubName = "";
 	private String psw;
 
 	public String getName() {
-		return name;
+		return clubName;
 	}
 
 	public String getPsw() {
@@ -28,7 +29,7 @@ public class ClientClub extends UnicastRemoteObject {
 	protected boolean access(String name, String cs) throws RemoteException {
 		boolean res = server.access(name, cs);
 		if (res) {
-			this.name = name;
+			this.clubName = name;
 			this.psw = cs;
 		}
 		return res;
@@ -41,11 +42,14 @@ public class ClientClub extends UnicastRemoteObject {
 				psw);
 	}
 
-	protected boolean addEvent(MyEvent e) throws RemoteException {
-		return server.addEvent(name, psw, e);
+	protected LinkedList<Club> getClubList() throws RemoteException {
+		return server.getClubList();
 	}
 
-	protected String showClubEvent() throws RemoteException {
-		return server.showClubEvent(name, psw);
+	protected Club getClubData() throws RemoteException {
+		System.out.println("CAZZU CAZZU");
+		System.out.println(server.getClubData(clubName));
+		return server.getClubData(clubName);
 	}
+
 }
