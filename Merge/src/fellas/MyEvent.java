@@ -8,10 +8,10 @@ import java.rmi.server.UnicastRemoteObject;
 public class MyEvent implements Serializable{
 	String name;
 	String description;
-	ClubUser club;
+	Club club;
 	MobileUser mList[];
 	
-	public MyEvent(String name, String description, ClubUser club){
+	public MyEvent(String name, String description, Club club){
 		super();
 		this.name = name;
 		this.description = description;

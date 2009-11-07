@@ -10,18 +10,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 
 public class Server extends UnicastRemoteObject implements ServerInterface {
-	protected ArrayList<MobileUser> mobileList = new ArrayList<MobileUser>();
-	protected ArrayList<ClubUser> clubList = new ArrayList<ClubUser>();
-	protected ArrayList<MyEvent> eventList = new ArrayList<MyEvent>();
-
-	Connection connection = null;
-	Statement statement = null;
-	String query = "";
-	ResultSet rs = null;
+	private Connection connection = null;
+	private Statement statement = null;
+	private String query = "";
+	private ResultSet rs = null;
 
 	public Server() throws RemoteException {
 		try {
@@ -67,10 +62,41 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
-	public ClubUser[] getClubList(String sqlString) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+	public LinkedList<Club> getClubList() throws RemoteException {
+		LinkedList<Club> clubList = new LinkedList<Club>();
+		try {
+			query = "SELECT * FROM clubs";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			while (rs.next()) {
+				clubList.add(new Club(rs.getString("oName"), rs
+						.getString("oSurname"), rs.getString("cAddress"), rs
+						.getString("cTel"), rs.getString("cName"), rs
+						.getString("psw")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return clubList;
+	}
+
+	public Club getClubData(String clubName) throws RemoteException {
+		try {
+			query = "SELECT * FROM clubs WHERE cName='" + clubName + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next())
+				return new Club(rs.getString("oName"),
+						rs.getString("oSurname"), rs.getString("cAddress"), rs
+								.getString("cTel"), rs.getString("cName"), rs
+								.getString("psw"));
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getClubData: " + clubName);
+			e.printStackTrace();
+			return new Club();
+		}
+		return new Club();
 	}
 
 	@Override
@@ -116,53 +142,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public MobileUser getMobileUser(String name) {
-		MobileUser c;
-		for (Iterator<MobileUser> i = mobileList.iterator(); i.hasNext();) {
-			c = (MobileUser) i.next();
-			if (c.name.equals(name))
-				return c;
-		}
 		return null;
-	}
-
-	@Override
-	public String showClub() throws RemoteException {
-		// TODO to change, now it's only for debug
-		/*
-		String clubs = "";
-		ClubUser c;
-		for (Iterator<ClubUser> i = clubList.iterator(); i.hasNext();) {
-			c = (ClubUser) i.next();
-			clubs += c.name;
-			System.out.println(c.name);
-		}*/
-		return "";
-	}
-
-	public String showEvent() throws RemoteException {
-		// TODO to change, now it's only for debug
-		String event = "";
-		MyEvent c;
-		for (Iterator<MyEvent> i = eventList.iterator(); i.hasNext();) {
-			c = (MyEvent) i.next();
-			event += c.name;
-			System.out.println(c.name);
-		}
-		return event;
-	}
-
-	public String showClubEvent(String name, String psw) throws RemoteException {
-		// TODO to change, now it's only for debug
-		// if (authenticationClub(name,psw)==false)
-		// return null; //TODO return an error message instead null
-		String event = "";
-		MyEvent c;
-		for (Iterator<MyEvent> i = eventList.iterator(); i.hasNext();) {
-			c = (MyEvent) i.next();
-			event += c.name;
-			System.out.println(c.name);
-		}
-		return event;
 	}
 
 	public boolean addEvent(String name, String psw, MyEvent e)

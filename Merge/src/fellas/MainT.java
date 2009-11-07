@@ -289,25 +289,32 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// cP.setBackground(Color.WHITE);
 		JPanel bP = new JPanel();
 		// bP.setBackground(Color.WHITE);
-
-		nameR = new JTextField(20);
+		
+		Club clubData = new Club();
+		try {
+			clubData = currentClub.getClubData();
+			System.out.println(clubData);
+		} catch (Exception ex) {
+			// TODO add error alert
+		}
+		
+		nameR = new JTextField(clubData.getoName(), 20);
 		nameR.setBackground(new Color(255, 215, 0));
-		surnameR = new JTextField(20);
+		surnameR = new JTextField(clubData.getoSurname(), 20);
 		surnameR.setBackground(Color.yellow);
-		addressR = new JTextField(20);
+		addressR = new JTextField(clubData.getcAddress(), 20);
 		addressR.setBackground(Color.yellow);
-		telR = new JTextField(20);
+		telR = new JTextField(clubData.getcTel(), 20);
 		telR.setBackground(Color.yellow);
-		userR = new JTextField(20);
+		userR = new JTextField(clubData.getcName(), 20);
 		userR.setBackground(Color.yellow);
-		pwdR = new JPasswordField(20);
+		pwdR = new JPasswordField(clubData.getPsw(), 20);
 		pwdR.setBackground(Color.yellow);
-		confPwdR = new JPasswordField(20);
+		confPwdR = new JPasswordField(clubData.getPsw(), 20);
 		confPwdR.setBackground(Color.yellow);
 		modifyProfB = new JButton("Save Changes");
 		modifyProfB.addActionListener(this);
 
-		// TODO load clubs data from server
 		nP.add(new JLabel("Owner Name:      "));
 		nP.add(nameR);
 		leftProfileP.add(nP);
