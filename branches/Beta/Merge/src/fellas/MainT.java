@@ -76,6 +76,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField surnameR;
 	JTextField addressR;
 	JTextField telR;
+	JTextField emailR;
+	JTextField typeR;
 	JTextField userR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
@@ -281,6 +283,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// aP.setBackground(Color.WHITE);
 		JPanel tP = new JPanel();
 		// tP.setBackground(Color.WHITE);
+		JPanel eP = new JPanel();
+		// tP.setBackground(Color.WHITE);
+		JPanel yP = new JPanel();
+		// tP.setBackground(Color.WHITE);
 		JPanel uP = new JPanel();
 		// uP.setBackground(Color.WHITE);
 		JPanel pP = new JPanel();
@@ -289,7 +295,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// cP.setBackground(Color.WHITE);
 		JPanel bP = new JPanel();
 		// bP.setBackground(Color.WHITE);
-		
+
 		Club clubData = new Club();
 		try {
 			clubData = currentClub.getClubData();
@@ -297,7 +303,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		} catch (Exception ex) {
 			// TODO add error alert
 		}
-		
+
 		nameR = new JTextField(clubData.getoName(), 20);
 		nameR.setBackground(new Color(255, 215, 0));
 		surnameR = new JTextField(clubData.getoSurname(), 20);
@@ -306,6 +312,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		addressR.setBackground(Color.yellow);
 		telR = new JTextField(clubData.getcTel(), 20);
 		telR.setBackground(Color.yellow);
+		emailR = new JTextField(clubData.getcEMail(), 20);
+		emailR.setBackground(Color.yellow);
+		typeR = new JTextField(clubData.getcType(), 20);
+		typeR.setBackground(Color.yellow);
 		userR = new JTextField(clubData.getcName(), 20);
 		userR.setBackground(Color.yellow);
 		pwdR = new JPasswordField(clubData.getPsw(), 20);
@@ -314,32 +324,59 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		confPwdR.setBackground(Color.yellow);
 		modifyProfB = new JButton("Save Changes");
 		modifyProfB.addActionListener(this);
+		JLabel lb;
 
-		nP.add(new JLabel("Owner Name:      "));
+		lb = new JLabel("Owner Name:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		nP.add(lb);
 		nP.add(nameR);
 		leftProfileP.add(nP);
 
-		sP.add(new JLabel("Owner Surname:"));
+		lb = new JLabel("Owner Surname:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		sP.add(lb);
 		sP.add(surnameR);
 		leftProfileP.add(sP);
 
-		aP.add(new JLabel("Club Address:     "));
+		lb = new JLabel("Club Address:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		aP.add(lb);
 		aP.add(addressR);
 		leftProfileP.add(aP);
 
-		tP.add(new JLabel("Club Tel.:              "));
+		lb = new JLabel("Club Tel.:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		tP.add(lb);
 		tP.add(telR);
 		leftProfileP.add(tP);
 
-		uP.add(new JLabel("Club Name:          "));
+		lb = new JLabel("Club E-Mail:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		eP.add(lb);
+		eP.add(emailR);
+		leftProfileP.add(eP);
+
+		lb = new JLabel("Club Type:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		yP.add(lb);
+		yP.add(typeR);
+		leftProfileP.add(yP);
+
+		lb = new JLabel("Club Name:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		uP.add(lb);
 		uP.add(userR);
 		leftProfileP.add(uP);
 
-		pP.add(new JLabel("Password:            "));
+		lb = new JLabel("Password:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		pP.add(lb);
 		pP.add(pwdR);
 		leftProfileP.add(pP);
 
-		cP.add(new JLabel("Confirm Pwd:       "));
+		lb = new JLabel("Confirm Pwd:");
+		lb.setPreferredSize(new Dimension(100, 20));
+		cP.add(lb);
 		cP.add(confPwdR);
 		leftProfileP.add(cP);
 

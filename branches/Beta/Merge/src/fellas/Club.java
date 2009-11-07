@@ -9,6 +9,8 @@ public class Club implements Serializable {
 	private String oSurname;
 	private String cAddress;
 	private String cTel;
+	private String cEMail;
+	private String cType;
 	private String cName;
 	private String psw;
 
@@ -21,6 +23,8 @@ public class Club implements Serializable {
 		this.oSurname = oSurname;
 		this.cAddress = cAddress;
 		this.cTel = cTel;
+		this.cEMail = cEMail;
+		this.cType = cType;
 		this.cName = cName;
 		this.psw = psw;
 	}
@@ -31,6 +35,8 @@ public class Club implements Serializable {
 		this.oSurname = "";
 		this.cAddress = "";
 		this.cTel = "";
+		this.cEMail = "";
+		this.cType = "";
 		this.cName = "";
 		this.psw = "";
 	}
@@ -59,6 +65,22 @@ public class Club implements Serializable {
 		this.cAddress = cAddress;
 	}
 
+	public String getcType() {
+		return cType;
+	}
+
+	public void setcType(String cType) {
+		this.cType = cType;
+	}
+
+	public String getcEMail() {
+		return cEMail;
+	}
+
+	public void setcEMail(String cEMail) {
+		this.cEMail = cEMail;
+	}
+
 	public String getcTel() {
 		return cTel;
 	}
@@ -84,9 +106,8 @@ public class Club implements Serializable {
 	}
 
 	public String toString() {
-		return "Club [cAddress=" + cAddress + ", cName=" + cName + ", cTel="
-				+ cTel + ", oName=" + oName + ", oSurname=" + oSurname
-				+ ", psw=" + psw + "]";
+		return "Club [cAddress=" + cAddress + ", cEMail=" + cEMail + ", cName="
+				+ cName + ", cTel=" + cTel + ", cType=" + cType + ", oName="
+				+ oName + ", oSurname=" + oSurname + ", psw=" + psw + "]";
 	}
-
 }

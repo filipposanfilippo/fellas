@@ -36,10 +36,10 @@ public class ClientClub extends UnicastRemoteObject {
 	}
 
 	protected boolean clubRegistration(String oName, String oSurname,
-			String cAddress, String cTel, String cName, String psw)
-			throws RemoteException {
-		return server.clubRegistration(oName, oSurname, cAddress, cTel, cName,
-				psw);
+			String cAddress, String cTel, String cEMail, String cType,
+			String cName, String psw) throws RemoteException {
+		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
+				cType, cName, psw);
 	}
 
 	protected LinkedList<Club> getClubList() throws RemoteException {
@@ -47,8 +47,6 @@ public class ClientClub extends UnicastRemoteObject {
 	}
 
 	protected Club getClubData() throws RemoteException {
-		System.out.println("CAZZU CAZZU");
-		System.out.println(server.getClubData(clubName));
 		return server.getClubData(clubName);
 	}
 

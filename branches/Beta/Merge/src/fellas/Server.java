@@ -106,8 +106,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public boolean clubRegistration(String oName, String oSurname,
-			String cAddress, String cTel, String cName, String psw)
-			throws RemoteException {
+			String cAddress, String cTel, String cEMail, String cType,
+			String cName, String psw) throws RemoteException {
 		if (isClubExisting(oName))
 			return false;
 		try {
