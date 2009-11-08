@@ -119,17 +119,17 @@ class ClientMobile extends UnicastRemoteObject {
 				// friendPhone);
 				served = true;
 				break;
-			case 'm' | 'M':
-				System.out.println("\nMY LOCATION: ");
-				// check registration by phone
-				String phoneCheckM = new String(sentence.substring(sentence
+			case 'l' | 'L':
+				System.out.println("\nSET LOCATION: ");
+				// check registration by phone  --> it will be done in Server.java
+				String uTelL = new String(sentence.substring(sentence
 						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String myLocation = new String(sentence.substring(sentence
+				String uLocationL = new String(sentence.substring(sentence
 						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + phoneCheckM);
-				System.out.println("\nmyLocation: " + myLocation);
+				System.out.println("\nphone: " + uTelL);
+				System.out.println("\nmyLocation: " + uLocationL);
 				// invoke remote method
-				// serverAnswer = client.myLocation(phoneCheckM, myLocation);
+				serverAnswer = server.setLocation(uTelL, uLocationL);
 				served = true;
 				break;
 			case 'u' | 'U':
