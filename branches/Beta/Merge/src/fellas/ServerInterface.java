@@ -32,8 +32,8 @@ public interface ServerInterface extends Remote {
 
 	// __________________________
 
-	public boolean mobileRegistration(String senderPhone, String username,
-			String password, String sex, String age) throws RemoteException;
+	public String mobileRegistration(String uTel, String username,
+			String psw, String uSex, String uAge, String uLocation) throws RemoteException;
 
 	public String eventsList(String senderPhone, String criterion)
 			throws RemoteException;

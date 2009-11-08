@@ -141,6 +141,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	// added by Fil
+	public boolean isUserExisting(String uTel) {
+		try {
+			query = "SELECT * FROM users WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			return rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return true;
+		}
+	}
+
 	public MobileUser getMobileUser(String name) {
 		return null;
 	}
@@ -207,10 +220,26 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean mobileRegistration(String senderPhone, String username,
-			String password, String sex, String age) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+	public String mobileRegistration(String uTel, String username,
+			String psw, String uSex, String uAge, String uLocation) throws RemoteException {
+		if (isUserExisting(uTel))
+			return "Already registered";
+		try {
+			query = "INSERT INTO users (uTel,username,psw,uSex,uAge, uLocation)"
+					+ "VALUES ('"
+					+ uTel
+					+ "','"
+					+ username
+					+ "','"
+					+ psw
+					+ "','" + uSex + "','" + uAge + "', '" + uLocation + "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return "Welcome to Diana, you can now use our services%";
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			return "Registration error%";
+		}
 	}
 
 	@Override
