@@ -199,7 +199,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean inviteFriend(String senderPhone, String friendPhone)
+	public boolean inviteFriend(String senderPhone, String friendPhone, String event)
 			throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
@@ -213,15 +213,26 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean myLocation(String senderPhone, String myLocation)
+	public String setLocation(String uTel, String uLocation)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		// if(!checkRegistration())
+		// return "You are not registered, please register";
+
+		try {
+			query = "UPDATE users SET uLocation = '" + uLocation
+					+ "' WHERE uTel = '" + uTel + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return "Location updated%";
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			return "Location update error%";
+		}
 	}
 
 	@Override
-	public String mobileRegistration(String uTel, String username,
-			String psw, String uSex, String uAge, String uLocation) throws RemoteException {
+	public String mobileRegistration(String uTel, String username, String psw,
+			String uSex, String uAge, String uLocation) throws RemoteException {
 		if (isUserExisting(uTel))
 			return "Already registered";
 		try {

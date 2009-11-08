@@ -41,10 +41,10 @@ public interface ServerInterface extends Remote {
 	public boolean joinEvent(String senderPhone, String eventCode)
 			throws RemoteException;
 
-	public boolean inviteFriend(String senderPhone, String friendPhone)
+	public boolean inviteFriend(String senderPhone, String friendPhone, String event)
 			throws RemoteException;
 
-	public boolean myLocation(String senderPhone, String myLocation)
+	public String setLocation(String uTel, String uLocation)
 			throws RemoteException;
 
 	public String userList(String senderPhone, String criterion)
