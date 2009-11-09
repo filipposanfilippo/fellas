@@ -316,24 +316,26 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			// TODO add error alert
 		}
 
+		Color color = new Color(255, 215, 0);
+		Color colorEnf = new Color(255, 255, 100);
 		nameR = new JTextField(clubData.getoName(), 20);
-		nameR.setBackground(new Color(255, 215, 0));
+		nameR.setBackground(color);
 		surnameR = new JTextField(clubData.getoSurname(), 20);
-		surnameR.setBackground(Color.yellow);
+		surnameR.setBackground(color);
 		addressR = new JTextField(clubData.getcAddress(), 20);
-		addressR.setBackground(Color.yellow);
+		addressR.setBackground(color);
 		telR = new JTextField(clubData.getcTel(), 20);
-		telR.setBackground(Color.yellow);
+		telR.setBackground(color);
 		emailR = new JTextField(clubData.getcEMail(), 20);
-		emailR.setBackground(Color.yellow);
+		emailR.setBackground(color);
 		typeR = new JTextField(clubData.getcType(), 20);
-		typeR.setBackground(Color.yellow);
+		typeR.setBackground(color);
 		userR = new JTextField(clubData.getcName(), 20);
-		userR.setBackground(Color.yellow);
+		userR.setBackground(colorEnf);
 		pwdR = new JPasswordField(clubData.getPsw(), 20);
-		pwdR.setBackground(Color.yellow);
+		pwdR.setBackground(colorEnf);
 		confPwdR = new JPasswordField(clubData.getPsw(), 20);
-		confPwdR.setBackground(Color.yellow);
+		confPwdR.setBackground(colorEnf);
 		modifyProfB = new JButton("Save Changes");
 		modifyProfB.addActionListener(this);
 		JLabel lb;
