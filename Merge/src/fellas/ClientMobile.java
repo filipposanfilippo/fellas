@@ -132,6 +132,19 @@ class ClientMobile extends UnicastRemoteObject {
 				serverAnswer = server.setLocation(uTelL, uLocationL);
 				served = true;
 				break;
+			case 's' | 'S':
+				System.out.println("\nSET STATUS: ");
+				// check registration by phone  --> it will be done in Server.java
+				String uTelS = new String(sentence.substring(sentence
+						.indexOf("from") + 5, sentence.indexOf(':') - 1));
+				String uStatusS = new String(sentence.substring(sentence
+						.indexOf('&') + 1, sentence.indexOf('$')));
+				System.out.println("\nphone: " + uTelS);
+				System.out.println("\nmyLocation: " + uStatusS);
+				// invoke remote method
+				serverAnswer = server.setStatus(uTelS, uStatusS);
+				served = true;
+				break;
 			case 'u' | 'U':
 				System.out.println("\nUSERS LIST: ");
 				// check registration by phone
@@ -155,8 +168,7 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckB);
 				System.out.println("\ncriterion: " + criterionB);
 				// invoke remote method
-				// serverAnswer = client.broadcastMyStatus(phoneCheckB, String
-				// criterionB);
+				serverAnswer = server.broadcastMyStatus(phoneCheckB, criterionB+'$');
 				served = true;
 				break;
 			case 'c' | 'C':
