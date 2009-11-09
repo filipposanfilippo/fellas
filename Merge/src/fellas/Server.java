@@ -159,12 +159,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						rs.getString("eStartTime"),
 						rs.getString("eFinishTime"), rs
 								.getString("eRestriction")));
+			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
 			e.printStackTrace();
 			return null;
 		}
-		return null;
 	}
 
 	@Override
@@ -208,18 +208,27 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eDate, String eStartTime, String eFinishTime,
 			String eRestriction) throws RemoteException {
 		try {
-			query = "INSERT INTO users (cId,eName,eShortDescription,eLongDescription," +
-					"eLocation,ecategory,eDate,eStartTime,eFinishTime)"
+			query = "INSERT INTO users (cId,eName,eShortDescription,eLongDescription,"
+					+ "eLocation,ecategory,eDate,eStartTime,eFinishTime)"
 					+ "VALUES ('"
-					+ cId + "','"
-					+ eName + "','"
-					+ eShortDescription + "','"
-					+ eLongDescription + "','"
-					+ eLocation + "','"
-					+ eCategory + "','"
-					+ eDate + "','"
-					+ eStartTime + "','"
-					+ eFinishTime + "','"
+					+ cId
+					+ "','"
+					+ eName
+					+ "','"
+					+ eShortDescription
+					+ "','"
+					+ eLongDescription
+					+ "','"
+					+ eLocation
+					+ "','"
+					+ eCategory
+					+ "','"
+					+ eDate
+					+ "','"
+					+ eStartTime
+					+ "','"
+					+ eFinishTime
+					+ "','"
 					+ eRestriction
 					+ "')";
 			statement = connection.createStatement();
@@ -230,21 +239,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public boolean updateEvent(MyEvent event) throws RemoteException {
 		try {
-			query = "UPDATE events SET " 
-					+ "cId='" + event.getcId() + "',"
+			query = "UPDATE events SET " + "cId='" + event.getcId() + "',"
 					+ "eName='" + event.geteName() + "',"
-					+ "eShortDescription='" + event.geteShortDescription() + "',"
-					+ "eLongDescription='" + event.geteLongDescription() + "',"
-					+ "eLocation='" + event.geteLocation() + "',"
-					+ "eCategory='" + event.geteCategory() + "',"
-					+ "eDate='" + event.geteDate() + "',"
-					+ "eStartTime='" + event.geteStartTime() + "',"
-					+ "eFinishTime='" + event.geteFinishTime() + "',"
-					+ "eRestriction='" + event.geteRestriction();
+					+ "eShortDescription='" + event.geteShortDescription()
+					+ "'," + "eLongDescription='" + event.geteLongDescription()
+					+ "'," + "eLocation='" + event.geteLocation() + "',"
+					+ "eCategory='" + event.geteCategory() + "'," + "eDate='"
+					+ event.geteDate() + "'," + "eStartTime='"
+					+ event.geteStartTime() + "'," + "eFinishTime='"
+					+ event.geteFinishTime() + "'," + "eRestriction='"
+					+ event.geteRestriction();
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -253,7 +261,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-
 
 	public boolean deleteEvent(int eventId) throws RemoteException {
 		// TODO write
@@ -425,9 +432,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				return "Any users match with criterion%";
 			while (rs.next())
 				answer += '@' + rs.getString("uTel");
-			answer += '@'+message+'%';
+			answer += '@' + message + '%';
 			return answer;
-				
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "spamMobile error%";

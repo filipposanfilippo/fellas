@@ -170,11 +170,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftUpP.add(new JLabel("                 Users for Selected Event"));
 
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
-		// TODO caricare eventi dal server
-		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
-				"Halloween Night" };
-
-		eventJList = new JList(events);
+		
+		eventJList = new JList(getEventsArray());
 		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eventJList.setBackground(new Color(153, 204, 255));
 		eventJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -222,6 +219,23 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return messageP;
 	}
 
+	private String[] getEventsArray() {
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		try {
+			eventsList = currentClub.getClubEventsList();
+		} catch (Exception ex) {
+			// TODO add error alert
+			ex.printStackTrace();
+		}
+
+		String[] events = new String[eventsList.size()];
+		int i = 0;
+		for (MyEvent e : eventsList) {
+			events[i++] = e.geteName();
+		}
+		return events;
+	}
+
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
@@ -235,18 +249,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
 		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 
-		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		try {
-			eventsList = currentClub.getClubEventsList();
-		} catch (Exception ex) {
-			// TODO add error alert
-		}
-		String[] events = new String[eventsList.size()];
-		int i = 0;
-		for (MyEvent e : eventsList) {
-			events[i++] = e.geteName();
-		}
-		eventJList2 = new JList(events);
+		eventJList2 = new JList(getEventsArray());
 		eventJList2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eventJList2.setBackground(new Color(153, 204, 255));
 		eventJList2.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -275,9 +278,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(eCategory);
 
 		rightEvP.add(new JLabel("Event Date:"));
-		eName = new JTextField();
-		eName.setPreferredSize(new Dimension(390, 20));
-		rightEvP.add(eName);
+		eDate = new JTextField();
+		eDate.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eDate);
 
 		rightEvP.add(new JLabel("Starting Time:"));
 		eStartTime = new JTextField();
