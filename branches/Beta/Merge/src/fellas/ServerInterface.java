@@ -24,14 +24,16 @@ public interface ServerInterface extends Remote {
 
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
 
-	public boolean addEvent(String name, String psw, MyEvent e)
-			throws RemoteException;
+	public boolean createEvent(int cId, String eName, String eShortDescription,
+			String eLongDescription, String eLocation, String eCategory,
+			String eDate, String eStartTime, String eFinishTime,
+			String eRestriction) throws RemoteException;
+
+	public boolean updateEvent(MyEvent event) throws RemoteException;
+
+	public boolean deleteEvent(int eventId) throws RemoteException;
 
 	// public boolean registerMobile() throws RemoteException;
-
-	public MyEvent createEvent(String nameEvent, String description)
-			throws RemoteException;
-
 	// __________________________
 
 	public String mobileRegistration(String uTel, String username, String psw,

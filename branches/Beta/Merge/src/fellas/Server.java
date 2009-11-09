@@ -47,6 +47,29 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return false;
 	}
 
+	public boolean clubRegistration(String oName, String oSurname,
+			String cAddress, String cTel, String cEMail, String cType,
+			String cName, String psw) throws RemoteException {
+		if (isClubExisting(oName))
+			return false;
+		try {
+			query = "INSERT INTO clubs (oName,oSurname,cAddress,cTel,cName,psw)"
+					+ "VALUES ('"
+					+ oName
+					+ "','"
+					+ oSurname
+					+ "','"
+					+ cAddress
+					+ "','" + cTel + "','" + cName + "','" + psw + "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			return false;
+		}
+	}
+
 	@Override
 	public boolean clubAccess(String cName, String psw) throws RemoteException {
 		System.out.println(cName + " : " + psw);
@@ -110,7 +133,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ club.getcType() + "'," + " cName='" + club.getcName()
 					+ "'," + " psw='" + club.getPsw() + "'" + " WHERE id="
 					+ club.getId();
-			//System.out.println(query);
+			// System.out.println(query);
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -120,33 +143,34 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	public LinkedList<MyEvent> getClubEventsList(int cId) {
+		try {
+			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
+			query = "SELECT * FROM events WHERE cId=" + cId;
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+
+			while (rs.next())
+				eventList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+						.getString("eName"), rs.getString("eShortDescription"),
+						rs.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs.getString("eDate"),
+						rs.getString("eStartTime"),
+						rs.getString("eFinishTime"), rs
+								.getString("eRestriction")));
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
+			e.printStackTrace();
+			return null;
+		}
+		return null;
+	}
+
 	@Override
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public boolean clubRegistration(String oName, String oSurname,
-			String cAddress, String cTel, String cEMail, String cType,
-			String cName, String psw) throws RemoteException {
-		if (isClubExisting(oName))
-			return false;
-		try {
-			query = "INSERT INTO clubs (oName,oSurname,cAddress,cTel,cName,psw)"
-					+ "VALUES ('"
-					+ oName
-					+ "','"
-					+ oSurname
-					+ "','"
-					+ cAddress
-					+ "','" + cTel + "','" + cName + "','" + psw + "')";
-			statement = connection.createStatement();
-			statement.execute(query);
-			return true;
-		} catch (SQLException e) {
-			// e.printStackTrace();
-			return false;
-		}
 	}
 
 	// TODO check whether it's working or not...
@@ -179,17 +203,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return null;
 	}
 
-	public boolean addEvent(String name, String psw, MyEvent e)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		// if (authenticationClub(name,psw)==false)
-		// return false;
+	public boolean createEvent(int cId, String eName, String eShortDescription,
+			String eLongDescription, String eLocation, String eCategory,
+			String eDate, String eStartTime, String eFinishTime,
+			String eRestriction) throws RemoteException {
+		// TODO write
 		return true;
 	}
 
-	public MyEvent createEvent(String nameEvent, String description)
-			throws RemoteException {
-		return new MyEvent(nameEvent, description);
+	public boolean updateEvent(MyEvent event) throws RemoteException {
+		// TODO write
+		return true;
+	}
+
+	public boolean deleteEvent(int eventId) throws RemoteException {
+		// TODO write
+		return true;
 	}
 
 	@Override
