@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -15,6 +16,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -82,12 +85,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
 	JButton modifyProfB;
+	JLabel profileStatus;
 
 	// -------------------------------------------
 
 	public MainT(ClientClub currentClub) {
 		this.currentClub = currentClub;
-		this.TITLE = this.TITLE + "(" + currentClub.getName() + " Client)";
+		this.TITLE = this.TITLE + "(" + currentClub.getClubName() + " Client)";
 	}
 
 	private JMenuBar createMenu() {
@@ -137,7 +141,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return menuBar;
 	}
 
-	// ------------------------- MESSAGE PANEL -------------------------------
+	// ******************************************************************************
+	// Message Panel
+	// ******************************************************************************
 
 	private JPanel createMessagePanel() {
 		JPanel messageP = new JPanel();
@@ -208,7 +214,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return messageP;
 	}
 
-	// --------------------- EVENTS PANEL --------------------------------------
+	// ******************************************************************************
+	// Event Panel
+	// ******************************************************************************
 
 	private JPanel createEventsPanel() {
 		JPanel eventsP = new JPanel();
@@ -268,7 +276,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return eventsP;
 	}
 
-	// -------------------- CLUB PROFILE PANEL-------------------------------
+	// ******************************************************************************
+	// Club Profile Panel
+	// ******************************************************************************
 
 	private JPanel createProfilePanel() {
 		JPanel leftProfileP = new JPanel();
@@ -295,10 +305,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// cP.setBackground(Color.WHITE);
 		JPanel bP = new JPanel();
 		// bP.setBackground(Color.WHITE);
+		JPanel lP = new JPanel();
+		// bP.setBackground(Color.WHITE);
 
 		Club clubData = new Club();
 		try {
-			clubData = currentClub.getClubData();
+			clubData = currentClub.getClub();
 			System.out.println(clubData);
 		} catch (Exception ex) {
 			// TODO add error alert
@@ -384,6 +396,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		bP.add(modifyProfB);
 		leftProfileP.add(bP);
 
+		profileStatus = new JLabel();
+		lP.add(new JLabel("                     "));
+		lP.add(profileStatus);
+		leftProfileP.add(lP);
+
 		leftProfileP.setVisible(true);
 		return leftProfileP;
 	}
@@ -394,7 +411,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(800, 400));
+		mainFrame.setPreferredSize(new Dimension(800, 450));
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
 
@@ -429,6 +446,40 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				String users[] = { "selection: " + selection, "Pippo", "Pluto",
 						"Paperino", "Minnie" };
 				usersJList.setListData(users);
+			}
+		}
+
+		if (event == modifyProfB) {
+			if (!Arrays.equals(pwdR.getPassword(), confPwdR.getPassword())) {
+				profileStatus.setForeground(Color.red);
+				profileStatus.setText("Error: Password are different!");
+			} else {
+				try {
+					boolean res = currentClub.updateClubData(nameR.getText(),
+							surnameR.getText(), addressR.getText(), telR
+									.getText(), emailR.getText(), typeR
+									.getText(), userR.getText(), new String(
+									pwdR.getPassword()));
+					System.out.println("RISULTATO CONNESSIONE : " + res);
+					if (res) {
+						profileStatus.setForeground(Color.green);
+						profileStatus.setText("Data update succesfully!");
+					} else {
+						profileStatus.setForeground(Color.red);
+						profileStatus
+								.setText("Connection Error, try again later. CODE: 1");
+					}
+				} catch (HeadlessException e1) {
+					e1.printStackTrace();
+					profileStatus.setForeground(Color.red);
+					profileStatus
+							.setText("Connection Error, try again later. CODE: 2");
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+					profileStatus.setForeground(Color.red);
+					profileStatus
+							.setText("Connection Error, try again later. CODE: 3");
+				}
 			}
 		}
 		if (event == createEvB) {
@@ -483,7 +534,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						new FileReader(HELP_ENG));
 				String line = "";
 
-				JFrame helpFrame = new JFrame("J-MAS : Help");
+				JFrame helpFrame = new JFrame("Fellas : Help");
 				JTabbedPane tPane = new JTabbedPane();
 				tPane.setPreferredSize(new Dimension(600, 500));
 

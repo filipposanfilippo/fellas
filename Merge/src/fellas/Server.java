@@ -48,7 +48,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean access(String cName, String psw) throws RemoteException {
+	public boolean clubAccess(String cName, String psw) throws RemoteException {
 		System.out.println(cName + " : " + psw);
 		try {
 			query = "SELECT psw FROM clubs WHERE cName='" + cName
@@ -69,10 +69,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next()) {
-				clubList.add(new Club(rs.getString("oName"), rs
-						.getString("oSurname"), rs.getString("cAddress"), rs
-						.getString("cTel"), rs.getString("cName"), rs
-						.getString("psw")));
+				clubList.add(new Club(rs.getInt("id"), rs.getString("oName"),
+						rs.getString("oSurname"), rs.getString("cAddress"), rs
+								.getString("cTel"), rs.getString("cEMail"), rs
+								.getString("cType"), rs.getString("cName"), rs
+								.getString("psw")));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -87,16 +88,36 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				return new Club(rs.getString("oName"),
-						rs.getString("oSurname"), rs.getString("cAddress"), rs
-								.getString("cTel"), rs.getString("cName"), rs
-								.getString("psw"));
+				return new Club(rs.getInt("id"), rs.getString("oName"), rs
+						.getString("oSurname"), rs.getString("cAddress"), rs
+						.getString("cTel"), rs.getString("cEMail"), rs
+						.getString("cType"), rs.getString("cName"), rs
+						.getString("psw"));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubData: " + clubName);
 			e.printStackTrace();
 			return new Club();
 		}
 		return new Club();
+	}
+
+	public boolean updateClubData(Club club) throws RemoteException {
+		try {
+			query = "UPDATE clubs SET oName='" + club.getoName() + "',"
+					+ " oSurname='" + club.getoSurname() + "'," + " cAddress='"
+					+ club.getcAddress() + "'," + " cTel='" + club.getcTel()
+					+ "'," + " cEMail='" + club.getcEMail() + "'," + " cType='"
+					+ club.getcType() + "'," + " cName='" + club.getcName()
+					+ "'," + " psw='" + club.getPsw() + "'" + " WHERE id="
+					+ club.getId();
+			//System.out.println(query);
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
@@ -199,8 +220,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean inviteFriend(String senderPhone, String friendPhone, String event)
-			throws RemoteException {
+	public boolean inviteFriend(String senderPhone, String friendPhone,
+			String event) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}

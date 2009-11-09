@@ -8,13 +8,15 @@ public interface ServerInterface extends Remote {
 	public boolean authenticationClub(String name, String psw)
 			throws RemoteException;
 
-	public boolean access(String name, String cs) throws RemoteException;
+	public boolean clubAccess(String name, String cs) throws RemoteException;
 
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException;
 
 	public Club getClubData(String clubName) throws RemoteException;
+
+	public boolean updateClubData(Club club) throws RemoteException;
 
 	public LinkedList<Club> getClubList() throws RemoteException;
 
@@ -32,8 +34,8 @@ public interface ServerInterface extends Remote {
 
 	// __________________________
 
-	public String mobileRegistration(String uTel, String username,
-			String psw, String uSex, String uAge, String uLocation) throws RemoteException;
+	public String mobileRegistration(String uTel, String username, String psw,
+			String uSex, String uAge, String uLocation) throws RemoteException;
 
 	public String eventsList(String senderPhone, String criterion)
 			throws RemoteException;
@@ -41,8 +43,8 @@ public interface ServerInterface extends Remote {
 	public boolean joinEvent(String senderPhone, String eventCode)
 			throws RemoteException;
 
-	public boolean inviteFriend(String senderPhone, String friendPhone, String event)
-			throws RemoteException;
+	public boolean inviteFriend(String senderPhone, String friendPhone,
+			String event) throws RemoteException;
 
 	public String setLocation(String uTel, String uLocation)
 			throws RemoteException;
