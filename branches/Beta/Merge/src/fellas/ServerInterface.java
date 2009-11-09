@@ -20,6 +20,9 @@ public interface ServerInterface extends Remote {
 
 	public LinkedList<Club> getClubList() throws RemoteException;
 
+	public LinkedList<MyEvent> getClubEventsList(int cId)
+			throws RemoteException;
+
 	public boolean authenticationMobile() throws RemoteException;
 
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
