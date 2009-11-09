@@ -53,16 +53,19 @@ public interface ServerInterface extends Remote {
 
 	public String setLocation(String uTel, String uLocation)
 			throws RemoteException;
+	public String setStatus(String uTel, String uStatus)
+	throws RemoteException;
 
 	public String userList(String senderPhone, String criterion)
 			throws RemoteException;
 
-	public boolean broadcastMyStatus(String senderPhone, String criterion)
+	public String broadcastMyStatus(String senderPhone, String criterion)
 			throws RemoteException;
 
 	public boolean chatUp(String senderPhone, String nickname)
 			throws RemoteException;
 
 	public boolean checkRegistration(String phoneNumber) throws RemoteException;
+	public String spamMobile(String message, String criterion) throws RemoteException;
 	// __________________________
 }

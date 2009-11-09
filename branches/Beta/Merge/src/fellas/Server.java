@@ -211,10 +211,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return true;
 	}
 
-	public boolean updateEvent(MyEvent event) throws RemoteException {
-		// TODO write
-		return true;
-	}
 
 	public boolean deleteEvent(int eventId) throws RemoteException {
 		// TODO write
@@ -222,10 +218,50 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean broadcastMyStatus(String senderPhone, String criterion)
+	public String broadcastMyStatus(String senderPhone, String criterion)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		// if(!checkRegistration())
+		// return "You are not registered, please register";
+		char field = criterion.charAt(0);
+		String answer = new String();
+		switch (field) {
+		case 'l' | 'L':
+			criterion = criterion.substring(criterion.indexOf('=') + 1,
+					criterion.indexOf("$"));
+			System.out.println(criterion);
+			try {
+				query = "SELECT uTel FROM users WHERE uLocation='" + criterion
+						+ "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				if (!rs.next())
+					return "Any users match with criterion%";
+				while (rs.next()) {
+					// System.out.println("---->"+rs.getString("uTel"));
+					answer += '@' + rs.getString("uTel");
+				}
+				answer += '@';
+				System.out.println(answer);
+
+				query = "SELECT username, uStatus FROM users WHERE uTel='"
+						+ senderPhone + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				if (rs.next()) {
+					answer += rs.getString("username") + '+'
+							+ rs.getString("uStatus") + "%";
+					System.out.println(answer);
+					return answer;
+				} else
+					return "You are not registered, please register%";
+
+			} catch (SQLException e) {
+				// e.printStackTrace();
+				return ">broadcastMyStatus error%";
+			}
+			// break;
+		}
+		return "broadcastMyStatus Erroe%";
 	}
 
 	@Override
@@ -281,10 +317,26 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
+	public String setStatus(String uTel, String uStatus) throws RemoteException {
+		// if(!checkRegistration())
+		// return "You are not registered, please register";
+		try {
+			query = "UPDATE users SET uStatus = '" + uStatus
+					+ "' WHERE uTel = '" + uTel + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return "Status updated%";
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			return "Status update error%";
+		}
+	}
+
+	@Override
 	public String mobileRegistration(String uTel, String username, String psw,
 			String uSex, String uAge, String uLocation) throws RemoteException {
 		if (isUserExisting(uTel))
-			return "Already registered";
+			return "Already registered%";
 		try {
 			query = "INSERT INTO users (uTel,username,psw,uSex,uAge, uLocation)"
 					+ "VALUES ('"
@@ -310,6 +362,27 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return null;
 	}
 
+	@Override
+	public String spamMobile(String message, String criterion)
+			throws RemoteException {
+		String answer = new String();
+		try {
+			query = "SELECT uTel FROM clubs WHERE '" + criterion + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "Any users match with criterion%";
+			while (rs.next())
+				answer += '@' + rs.getString("uTel");
+			answer += '@'+message+'%';
+			return answer;
+				
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "spamMobile error%";
+		}
+	}
+
 	public static void main(String[] args) throws RemoteException,
 			MalformedURLException, NotBoundException {
 		try {
@@ -320,4 +393,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	@Override
+	public boolean updateEvent(MyEvent event) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
