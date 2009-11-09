@@ -63,4 +63,8 @@ public class ClientClub extends UnicastRemoteObject {
 	public String getClubPsw() {
 		return clubLogged.getPsw();
 	}
+
+	public LinkedList<MyEvent> getClubEventsList() throws RemoteException {
+		return server.getClubEventsList(clubLogged.getId());
+	}
 }
