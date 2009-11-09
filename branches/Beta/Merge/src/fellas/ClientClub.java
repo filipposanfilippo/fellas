@@ -67,4 +67,14 @@ public class ClientClub extends UnicastRemoteObject {
 	public LinkedList<MyEvent> getClubEventsList() throws RemoteException {
 		return server.getClubEventsList(clubLogged.getId());
 	}
+
+	public boolean createEvent(String eName, String eShortDescription,
+			String eLongDescription, String eLocation, String eCategory,
+			String eDate, String eStartTime, String eFinishTime,
+			String eRestriction) throws RemoteException {
+		return server.createEvent(clubLogged.getId(), eName, eShortDescription,
+				eLongDescription, eLocation, eCategory, eDate, eStartTime,
+				eFinishTime, eRestriction);
+
+	}
 }
