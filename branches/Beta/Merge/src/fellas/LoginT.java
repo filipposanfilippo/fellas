@@ -173,7 +173,7 @@ public class LoginT implements Runnable, ActionListener {
 					if (isRegistrationCorrect) {
 						registrationStatus1.setForeground(Color.green);
 						registrationStatus2.setForeground(Color.green);
-						registrationStatus1.setText("New Club");
+						registrationStatus1.setText(userR.getText());
 						registrationStatus2.setText("Registered Correctly!");
 					} else {
 						registrationStatus1.setForeground(Color.red);
