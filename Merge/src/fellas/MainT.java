@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -18,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -59,22 +59,30 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JMenuItem help;
 	JMenuItem credits;
 
-	// -------------- Message Items ---------------
+	// -------------- Message Items ---------------------------
 	JList eventJList;
 	JList usersJList;
 	JButton loadUsersB;
 	JButton sendMessB;
 	JTextArea message;
 
-	// -------------- Events Items ---------------
-	JTextArea evDescription;
+	// -------------- Events Items ----------------------------
+	JTextField eName;
+	JTextField eShortDescription;
+	JTextArea eLongDescription;
+	JTextField eLocation;
+	JTextField eCategory;
+	JTextField eDate;
+	JTextField eStartTime;
+	JTextField eFinishTime;
+	JTextField eRestriction;
+
 	JButton createEvB;
 	JButton modifyEvB;
 	JButton deleteEvB;
-	JTextField evName;
 	JList eventJList2;
 
-	// -------------- Profile Items ----------------------------
+	// -------------- Profile Items ---------------------------
 	JTextField nameR;
 	JTextField surnameR;
 	JTextField addressR;
@@ -227,10 +235,17 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
 		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 
-		// TODO caricare eventi dal server
-		String events[] = { "Erasmus Party", "Cera l'h", "Paolo Bolognesi DJ",
-				"Halloween Night" };
-
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		try {
+			eventsList = currentClub.getClubEventsList();
+		} catch (Exception ex) {
+			// TODO add error alert
+		}
+		String[] events = new String[eventsList.size()];
+		int i = 0;
+		for (MyEvent e : eventsList) {
+			events[i++] = e.geteName();
+		}
 		eventJList2 = new JList(events);
 		eventJList2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eventJList2.setBackground(new Color(153, 204, 255));
@@ -245,14 +260,49 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
 
 		rightEvP.add(new JLabel("Event Name:"));
-		evName = new JTextField();
-		evName.setPreferredSize(new Dimension(390, 20));
-		rightEvP.add(evName);
+		eName = new JTextField();
+		eName.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eName);
 
-		rightEvP.add(new JLabel("Event Description:"));
-		evDescription = new JTextArea(13, 35);
-		evDescription.setLineWrap(true);
-		JScrollPane descrScrollPane = new JScrollPane(evDescription);
+		rightEvP.add(new JLabel("Location:"));
+		eLocation = new JTextField();
+		eLocation.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eLocation);
+
+		rightEvP.add(new JLabel("Event Category:"));
+		eCategory = new JTextField();
+		eCategory.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eCategory);
+
+		rightEvP.add(new JLabel("Event Date:"));
+		eName = new JTextField();
+		eName.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eName);
+
+		rightEvP.add(new JLabel("Starting Time:"));
+		eStartTime = new JTextField();
+		eStartTime.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eStartTime);
+
+		rightEvP.add(new JLabel("Finishing Time:"));
+		eFinishTime = new JTextField();
+		eFinishTime.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eFinishTime);
+
+		rightEvP.add(new JLabel("Restriction:"));
+		eRestriction = new JTextField();
+		eRestriction.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eRestriction);
+
+		rightEvP.add(new JLabel("Short Desciption:"));
+		eShortDescription = new JTextField();
+		eShortDescription.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eShortDescription);
+
+		rightEvP.add(new JLabel("Long Description:"));
+		eLongDescription = new JTextArea(5, 35);
+		eLongDescription.setLineWrap(true);
+		JScrollPane descrScrollPane = new JScrollPane(eLongDescription);
 		rightEvP.add(descrScrollPane);
 
 		createEvB = new JButton("Create Event");
@@ -413,7 +463,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(800, 450));
+		mainFrame.setPreferredSize(new Dimension(800, 600));
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
 
@@ -471,11 +521,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						profileStatus
 								.setText("Connection Error, try again later. CODE: 1");
 					}
-				} catch (HeadlessException e1) {
-					e1.printStackTrace();
-					profileStatus.setForeground(Color.red);
-					profileStatus
-							.setText("Connection Error, try again later. CODE: 2");
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
 					profileStatus.setForeground(Color.red);
@@ -485,13 +530,22 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			}
 		}
 		if (event == createEvB) {
-			// TODO sinc with server
-			String newEv = evName.getText();
+			String newEv = eName.getText();
 			if (newEv.equals("")) {
 				JOptionPane.showMessageDialog(mainFrame,
 						"Type a correct event name to preceed.",
 						"Creation Error!", JOptionPane.ERROR_MESSAGE);
 			} else {
+				try {
+					currentClub.createEvent(eName.getText(), eShortDescription
+							.getText(), eLongDescription.getText(), eLocation
+							.getText(), eCategory.getText(), eDate.getText(),
+							eStartTime.getText(), eFinishTime.getText(),
+							eRestriction.getText());
+				} catch (RemoteException e1) {
+					// TODO add error message
+					e1.printStackTrace();
+				}
 				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
 						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -621,13 +675,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		if (e.getSource() == eventJList2) {
 			modifyEvB.setEnabled(true);
 			deleteEvB.setEnabled(true);
-
-			evName.setText(((JList) e.getSource()).getSelectedValue()
-					.toString());
+			eName
+					.setText(((JList) e.getSource()).getSelectedValue()
+							.toString());
 			// TODO inserire i dati dell'evento prelevati dal server
-			evDescription.setText("Descrizione di "
+			eLongDescription.setText("Descrizione di "
 					+ ((JList) e.getSource()).getSelectedValue().toString());
-
 		}
 	}
 
