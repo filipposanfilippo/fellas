@@ -207,14 +207,65 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
 			String eRestriction) throws RemoteException {
-		// TODO write
-		return true;
+		try {
+			query = "INSERT INTO users (cId,eName,eShortDescription,eLongDescription," +
+					"eLocation,ecategory,eDate,eStartTime,eFinishTime)"
+					+ "VALUES ('"
+					+ cId + "','"
+					+ eName + "','"
+					+ eShortDescription + "','"
+					+ eLongDescription + "','"
+					+ eLocation + "','"
+					+ eCategory + "','"
+					+ eDate + "','"
+					+ eStartTime + "','"
+					+ eFinishTime + "','"
+					+ eRestriction
+					+ "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean updateEvent(MyEvent event) throws RemoteException {
+		try {
+			query = "UPDATE events SET " 
+					+ "cId='" + event.getcId() + "',"
+					+ "eName='" + event.geteName() + "',"
+					+ "eShortDescription='" + event.geteShortDescription() + "',"
+					+ "eLongDescription='" + event.geteLongDescription() + "',"
+					+ "eLocation='" + event.geteLocation() + "',"
+					+ "eCategory='" + event.geteCategory() + "',"
+					+ "eDate='" + event.geteDate() + "',"
+					+ "eStartTime='" + event.geteStartTime() + "',"
+					+ "eFinishTime='" + event.geteFinishTime() + "',"
+					+ "eRestriction='" + event.geteRestriction();
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 
 	public boolean deleteEvent(int eventId) throws RemoteException {
 		// TODO write
-		return true;
+		try {
+			query = "DELETE from events where id='" + eventId + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
@@ -393,9 +444,4 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
-	public boolean updateEvent(MyEvent event) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }
