@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 // server class
+/**
+ * @author Lorenzo
+ * 
+ */
 public class Club implements Serializable {
+	private int id;
 	private String oName;
 	private String oSurname;
 	private String cAddress;
@@ -16,9 +21,9 @@ public class Club implements Serializable {
 
 	ArrayList<MyEvent> eventList = new ArrayList<MyEvent>();
 
-	public Club(String oName, String oSurname, String cAddress, String cTel,
-			String cName, String psw) {
-		super();
+	public Club(int id, String oName, String oSurname, String cAddress,
+			String cTel, String cEMail, String cType, String cName, String psw) {
+		this.id = id;
 		this.oName = oName;
 		this.oSurname = oSurname;
 		this.cAddress = cAddress;
@@ -30,7 +35,7 @@ public class Club implements Serializable {
 	}
 
 	public Club() {
-		super();
+		this.id = 0;
 		this.oName = "";
 		this.oSurname = "";
 		this.cAddress = "";
@@ -39,6 +44,14 @@ public class Club implements Serializable {
 		this.cType = "";
 		this.cName = "";
 		this.psw = "";
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getoName() {
@@ -65,20 +78,20 @@ public class Club implements Serializable {
 		this.cAddress = cAddress;
 	}
 
-	public String getcType() {
-		return cType;
-	}
-
-	public void setcType(String cType) {
-		this.cType = cType;
-	}
-
 	public String getcEMail() {
 		return cEMail;
 	}
 
 	public void setcEMail(String cEMail) {
 		this.cEMail = cEMail;
+	}
+
+	public String getcType() {
+		return cType;
+	}
+
+	public void setcType(String cType) {
+		this.cType = cType;
 	}
 
 	public String getcTel() {

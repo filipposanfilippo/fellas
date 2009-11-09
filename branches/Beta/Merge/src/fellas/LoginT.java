@@ -1,5 +1,6 @@
 package fellas;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class LoginT implements Runnable, ActionListener {
 	ClientClub currentClub;
@@ -43,6 +45,8 @@ public class LoginT implements Runnable, ActionListener {
 	JTextField userR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
+	JLabel registrationStatus1;
+	JLabel registrationStatus2;
 
 	// ------------------- RIGHT PANEL (Login) ---------------------------
 
@@ -63,7 +67,7 @@ public class LoginT implements Runnable, ActionListener {
 		loginP.setBorder(BorderFactory.createTitledBorder("Login"));
 
 		JPanel rightP = new JPanel();
-		rightP.setLayout(new GridLayout(3, 2));
+		rightP.setLayout(new GridLayout(5, 2));
 
 		userL = new JTextField(10);
 		pwdL = new JPasswordField(10);
@@ -76,6 +80,13 @@ public class LoginT implements Runnable, ActionListener {
 		rightP.add(pwdL);
 		rightP.add(new JLabel(""));
 		rightP.add(loginB);
+
+		registrationStatus1 = new JLabel("", JLabel.LEFT);
+		rightP.add(registrationStatus1);
+		
+		registrationStatus2 = new JLabel("", JLabel.LEFT);
+		rightP.add(registrationStatus2);
+		
 
 		rightP.setVisible(true);
 		loginP.add(rightP);
@@ -120,7 +131,6 @@ public class LoginT implements Runnable, ActionListener {
 		leftP.add(pwdR);
 		leftP.add(new JLabel("Confirm Pwd:"));
 		leftP.add(confPwdR);
-		leftP.add(new JLabel(""));
 		leftP.add(registerB);
 
 		leftP.setVisible(true);
@@ -147,13 +157,13 @@ public class LoginT implements Runnable, ActionListener {
 		Object event = e.getSource();
 
 		if (event == registerB) {
-			// checks whether confirm psw is the same of psw or not
+			// Checks whether confirm psw is the same of psw or not
 			if (!Arrays.equals(pwdR.getPassword(), confPwdR.getPassword())) {
-				JOptionPane.showMessageDialog(null,
-						"Passwords are different, check and try again!",
-						"Registration Refused", JOptionPane.ERROR_MESSAGE);
+				registrationStatus1.setForeground(Color.red);
+				registrationStatus2.setForeground(Color.red);
+				registrationStatus1.setText("Different Passwords,");
+				registrationStatus2.setText(" correct and retry!");
 			} else {
-				// TODO collegati al server ed effettua la registrazione
 				boolean isRegistrationCorrect = false;
 				try {
 					isRegistrationCorrect = currentClub.clubRegistration(nameR
@@ -161,33 +171,31 @@ public class LoginT implements Runnable, ActionListener {
 							telR.getText(), emailR.getText(), typeR.getText(),
 							userR.getText(), new String(pwdR.getPassword()));
 					if (isRegistrationCorrect) {
-						JOptionPane.showMessageDialog(null,
-								"Welcome to Diana: Feel Like Doing...",
-								"Registered!", JOptionPane.INFORMATION_MESSAGE);
+						registrationStatus1.setForeground(Color.green);
+						registrationStatus2.setForeground(Color.green);
+						registrationStatus1.setText("New Club");
+						registrationStatus2.setText("Registered Correctly!");
 					} else {
-						JOptionPane
-								.showMessageDialog(
-										null,
-										"Registration refused by server.\n"
-												+ "Try to check whether the Club is already"
-												+ " registered and try again.",
-										"Registration Refused",
-										JOptionPane.ERROR_MESSAGE);
+						registrationStatus1.setForeground(Color.red);
+						registrationStatus2.setForeground(Color.red);
+						registrationStatus1
+								.setText("Maybe Club Existing,");
+						registrationStatus2.setText(" try again.");
 					}
 				} catch (RemoteException e1) {
-					JOptionPane.showMessageDialog(null,
-							"Connection with server error...", "Login Refused",
-							JOptionPane.ERROR_MESSAGE);
+					registrationStatus1.setForeground(Color.red);
+					registrationStatus2.setForeground(Color.red);
+					registrationStatus1.setText("Error:");
+					registrationStatus1.setText(" Server Disconnected.");
 				}
 			}
 		}
 
 		if (event == loginB) {
-			// TODO collegati al server ed effettua il login
 			boolean isLogged = false;
 			try {
-				isLogged = currentClub.access(userL.getText(), new String(pwdL
-						.getPassword()));
+				isLogged = currentClub.clubAccess(userL.getText(), new String(
+						pwdL.getPassword()));
 				// System.out.println("Logged = " + isLogged);
 				if (isLogged) {
 					JOptionPane.showMessageDialog(null,

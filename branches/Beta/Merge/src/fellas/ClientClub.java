@@ -10,44 +10,57 @@ import java.util.LinkedList;
 public class ClientClub extends UnicastRemoteObject {
 	private ServerInterface server;
 	private String host = "localhost";
-	private String clubName = "";
-	private String psw;
+	private Club clubLogged;
 
-	public String getName() {
-		return clubName;
-	}
-
-	public String getPsw() {
-		return psw;
-	}
-
-	protected ClientClub() throws RemoteException, MalformedURLException,
+	public ClientClub() throws RemoteException, MalformedURLException,
 			NotBoundException {
 		server = (ServerInterface) Naming.lookup("//" + host + "/SvrMobile");
 	}
 
-	protected boolean access(String name, String cs) throws RemoteException {
-		boolean res = server.access(name, cs);
+	public boolean clubAccess(String name, String psw) throws RemoteException {
+		boolean res = server.clubAccess(name, psw);
 		if (res) {
-			this.clubName = name;
-			this.psw = cs;
+			clubLogged = getClubData(name);
 		}
 		return res;
 	}
 
-	protected boolean clubRegistration(String oName, String oSurname,
+	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException {
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
 				cType, cName, psw);
 	}
 
-	protected LinkedList<Club> getClubList() throws RemoteException {
+	public LinkedList<Club> getClubList() throws RemoteException {
 		return server.getClubList();
 	}
 
-	protected Club getClubData() throws RemoteException {
-		return server.getClubData(clubName);
+	private Club getClubData(String cName) throws RemoteException {
+		return server.getClubData(cName);
 	}
 
+	public boolean updateClubData(String oName, String oSurname,
+			String cAddress, String cTel, String cEMail, String cType,
+			String cName, String psw) throws RemoteException {
+		final Club tempClub = new Club(clubLogged.getId(), oName, oSurname,
+				cAddress, cTel, cEMail, cType, cName, psw);
+		if (server.updateClubData(tempClub)) {
+			clubLogged = tempClub;
+			return true;
+		} else
+			return false;
+	}
+
+	public Club getClub() {
+		return clubLogged;
+	}
+
+	public String getClubName() {
+		return clubLogged.getcName();
+	}
+
+	public String getClubPsw() {
+		return clubLogged.getPsw();
+	}
 }
