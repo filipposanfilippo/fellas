@@ -95,7 +95,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JButton modifyProfB;
 	JLabel profileStatus;
 
-	// -------------------------------------------
+	// ******************************************************************************
+	// MENU
+	// ******************************************************************************
 
 	public MainT(ClientClub currentClub) {
 		this.currentClub = currentClub;
@@ -170,7 +172,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftUpP.add(new JLabel("                 Users for Selected Event"));
 
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
-		
+
 		eventJList = new JList(getEventsArray());
 		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eventJList.setBackground(new Color(153, 204, 255));
@@ -219,6 +221,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return messageP;
 	}
 
+	// ******************************************************************************
+	// Utility
+	// ******************************************************************************
+
 	private String[] getEventsArray() {
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		try {
@@ -231,7 +237,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		String[] events = new String[eventsList.size()];
 		int i = 0;
 		for (MyEvent e : eventsList) {
-			events[i++] = e.geteName();
+			events[i++] = e.getId() + "]" + e.geteName();
 		}
 		return events;
 	}
@@ -555,16 +561,51 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == modifyEvB) {
 			// TODO sinc with server
-			String selEv = eventJList2.getSelectedValue().toString();
-			JOptionPane.showMessageDialog(mainFrame, "Modified succesfully "
-					+ selEv, "Modified!", JOptionPane.INFORMATION_MESSAGE);
+			// TODO create a refresh function to add to the three buttons for
+			// update the events! (for update create e delete!!)
+			String selEv[] = eventJList2.getSelectedValue().toString().split(
+					"]");
+			try {
+				currentClub.updateEvent(new MyEvent(Integer.parseInt(selEv[0]),
+						currentClub.getClub().getId(), eName.getText(),
+						eShortDescription.getText(),
+						eLongDescription.getText(), eLocation.getText(),
+						eCategory.getText(), eDate.getText(), eStartTime
+								.getText(), eFinishTime.getText(), eRestriction
+								.getText()));
+				JOptionPane.showMessageDialog(mainFrame,
+						"Modified succesfully " + selEv[1], "Modified!",
+						JOptionPane.INFORMATION_MESSAGE);
+			} catch (NumberFormatException e1) {
+				JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				e1.printStackTrace();
+			} catch (RemoteException e1) {
+				JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				e1.printStackTrace();
+			}
 
 		}
 		if (event == deleteEvB) {
-			// TODO sinc with server
-			String selEv = eventJList2.getSelectedValue().toString();
-			JOptionPane.showMessageDialog(mainFrame, "Deleted succesfully"
-					+ selEv, "Deleted!", JOptionPane.INFORMATION_MESSAGE);
+			String selEv[] = eventJList2.getSelectedValue().toString().split(
+					"]");
+			try {
+				currentClub.deleteEvent(Integer.parseInt(selEv[0]));
+				JOptionPane
+						.showMessageDialog(mainFrame, "Deleted succesfully"
+								+ selEv[1], "Deleted!",
+								JOptionPane.INFORMATION_MESSAGE);
+			} catch (NumberFormatException e1) {
+				JOptionPane.showMessageDialog(mainFrame, "Not Deleted!"
+						+ selEv[1], "Error", JOptionPane.ERROR_MESSAGE);
+				e1.printStackTrace();
+			} catch (RemoteException e1) {
+				JOptionPane.showMessageDialog(mainFrame, "Not Deleted!"
+						+ selEv[1], "Error", JOptionPane.ERROR_MESSAGE);
+				e1.printStackTrace();
+			}
+
 		}
 
 		if (event == credits) {
@@ -678,9 +719,22 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		if (e.getSource() == eventJList2) {
 			modifyEvB.setEnabled(true);
 			deleteEvB.setEnabled(true);
-			eName
-					.setText(((JList) e.getSource()).getSelectedValue()
-							.toString());
+
+			int sel = Integer.parseInt(((JList) e.getSource())
+					.getSelectedValue().toString());
+			
+			MyEvent event = new MyEvent();//currentClub.getEvent(sel);
+
+			eName.setText(event.geteName());
+			eShortDescription.setText(event.geteShortDescription());
+			eLongDescription.setText(event.geteLongDescription());
+			eLocation.setText(event.geteLocation());
+			eCategory.setText(event.geteCategory());
+			eDate.setText(event.geteDate());
+			eStartTime.setText(event.geteShortDescription());
+			eFinishTime.setText(event.geteFinishTime());
+			eRestriction.setText(event.geteRestriction());
+
 			// TODO inserire i dati dell'evento prelevati dal server
 			eLongDescription.setText("Descrizione di "
 					+ ((JList) e.getSource()).getSelectedValue().toString());
