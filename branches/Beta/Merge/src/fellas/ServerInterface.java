@@ -23,6 +23,8 @@ public interface ServerInterface extends Remote {
 	public LinkedList<MyEvent> getClubEventsList(int cId)
 			throws RemoteException;
 
+	public MyEvent getEvent(int id) throws RemoteException;
+
 	public boolean authenticationMobile() throws RemoteException;
 
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
@@ -53,8 +55,8 @@ public interface ServerInterface extends Remote {
 
 	public String setLocation(String uTel, String uLocation)
 			throws RemoteException;
-	public String setStatus(String uTel, String uStatus)
-	throws RemoteException;
+
+	public String setStatus(String uTel, String uStatus) throws RemoteException;
 
 	public String userList(String senderPhone, String criterion)
 			throws RemoteException;
@@ -66,6 +68,8 @@ public interface ServerInterface extends Remote {
 			throws RemoteException;
 
 	public boolean checkRegistration(String phoneNumber) throws RemoteException;
-	public String spamMobile(String message, String criterion) throws RemoteException;
+
+	public String spamMobile(String message, String criterion)
+			throws RemoteException;
 	// __________________________
 }

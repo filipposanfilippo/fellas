@@ -68,6 +68,10 @@ public class ClientClub extends UnicastRemoteObject {
 		return server.getClubEventsList(clubLogged.getId());
 	}
 
+	public MyEvent getEvent(int id) throws RemoteException {
+		return server.getEvent(id);
+	}
+
 	public boolean createEvent(String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
@@ -75,6 +79,13 @@ public class ClientClub extends UnicastRemoteObject {
 		return server.createEvent(clubLogged.getId(), eName, eShortDescription,
 				eLongDescription, eLocation, eCategory, eDate, eStartTime,
 				eFinishTime, eRestriction);
+	}
 
+	public boolean updateEvent(MyEvent event) throws RemoteException {
+		return server.updateEvent(event);
+	}
+
+	public boolean deleteEvent(int eventId) throws RemoteException {
+		return server.deleteEvent(eventId);
 	}
 }

@@ -170,6 +170,32 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	public MyEvent getEvent(int id) {
+		try {
+			query = "SELECT * FROM events WHERE id=" + id + " LIMIT 1";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next()) {
+				MyEvent event = new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+						rs.getString("eName"), rs
+								.getString("eShortDescription"), rs
+								.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs.getString("eDate"),
+						rs.getString("eStartTime"),
+						rs.getString("eFinishTime"), rs
+								.getString("eRestriction"));
+				return event;
+			} else {
+				return null;
+			}
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getEvent: " + id);
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	@Override
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -211,8 +237,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eDate, String eStartTime, String eFinishTime,
 			String eRestriction) throws RemoteException {
 		try {
-			query = "INSERT INTO users (cId,eName,eShortDescription,eLongDescription,"
-					+ "eLocation,ecategory,eDate,eStartTime,eFinishTime)"
+			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
+					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction)"
 					+ "VALUES ('"
 					+ cId
 					+ "','"
@@ -255,7 +281,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ event.geteDate() + "'," + "eStartTime='"
 					+ event.geteStartTime() + "'," + "eFinishTime='"
 					+ event.geteFinishTime() + "'," + "eRestriction='"
-					+ event.geteRestriction();
+					+ event.geteRestriction() + "' WHERE id=" + event.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -266,7 +292,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public boolean deleteEvent(int eventId) throws RemoteException {
-		// TODO write
 		try {
 			query = "DELETE from events where id='" + eventId + "'";
 			statement = connection.createStatement();
@@ -476,9 +501,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// ---------
 
 		} catch (Exception e) {
-            e.printStackTrace();
-            return "spamMobile error%";
-        }
+			e.printStackTrace();
+			return "spamMobile error%";
+		}
 	}
 
 	public static void main(String[] args) throws RemoteException,
