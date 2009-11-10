@@ -1,5 +1,8 @@
 package fellas;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -281,7 +284,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		char field = criterion.charAt(0);
-		String answer = new String();
+		String answer = "";
 		switch (field) {
 		case 'l' | 'L':
 			criterion = criterion.substring(criterion.indexOf('=') + 1,
@@ -292,12 +295,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "'";
 				statement = connection.createStatement();
 				rs = statement.executeQuery(query);
-				if (!rs.next())
-					return "Any users match with criterion%";
+				// if (!rs.next())
+				// return "Any users match with criterion%";
+				// rs.previous();
 				while (rs.next()) {
 					// System.out.println("---->"+rs.getString("uTel"));
 					answer += '@' + rs.getString("uTel");
 				}
+				if (answer.equals(""))
+					return "Any users match with criterion%";
 				answer += '@';
 				System.out.println(answer);
 
@@ -423,22 +429,56 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public String spamMobile(String message, String criterion)
 			throws RemoteException {
-		String answer = new String();
+		String answer = "";
 		try {
-			query = "SELECT uTel FROM clubs WHERE '" + criterion + "'";
+			query = "SELECT uTel FROM users WHERE " + criterion + "";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (!rs.next())
-				return "Any users match with criterion%";
+			// if (!rs.next())
+			// return "Any users match with criterion%";
+			// rs.previous();
 			while (rs.next())
 				answer += '@' + rs.getString("uTel");
+			if (answer.equals(""))
+				return "Any users match with criterion%";
 			answer += '@' + message + '%';
-			return answer;
+			System.out.println(answer);
+			// return answer;
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return "spamMobile error%";
-		}
+			// ---------
+
+			// Retrieve the ServerName
+			InetAddress serverAddr = InetAddress.getByName("192.168.1.104"); // HTC
+			// ip
+			// address
+			// where
+			// SMS.java
+			// is
+			// running
+
+			System.out.println("\nConnecting...");
+			/* Create new UDP-Socket */
+			DatagramSocket socket = new DatagramSocket();
+
+			/* Prepare some data to be sent. */
+			byte[] buf = answer.getBytes();
+
+			// Create UDP-packet with data & destination(url+port)
+
+			DatagramPacket packet = new DatagramPacket(buf, buf.length,
+					serverAddr, 4445);
+
+			/* Send out the packet */
+			socket.send(packet);
+			System.out.println("\nSent...");
+			return "mobile spammed";
+
+			// ---------
+
+		} catch (Exception e) {
+            e.printStackTrace();
+            return "spamMobile error%";
+        }
 	}
 
 	public static void main(String[] args) throws RemoteException,
