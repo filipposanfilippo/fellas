@@ -374,10 +374,33 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean inviteFriend(String senderPhone, String friendPhone,
-			String event) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+	public String inviteFriend(String senderPhone, String friendPhone,
+			int eventId) throws RemoteException {
+		String answer = new String('@' + friendPhone + '@');
+		try {
+			query = "SELECT username FROM users WHERE uTel='" + senderPhone
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+
+			if (rs.next())
+				answer += rs.getString("username") + ">invite you at>";
+			else
+				return ">You are not registered, please register%";
+
+			query = "SELECT eShortDescription FROM events WHERE id='" + eventId
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next())
+				answer += rs.getString("eShortDescription") + '%';
+			else
+				return ">Any events match with id%";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ">inviteFriend ERROR%";
+		}
+		return answer;
 	}
 
 	@Override
