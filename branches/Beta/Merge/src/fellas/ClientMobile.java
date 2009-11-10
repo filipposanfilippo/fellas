@@ -12,7 +12,8 @@ import java.rmi.server.UnicastRemoteObject;
 class ClientMobile extends UnicastRemoteObject {
 	private static ServerInterface server;
 	private static String host = "localhost";
-	//comunica con SmsReceiver
+
+	// comunica con SmsReceiver
 	protected ClientMobile() throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
@@ -32,8 +33,9 @@ class ClientMobile extends UnicastRemoteObject {
 		// byte[] sendData = new byte[1024];
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
-		
-		System.out.println(server.spamMobile("stasera maudit!", "uLocation = 'agira'"));//test
+
+		// System.out.println(server.spamMobile("stasera maudit!",
+		// "uLocation = 'roma'"));//test
 		while (true) {
 			served = false;
 			byte[] receiveData = new byte[1024];
@@ -107,18 +109,23 @@ class ClientMobile extends UnicastRemoteObject {
 				// serverAnswer = client.joinEvent(phoneCheckJ, eventCode);
 				served = true;
 				break;
-			case 'i' | 'I':
+			case 'i' | 'I':// TODO need to fix
 				System.out.println("\nINVITE FRIEND: ");
 				// check registration by phone
 				String phoneCheckI = new String(sentence.substring(sentence
 						.indexOf("from") + 5, sentence.indexOf(':') - 1));
 				String friendPhone = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
+						.indexOf('&') + 1, sentence.indexOf('&', sentence
+						.indexOf('&') + 1)));
+				pointer += 3 + sentence.indexOf(':') + friendPhone.length();
+				int eventId = Integer.valueOf(sentence.substring(pointer + 1, sentence.indexOf(
+						'&', pointer + 1)));
 				System.out.println("\nphone: " + phoneCheckI);
 				System.out.println("\nfriendPhone: " + friendPhone);
+				System.out.println("\neventId: " + eventId);
 				// invoke remote method
-				// serverAnswer = client.inviteFriend( phoneCheckI,
-				// friendPhone);
+				serverAnswer = server.inviteFriend( phoneCheckI, friendPhone, eventId);
+				//serverAnswer = server.inviteFriend("+393202186626", "+393280332489", 1);
 				served = true;
 				break;
 			case 'l' | 'L':
