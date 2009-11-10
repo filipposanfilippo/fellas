@@ -12,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 class ClientMobile extends UnicastRemoteObject {
 	private static ServerInterface server;
 	private static String host = "localhost";
-
+	//comunica con SmsReceiver
 	protected ClientMobile() throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
@@ -32,6 +32,8 @@ class ClientMobile extends UnicastRemoteObject {
 		// byte[] sendData = new byte[1024];
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
+		
+		System.out.println(server.spamMobile("stasera maudit!", "uLocation = 'agira'"));//test
 		while (true) {
 			served = false;
 			byte[] receiveData = new byte[1024];
@@ -42,7 +44,7 @@ class ClientMobile extends UnicastRemoteObject {
 					receiveData.length);
 			serverSocket.receive(receivePacket);
 			String sentence = new String(receivePacket.getData());
-			
+
 			sentence = sentence.substring(0, sentence.indexOf("%"));
 			System.out.println("RECEIVED: " + sentence);
 
@@ -76,7 +78,7 @@ class ClientMobile extends UnicastRemoteObject {
 				// invoke remote method
 				serverAnswer = server.mobileRegistration(uTel, username, psw,
 						uSex, uAge, uLocation);
-				//System.out.println("\nServerAnswer: " + serverAnswer);
+				// System.out.println("\nServerAnswer: " + serverAnswer);
 				served = true;
 				break;
 			case 'e' | 'E':
@@ -121,7 +123,8 @@ class ClientMobile extends UnicastRemoteObject {
 				break;
 			case 'l' | 'L':
 				System.out.println("\nSET LOCATION: ");
-				// check registration by phone  --> it will be done in Server.java
+				// check registration by phone --> it will be done in
+				// Server.java
 				String uTelL = new String(sentence.substring(sentence
 						.indexOf("from") + 5, sentence.indexOf(':') - 1));
 				String uLocationL = new String(sentence.substring(sentence
@@ -134,7 +137,8 @@ class ClientMobile extends UnicastRemoteObject {
 				break;
 			case 's' | 'S':
 				System.out.println("\nSET STATUS: ");
-				// check registration by phone  --> it will be done in Server.java
+				// check registration by phone --> it will be done in
+				// Server.java
 				String uTelS = new String(sentence.substring(sentence
 						.indexOf("from") + 5, sentence.indexOf(':') - 1));
 				String uStatusS = new String(sentence.substring(sentence
@@ -168,7 +172,8 @@ class ClientMobile extends UnicastRemoteObject {
 				System.out.println("\nphone: " + phoneCheckB);
 				System.out.println("\ncriterion: " + criterionB);
 				// invoke remote method
-				serverAnswer = server.broadcastMyStatus(phoneCheckB, criterionB+'$');
+				serverAnswer = server.broadcastMyStatus(phoneCheckB,
+						criterionB + '$');
 				served = true;
 				break;
 			case 'c' | 'C':
