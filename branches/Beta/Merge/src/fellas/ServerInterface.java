@@ -50,8 +50,8 @@ public interface ServerInterface extends Remote {
 	public boolean joinEvent(String senderPhone, String eventCode)
 			throws RemoteException;
 
-	public boolean inviteFriend(String senderPhone, String friendPhone,
-			String event) throws RemoteException;
+	public String inviteFriend(String senderPhone, String friendPhone,
+			int eventId) throws RemoteException;
 
 	public String setLocation(String uTel, String uLocation)
 			throws RemoteException;
