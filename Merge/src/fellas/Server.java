@@ -339,16 +339,63 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			return ">broadcastMyStatus error%";
+			return "broadcastMyStatus error%";
 		}
 		// break;
 	}
 
 	@Override
-	public boolean chatUp(String senderPhone, String nickname)
+	public String chatUp(String senderTel, String username)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		String answer = "";
+		String receiverTel = "";
+		try {
+			query = "SELECT uTel FROM users WHERE username='" + username + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			receiverTel = rs.getString("uTel");
+			if (receiverTel.equals(""))
+				return "Any users with this username found%";
+			answer = '@' + receiverTel + '@';
+
+			query = "SELECT username FROM users WHERE uTel='" + senderTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next())
+				answer += "User " + rs.getString("username");
+			else
+				return "You are not registered, please register%";
+
+			query = "SELECT id, authorization FROM chatup WHERE senderTel='"
+					+ senderTel + "' AND receiverTel='" + receiverTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+
+			if (rs.next()) {
+				if (rs.getString("authorization").equals("0"))
+					return "Request already sent. You are waiting for authorization number "
+							+ rs.getString("id") + "%";
+			}
+
+			query = "INSERT INTO chatup (senderTel,receiverTel,authorization)"
+					+ "VALUES ('" + senderTel + "','" + receiverTel + "','0')";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			query = "SELECT id FROM chatup WHERE senderTel='" + senderTel
+					+ "' AND receiverTel='" + receiverTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			answer += " asks to chatup with you. If you agree, respond 'y&"
+					+ rs.getString("id") + "$'%";
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "CHATUP ERROR%";
+		}
+		return answer;
 	}
 
 	@Override
@@ -377,17 +424,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			while (rs.next())
 				answer += rs.getString("eName") + ',';
-			answer=answer.substring(0, answer.lastIndexOf(','));
-			answer+='%';
+			answer = answer.substring(0, answer.lastIndexOf(','));
+			answer += '%';
 			System.out.println(answer);
-			
+
 			if (answer.equals(""))
 				return "Any events match with criterion%";
 			return answer;
 
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			return "eventList error%";
+			return "EVENTLIST ERROR%";
 		}
 	}
 
@@ -416,7 +463,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				return "Any events match with id%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return "inviteFriend ERROR%";
+			return "INVITEFRIEND ERROR%";
 		}
 		return answer;
 	}
@@ -443,7 +490,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "Location updated%";
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			return "Location update error%";
+			return "LOCATIONUPDATE ERROR%";
 		}
 	}
 
@@ -461,7 +508,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "Status updated%";
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			return "Status update error%";
+			return "STATUS UPDATE ERROR%";
 		}
 	}
 
@@ -484,7 +531,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			return "Registration error%";
+			return "REGISTRATION ERROR%";
 		}
 	}
 
@@ -508,17 +555,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			while (rs.next())
 				answer += rs.getString("username") + ',';
-			answer=answer.substring(0, answer.lastIndexOf(','));
-			answer+='%';
+			answer = answer.substring(0, answer.lastIndexOf(','));
+			answer += '%';
 			System.out.println(answer);
-			
+
 			if (answer.equals(""))
 				return "Any users match with criterion%";
 			return answer;
 
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			return "userList error%";
+			return "USERLIST ERROR%";
 		}
 	}
 
@@ -567,13 +614,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			/* Send out the packet */
 			socket.send(packet);
 			System.out.println("\nSent...");
-			return "mobile spammed%";
+			return "Mobile spammed%";
 
 			// ---------
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "spamMobile error%";
+			return "SPAMMOBILE error%";
 		}
 	}
 
@@ -588,20 +635,26 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public String mobileUnregistration(String uTel)
-			throws RemoteException {
+	public String mobileUnregistration(String uTel) throws RemoteException {
 		if (!isUserExisting(uTel))
 			return "You are not registered%";
 		try {
 			query = "DELETE from users WHERE uTel='" + uTel + "'";
-			//System.out.println("DELETE from users where uTel='" + uTel + "' AND username='"+username+"' AND psw='"+psw+"'");
+			// System.out.println("DELETE from users where uTel='" + uTel +
+			// "' AND username='"+username+"' AND psw='"+psw+"'");
 			statement = connection.createStatement();
 			statement.execute(query);
 			return "You have been unregistered%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return "mobileUnregistration error%";
+			return "MOBILEUNREGISTRATION ERROR%";
 		}
+	}
+
+	@Override
+	public String chatUpAnswer(String senderPhone) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
