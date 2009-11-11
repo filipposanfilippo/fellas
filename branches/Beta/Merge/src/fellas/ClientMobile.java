@@ -65,10 +65,7 @@ class ClientMobile extends UnicastRemoteObject {
 								// short!
 					System.out.println("\nUSER REGISTRATION: ");
 					// check registration by phone
-					/*
-					 * String uTel = new String(sentence.substring(sentence
-					 * .indexOf("from") + 5, sentence.indexOf(':') - 1));
-					 */
+					
 					String username = new String(splittedString[1]);
 					String psw = new String(splittedString[2]);
 					String uSex = new String(splittedString[3]);
@@ -89,11 +86,7 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'e' | 'E':
 					System.out.println("\nEVENTSLIST: ");
 					// check registration by phone
-					/*
-					 * String phoneCheckE = new
-					 * String(sentence.substring(sentence .indexOf("from") + 5,
-					 * sentence.indexOf(':') - 1));
-					 */
+
 					String criterionE = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionE);
@@ -104,11 +97,7 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'j' | 'J':
 					System.out.println("\nJOIN EVENT: ");
 					// check registration by phone
-					/*
-					 * String phoneCheckJ = new
-					 * String(sentence.substring(sentence .indexOf("from") + 5,
-					 * sentence.indexOf(':') - 1));
-					 */
+					
 					String eventCode = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCode);
@@ -119,11 +108,7 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'i' | 'I':// TODO need to fix
 					System.out.println("\nINVITE FRIEND: ");
 					// check registration by phone
-					/*
-					 * String phoneCheckI = new
-					 * String(sentence.substring(sentence .indexOf("from") + 5,
-					 * sentence.indexOf(':') - 1));
-					 */
+					
 					String friendPhone = new String(splittedString[1]);
 					int eventId = Integer.valueOf(splittedString[2]);
 					System.out.println("\nphone: " + uTel);
@@ -140,10 +125,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nSET LOCATION: ");
 					// check registration by phone --> it will be done in
 					// Server.java
-					/*
-					 * String uTelL = new String(sentence.substring(sentence
-					 * .indexOf("from") + 5, sentence.indexOf(':') - 1));
-					 */
+					
 					String uLocationL = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyLocation: " + uLocationL);
@@ -155,10 +137,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nSET STATUS: ");
 					// check registration by phone --> it will be done in
 					// Server.java
-					/*
-					 * String uTelS = new String(sentence.substring(sentence
-					 * .indexOf("from") + 5, sentence.indexOf(':') - 1));
-					 */
+					
 					String uStatusS = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyLocation: " + uStatusS);
@@ -169,11 +148,7 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'u' | 'U':
 					System.out.println("\nUSERS LIST: ");
 					// check registration by phone
-					/*
-					 * String phoneCheckU = new
-					 * String(sentence.substring(sentence .indexOf("from") + 5,
-					 * sentence.indexOf(':') - 1));
-					 */
+					
 					String criterionU = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionU);
@@ -184,11 +159,7 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'b' | 'B':
 					System.out.println("\nBROADCAST MY STATUS: ");
 					// check registration by phone
-					/*
-					 * String phoneCheckB = new
-					 * String(sentence.substring(sentence .indexOf("from") + 5,
-					 * sentence.indexOf(':') - 1));
-					 */
+					
 					String criterionB = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionB);
@@ -200,26 +171,18 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'c' | 'C':
 					System.out.println("\nCHAT UP: ");
 					// check registration by phone
-					/*
-					 * String phoneCheckC = new
-					 * String(sentence.substring(sentence .indexOf("from") + 5,
-					 * sentence.indexOf(':') - 1));
-					 */
+					
 					String nicknameC = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nnicknameC: " + nicknameC);
 					// invoke remote method
-					// serverAnswer = client.chatUp(phoneCheckC, nicknameC);
+					serverAnswer = server.chatUp(uTel, nicknameC);
 					served = true;
 					break;
 				case 'x' | 'X':
 					System.out.println("\nUNREGISTRATION: ");
 					
-					//String nicknameX = new String(splittedString[1]);
-					//String pswX = new String(splittedString[2]);
 					System.out.println("\nphone: " + uTel);
-					//System.out.println("\nnicknameC: " + nicknameX);
-					//System.out.println("\nnicknameC: " + pswX);
 					// invoke remote method
 					serverAnswer = server.mobileUnregistration(uTel);
 					served = true;
@@ -228,25 +191,25 @@ class ClientMobile extends UnicastRemoteObject {
 				if (served) {
 					InetAddress IPAddress = receivePacket.getAddress();
 					int port = receivePacket.getPort();
-					// String capitalizedSentence = sentence.toUpperCase();
-					// sendData = capitalizedSentence.getBytes();
 					sendData = serverAnswer.getBytes();
 					DatagramPacket sendPacket = new DatagramPacket(sendData,
 							sendData.length, IPAddress, port);
 					serverSocket.send(sendPacket);
+					System.out.println("\nSERVER ANSWER: " + serverAnswer);
 				}
 			} else {
 				serverAnswer = "SMS is malformed!";
-				InetAddress IPAddress = receivePacket.getAddress();
+				System.out.println("SMS is malformed!");
+				/*InetAddress IPAddress = receivePacket.getAddress();
 				int port = receivePacket.getPort();
 				// String capitalizedSentence = sentence.toUpperCase();
 				// sendData = capitalizedSentence.getBytes();
 				sendData = serverAnswer.getBytes();
 				DatagramPacket sendPacket = new DatagramPacket(sendData,
 						sendData.length, IPAddress, port);
-				serverSocket.send(sendPacket);
+				serverSocket.send(sendPacket);*/
 			}
-			System.out.println("\nSERVER ANSWER: " + serverAnswer);
+			
 		}
 	}
 }
