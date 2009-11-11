@@ -23,7 +23,7 @@ class ClientMobile extends UnicastRemoteObject {
 			IOException {
 		// invoke remote methods
 		server = (ServerInterface) Naming.lookup("//" + host + "/SvrMobile");
-		ClientMobile client = new ClientMobile();
+		//ClientMobile client = new ClientMobile();
 		// to parser gms
 		DatagramSocket serverSocket = new DatagramSocket(4444); // crea un
 		// datagram
@@ -34,13 +34,13 @@ class ClientMobile extends UnicastRemoteObject {
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
 
-		// System.out.println(server.spamMobile("stasera maudit!",
-		// "uLocation = 'roma'"));//test
+		//System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
 		while (true) {
 			served = false;
 			byte[] receiveData = new byte[1024];
 			byte[] sendData = new byte[1024];
-			int pointer = 0;
+			
+			String[] splittedString = null;
 			String serverAnswer = new String();
 			DatagramPacket receivePacket = new DatagramPacket(receiveData,
 					receiveData.length);
@@ -50,162 +50,191 @@ class ClientMobile extends UnicastRemoteObject {
 			sentence = sentence.substring(0, sentence.indexOf("%"));
 			System.out.println("RECEIVED: " + sentence);
 
-			switch (sentence.charAt(sentence.indexOf(':') + 1)) {
-			case 'r' | 'R': // note: status is not set...but sms is to short!
-				System.out.println("\nUSER REGISTRATION: ");
-				// check registration by phone
-				String uTel = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String username = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('&', sentence
-						.indexOf('&') + 1)));
-				pointer += 3 + sentence.indexOf(':') + username.length();
-				String psw = new String(sentence.substring(pointer + 1,
-						sentence.indexOf('&', pointer + 1)));
-				pointer += psw.length() + 1;
-				String uSex = new String(sentence.substring(pointer + 1,
-						sentence.indexOf('&', pointer + 1)));
-				pointer += uSex.length() + 1;
-				String uAge = new String(sentence.substring(pointer + 1,
-						sentence.indexOf('&', pointer + 1)));
-				pointer += uAge.length() + 1;
-				String uLocation = new String(sentence.substring(pointer + 1,
-						sentence.indexOf('$')));
-				System.out.println("\nphone: " + uTel);
-				System.out.println("\nusername: " + username);
-				System.out.println("\npassword: " + psw);
-				System.out.println("\nsex: " + uSex);
-				System.out.println("\nage: " + uAge);
-				System.out.println("\nlocation: " + uLocation);
-				// invoke remote method
-				serverAnswer = server.mobileRegistration(uTel, username, psw,
-						uSex, uAge, uLocation);
-				// System.out.println("\nServerAnswer: " + serverAnswer);
-				served = true;
-				break;
-			case 'e' | 'E':
-				System.out.println("\nEVENTSLIST: ");
-				// check registration by phone
-				String phoneCheckE = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String criterionE = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + phoneCheckE);
-				System.out.println("\ncriterion: " + criterionE);
-				// invoke remote method
-				// serverAnswer = client.eventsList(phoneCheckE, criterionE);
-				served = true;
-				break;
-			case 'j' | 'J':
-				System.out.println("\nJOIN EVENT: ");
-				// check registration by phone
-				String phoneCheckJ = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String eventCode = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + phoneCheckJ);
-				System.out.println("\neventCode: " + eventCode);
-				// invoke remote method
-				// serverAnswer = client.joinEvent(phoneCheckJ, eventCode);
-				served = true;
-				break;
-			case 'i' | 'I':// TODO need to fix
-				System.out.println("\nINVITE FRIEND: ");
-				// check registration by phone
-				String phoneCheckI = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String friendPhone = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('&', sentence
-						.indexOf('&') + 1)));
-				pointer += 3 + sentence.indexOf(':') + friendPhone.length();
-				int eventId = Integer.valueOf(sentence.substring(pointer + 1, sentence.indexOf(
-						'&', pointer + 1)));
-				System.out.println("\nphone: " + phoneCheckI);
-				System.out.println("\nfriendPhone: " + friendPhone);
-				System.out.println("\neventId: " + eventId);
-				// invoke remote method
-				serverAnswer = server.inviteFriend( phoneCheckI, friendPhone, eventId);
-				//serverAnswer = server.inviteFriend("+393202186626", "+393280332489", 1);
-				served = true;
-				break;
-			case 'l' | 'L':
-				System.out.println("\nSET LOCATION: ");
-				// check registration by phone --> it will be done in
-				// Server.java
-				String uTelL = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String uLocationL = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + uTelL);
-				System.out.println("\nmyLocation: " + uLocationL);
-				// invoke remote method
-				serverAnswer = server.setLocation(uTelL, uLocationL);
-				served = true;
-				break;
-			case 's' | 'S':
-				System.out.println("\nSET STATUS: ");
-				// check registration by phone --> it will be done in
-				// Server.java
-				String uTelS = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String uStatusS = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + uTelS);
-				System.out.println("\nmyLocation: " + uStatusS);
-				// invoke remote method
-				serverAnswer = server.setStatus(uTelS, uStatusS);
-				served = true;
-				break;
-			case 'u' | 'U':
-				System.out.println("\nUSERS LIST: ");
-				// check registration by phone
-				String phoneCheckU = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String criterionU = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + phoneCheckU);
-				System.out.println("\ncriterion: " + criterionU);
-				// invoke remote method
-				// serverAnswer = client.userList(phoneCheckU, criterionU);
-				served = true;
-				break;
-			case 'b' | 'B':
-				System.out.println("\nBROADCAST MY STATUS: ");
-				// check registration by phone
-				String phoneCheckB = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String criterionB = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + phoneCheckB);
-				System.out.println("\ncriterion: " + criterionB);
-				// invoke remote method
-				serverAnswer = server.broadcastMyStatus(phoneCheckB,
-						criterionB + '$');
-				served = true;
-				break;
-			case 'c' | 'C':
-				System.out.println("\nCHAT UP: ");
-				// check registration by phone
-				String phoneCheckC = new String(sentence.substring(sentence
-						.indexOf("from") + 5, sentence.indexOf(':') - 1));
-				String nicknameC = new String(sentence.substring(sentence
-						.indexOf('&') + 1, sentence.indexOf('$')));
-				System.out.println("\nphone: " + phoneCheckC);
-				System.out.println("\nnicknameC: " + nicknameC);
-				// invoke remote method
-				// serverAnswer = client.chatUp(phoneCheckC, nicknameC);
-				served = true;
-				break;
-			}
-			if (served) {
-				InetAddress IPAddress = receivePacket.getAddress();
-				int port = receivePacket.getPort();
-				// String capitalizedSentence = sentence.toUpperCase();
-				// sendData = capitalizedSentence.getBytes();
-				sendData = serverAnswer.getBytes();
-				DatagramPacket sendPacket = new DatagramPacket(sendData,
-						sendData.length, IPAddress, port);
-				serverSocket.send(sendPacket);
+			// _____________
+			String uTel = new String(sentence.substring(sentence
+					.indexOf("from") + 5, sentence.indexOf(':') - 1));
+			String temp2split = new String();
+			if (sentence.endsWith("$") && sentence.contains("&")) {
+				temp2split = sentence.substring(sentence.indexOf(':') + 1,
+						sentence.lastIndexOf('$'));
+				splittedString = temp2split.split("&");
+				// _____________
+
+				switch (splittedString[0].charAt(0)) {
+				case 'r' | 'R': // note: status is not set...but sms is to
+								// short!
+					System.out.println("\nUSER REGISTRATION: ");
+					// check registration by phone
+					/*
+					 * String uTel = new String(sentence.substring(sentence
+					 * .indexOf("from") + 5, sentence.indexOf(':') - 1));
+					 */
+					String username = new String(splittedString[1]);
+					String psw = new String(splittedString[2]);
+					String uSex = new String(splittedString[3]);
+					String uAge = new String(splittedString[4]);
+					String uLocation = new String(splittedString[5]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nusername: " + username);
+					System.out.println("\npassword: " + psw);
+					System.out.println("\nsex: " + uSex);
+					System.out.println("\nage: " + uAge);
+					System.out.println("\nlocation: " + uLocation);
+					// invoke remote method
+					serverAnswer = server.mobileRegistration(uTel, username,
+							psw, uSex, uAge, uLocation);
+					// System.out.println("\nServerAnswer: " + serverAnswer);
+					served = true;
+					break;
+				case 'e' | 'E':
+					System.out.println("\nEVENTSLIST: ");
+					// check registration by phone
+					/*
+					 * String phoneCheckE = new
+					 * String(sentence.substring(sentence .indexOf("from") + 5,
+					 * sentence.indexOf(':') - 1));
+					 */
+					String criterionE = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\ncriterion: " + criterionE);
+					// invoke remote method
+					serverAnswer = server.eventsList(uTel,criterionE);
+					served = true;
+					break;
+				case 'j' | 'J':
+					System.out.println("\nJOIN EVENT: ");
+					// check registration by phone
+					/*
+					 * String phoneCheckJ = new
+					 * String(sentence.substring(sentence .indexOf("from") + 5,
+					 * sentence.indexOf(':') - 1));
+					 */
+					String eventCode = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\neventCode: " + eventCode);
+					// invoke remote method
+					// serverAnswer = client.joinEvent(phoneCheckJ, eventCode);
+					served = true;
+					break;
+				case 'i' | 'I':// TODO need to fix
+					System.out.println("\nINVITE FRIEND: ");
+					// check registration by phone
+					/*
+					 * String phoneCheckI = new
+					 * String(sentence.substring(sentence .indexOf("from") + 5,
+					 * sentence.indexOf(':') - 1));
+					 */
+					String friendPhone = new String(splittedString[1]);
+					int eventId = Integer.valueOf(splittedString[2]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nfriendPhone: " + friendPhone);
+					System.out.println("\neventId: " + eventId);
+					// invoke remote method
+					serverAnswer = server.inviteFriend(uTel, friendPhone,
+							eventId);
+					// serverAnswer = server.inviteFriend("+393202186626",
+					// "+393280332489", 1);
+					served = true;
+					break;
+				case 'l' | 'L':
+					System.out.println("\nSET LOCATION: ");
+					// check registration by phone --> it will be done in
+					// Server.java
+					/*
+					 * String uTelL = new String(sentence.substring(sentence
+					 * .indexOf("from") + 5, sentence.indexOf(':') - 1));
+					 */
+					String uLocationL = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nmyLocation: " + uLocationL);
+					// invoke remote method
+					serverAnswer = server.setLocation(uTel, uLocationL);
+					served = true;
+					break;
+				case 's' | 'S':
+					System.out.println("\nSET STATUS: ");
+					// check registration by phone --> it will be done in
+					// Server.java
+					/*
+					 * String uTelS = new String(sentence.substring(sentence
+					 * .indexOf("from") + 5, sentence.indexOf(':') - 1));
+					 */
+					String uStatusS = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nmyLocation: " + uStatusS);
+					// invoke remote method
+					serverAnswer = server.setStatus(uTel, uStatusS);
+					served = true;
+					break;
+				case 'u' | 'U':
+					System.out.println("\nUSERS LIST: ");
+					// check registration by phone
+					/*
+					 * String phoneCheckU = new
+					 * String(sentence.substring(sentence .indexOf("from") + 5,
+					 * sentence.indexOf(':') - 1));
+					 */
+					String criterionU = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\ncriterion: " + criterionU);
+					// invoke remote method
+					serverAnswer = server.userList(uTel, criterionU);
+					served = true;
+					break;
+				case 'b' | 'B':
+					System.out.println("\nBROADCAST MY STATUS: ");
+					// check registration by phone
+					/*
+					 * String phoneCheckB = new
+					 * String(sentence.substring(sentence .indexOf("from") + 5,
+					 * sentence.indexOf(':') - 1));
+					 */
+					String criterionB = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\ncriterion: " + criterionB);
+					// invoke remote method
+					serverAnswer = server.broadcastMyStatus(uTel,
+							criterionB);
+					served = true;
+					break;
+				case 'c' | 'C':
+					System.out.println("\nCHAT UP: ");
+					// check registration by phone
+					/*
+					 * String phoneCheckC = new
+					 * String(sentence.substring(sentence .indexOf("from") + 5,
+					 * sentence.indexOf(':') - 1));
+					 */
+					String nicknameC = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nnicknameC: " + nicknameC);
+					// invoke remote method
+					// serverAnswer = client.chatUp(phoneCheckC, nicknameC);
+					served = true;
+					break;
+				case 'x' | 'X':
+					System.out.println("\nUNREGISTRATION: ");
+					
+					//String nicknameX = new String(splittedString[1]);
+					//String pswX = new String(splittedString[2]);
+					System.out.println("\nphone: " + uTel);
+					//System.out.println("\nnicknameC: " + nicknameX);
+					//System.out.println("\nnicknameC: " + pswX);
+					// invoke remote method
+					serverAnswer = server.mobileUnregistration(uTel);
+					served = true;
+					break;
+				}
+				if (served) {
+					InetAddress IPAddress = receivePacket.getAddress();
+					int port = receivePacket.getPort();
+					// String capitalizedSentence = sentence.toUpperCase();
+					// sendData = capitalizedSentence.getBytes();
+					sendData = serverAnswer.getBytes();
+					DatagramPacket sendPacket = new DatagramPacket(sendData,
+							sendData.length, IPAddress, port);
+					serverSocket.send(sendPacket);
+				}
 			} else {
 				serverAnswer = "SMS is malformed!";
 				InetAddress IPAddress = receivePacket.getAddress();
