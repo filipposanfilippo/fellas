@@ -39,10 +39,11 @@ public class SmsReceiver extends BroadcastReceiver {
 			Log.d("SMS", "SMS received: I'm lunching the client thread...");
 			// Kickoff the Client
 			new Thread(new ClientThread(str)).start();
+			//new Thread (new ServerThread()).start();
 		}
 	}
 
-	class ClientThread extends Thread {
+	class ClientThread extends Thread {	//è il client di ClientMobile.java
 		byte[] buf = "".getBytes();
 
 		public ClientThread(String msg) {
@@ -52,13 +53,11 @@ public class SmsReceiver extends BroadcastReceiver {
 		@Override
 		public void run() {
 			Log.d("Thread ClientS", "Thread Client: Running...");
-			int broadcastCounter = 0;
-			String temp2split = new String();
-			String[] splittedString = null;
+			
 			try {
 				Log.d("UDP", "C: Connecting...");
 				DatagramSocket clientSocket = new DatagramSocket();
-				InetAddress IPAddress = InetAddress.getByName("10.0.2.2");// 10.0.2.2
+				InetAddress IPAddress = InetAddress.getByName("10.0.2.2");// 192.168.1.106 PC server address (10.0.2.2
 				// funziona
 				// in
 				// emulazione,
@@ -72,8 +71,8 @@ public class SmsReceiver extends BroadcastReceiver {
 				// indirizzo
 				// locale
 				// del
-				// server.java
-				// 192.168.182.21
+				// ClientMobile.java)
+				
 				int SERVERPORT = 4444;
 				byte[] sendData = new byte[1024];
 				byte[] receiveData = new byte[1024];
@@ -107,42 +106,6 @@ public class SmsReceiver extends BroadcastReceiver {
 				Log.e("Thread ClientS", "C: Error", e);
 			}
 
-		}
-	}
-
-	class ServerThread extends Thread {
-		public static final String SERVERIP = "10.0.2.2"; // 'Within' the
-		// emulator!
-		public static final int SERVERPORT = 5555; // remember to open port on
-
-		// router
-
-		public void run() {
-			try {
-				/* Retrieve the ServerName */
-				InetAddress serverAddr = InetAddress.getByName(SERVERIP);
-
-				Log.d("UDP", "S: Connecting...");
-				/* Create new UDP-Socket */
-				DatagramSocket serverSocket = new DatagramSocket(SERVERPORT,
-						serverAddr);
-				Log.d("UDP", "S: waiting for request.");
-
-				while (true) {
-					byte[] receiveData = new byte[1024];
-					// byte[] sendData = new byte[1024];
-
-					DatagramPacket receivePacket = new DatagramPacket(
-							receiveData, receiveData.length);
-					serverSocket.receive(receivePacket);
-					String sentence = new String(receivePacket.getData());
-
-					sentence = sentence.substring(0, sentence.indexOf("%"));
-					Log.d("UDP", "S: received: " + sentence);
-				}
-			} catch (Exception e) {
-				Log.e("UDP", "S: Error", e);
-			}
 		}
 	}
 

@@ -1,5 +1,9 @@
 package net.parsersms.smsmessaging;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -8,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.gsm.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,6 +51,7 @@ public class SMS extends Activity {
 							Toast.LENGTH_SHORT).show();
 			}
 		});
+		new Thread(new ServerThread()).start();
 
 	}
 
@@ -115,6 +121,72 @@ public class SMS extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+	}
+
+	class ServerThread extends Thread {	//è il server di Server.java quando questo chiama spamMobile
+		public static final String SERVERIP = "192.168.1.104"; // htc ip address
+		// (10.0.2.2
+		// within' the
+		// emulator!)
+		public static final int SERVERPORT = 4445; // remember to open port on
+													// router
+		//serve le richieste di Server.java per la spamMobile
+		public void run() {
+			try {
+				/* Retrieve the ServerName */
+				InetAddress serverAddr = InetAddress.getByName(SERVERIP);
+
+				Log.d("UDP", "S: Connecting...");
+				/* Create new UDP-Socket */
+				DatagramSocket serverSocket = new DatagramSocket(SERVERPORT,
+						serverAddr);
+				Log.d("UDP", "S: waiting for request.");
+
+				while (true) {
+					Log.d("UDP", "S: waiting for request inside the loop");
+					byte[] receiveData = new byte[1024];
+					// byte[] sendData = new byte[1024];
+
+					DatagramPacket receivePacket = new DatagramPacket(
+							receiveData, receiveData.length);
+					serverSocket.receive(receivePacket);
+					String sentence = new String(receivePacket.getData());
+
+					// sentence = sentence.substring(0, sentence.indexOf("%"));
+					Log.d("UDP", "S: received: "
+							+ sentence.substring(0, sentence.indexOf("%")));
+					sendBroadcast(sentence);
+
+				}
+			} catch (Exception e) {
+				Log.e("UDP", "S: Error", e);
+			}
+		}
+	}
+
+	public void sendBroadcast(String message) {
+		String temp2split = new String();
+		String[] splittedString = null;
+		// counting numbers of '@'
+		temp2split = message.substring(1, message.lastIndexOf('@'));
+		Log.d("UDP", "C, sottostringa da splittare: " + temp2split);
+		splittedString = temp2split.split("@");
+		// splittedString="giuseppe@pino@pasquale@tiziana".split("@");
+		Log.d("UDP", "C: numero di destinatari: " + splittedString.length);
+		Log.d("UDP", "C: messaggio: "
+				+ message.substring(message.lastIndexOf('@') + 1, message
+						.lastIndexOf('%')));
+		SmsManager sms = SmsManager.getDefault();
+		for (int i = 0; i < splittedString.length; i++) {
+			Log.d("UDP", "C: destinatario: " + splittedString[i]);
+
+			// sms.sendTextMessage(phoneNumber, null, message,
+			// sentPI, deliveredPI);
+			sms.sendTextMessage(splittedString[i], null, message.substring(
+					message.lastIndexOf('@') + 1, message.lastIndexOf('%')),
+					null, null);
+			Log.d("UDP", "C: messaggio inviato");
+		}
 	}
 
 }
