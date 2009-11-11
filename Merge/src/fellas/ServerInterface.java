@@ -67,9 +67,9 @@ public interface ServerInterface extends Remote {
 	public String broadcastMyStatus(String senderPhone, String criterion)
 			throws RemoteException;
 
-	public String chatUp(String senderPhone, String username)
+	public String chatUp(String senderTel, String username)
 			throws RemoteException;
-	public String chatUpAnswer(String senderPhone)
+	public String chatUpAnswer(String senderTel, String id)
 	throws RemoteException;
 
 	public boolean checkRegistration(String phoneNumber) throws RemoteException;
