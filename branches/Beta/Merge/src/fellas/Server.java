@@ -652,9 +652,33 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public String chatUpAnswer(String senderPhone) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String chatUpAnswer(String senderTel, String id)
+			throws RemoteException {
+		String answer = "";
+		try {
+			query = "SELECT senderTel, authorization FROM chatup WHERE id='"
+					+ id + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next()) {
+				if (rs.getInt("authorization") == 1)
+					return "You have already accepted this chatup request%";
+				answer += '@' + rs.getString("senderTel") + '@';
+			} else
+				return "Any chatup requests are pending for you%";
 
+			query = "UPDATE chatup SET authorization='1' WHERE id='" + id + "'";
+			// System.out.println(query);
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			answer += "User has accepted to chatup with you. Here the phone number "
+					+ senderTel + "%";
+			return answer;
+
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			return "CHATUPANSWER ERROR%";
+		}
+	}
 }

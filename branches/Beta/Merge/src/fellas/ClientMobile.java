@@ -187,6 +187,15 @@ class ClientMobile extends UnicastRemoteObject {
 					serverAnswer = server.mobileUnregistration(uTel);
 					served = true;
 					break;
+				case 'y' | 'Y':
+					System.out.println("\nUNREGISTRATION: ");
+					String id = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nid: " + id);
+					// invoke remote method
+					serverAnswer = server.chatUpAnswer(uTel, id);
+					served = true;
+					break;
 				}
 				if (served) {
 					InetAddress IPAddress = receivePacket.getAddress();
