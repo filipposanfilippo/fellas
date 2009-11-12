@@ -236,6 +236,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
 			String eRestriction) throws RemoteException {
+		int idEvent = 0;
 		try {
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
 					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction)"
@@ -260,6 +261,23 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ eRestriction
 					+ "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			// TODO SQL error in console,(maybe authentication but it works!
+			// ????????????
+			try {
+				query = "SELECT id FROM events WHERE eName='" + eName + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				rs.next();
+				idEvent = rs.getInt("id");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			// create the event's table for the relative user event list
+			query = "CREATE TABLE IF NOT EXISTS `" + idEvent + "` ("
+					+ "`id` int(11) DEFAULT NULL" + ")";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -471,8 +489,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public boolean joinEvent(String senderPhone, String eventCode)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		int idClient;
+		try {
+			query = "SELECT id FROM users WHERE eName='" + senderPhone + "'";
+			rs = statement.executeQuery(query);
+			rs.next();
+			idClient = rs.getInt("id");
+			query = "INSERT INTO `" + eventCode + "` (`id`)" + "VALUES (`"
+					+ String.valueOf(idClient) + "`)";
+			rs = statement.executeQuery(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	@Override
