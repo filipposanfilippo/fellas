@@ -492,22 +492,32 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean joinEvent(String senderPhone, String eventCode)
+	public String joinEvent(String senderPhone, String eventCode)
 			throws RemoteException {
 		int idClient;
 		try {
 			query = "SELECT id FROM users WHERE eName='" + senderPhone + "'";
 			rs = statement.executeQuery(query);
-			rs.next();
+			if (!rs.next())
+				return "You are not registered, please register%";
 			idClient = rs.getInt("id");
+			// CHECK IF EVENT CODE EXISTS
+			/*
+			 * query = add here the query...i don't know the new tables ;-)
+			 * rs = statement.executeQuery(query); if(!rs.next()) return
+			 * "Event code does not exist%";
+			 */
+
 			query = "INSERT INTO `" + eventCode + "` (`id`)" + "VALUES (`"
 					+ String.valueOf(idClient) + "`)";
 			rs = statement.executeQuery(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			return "JOINEVENT ERROR%";
 		}
-		return true;
+		return "You are attending at event%"; // insert eShortDescription but
+		// dont forget to end sentence
+		// with %
 	}
 
 	@Override

@@ -102,7 +102,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCode);
 					// invoke remote method
-					// serverAnswer = client.joinEvent(phoneCheckJ, eventCode);
+					serverAnswer = server.joinEvent(uTel, eventCode);
 					served = true;
 					break;
 				case 'i' | 'I':// TODO need to fix
