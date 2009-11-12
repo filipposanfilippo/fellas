@@ -385,6 +385,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			else
 				return "You are not registered, please register%";
 
+			// check if there is already an entry in chatup table
+
 			query = "SELECT id, authorization FROM chatup WHERE senderTel='"
 					+ senderTel + "' AND receiverTel='" + receiverTel + "'";
 			statement = connection.createStatement();
@@ -394,6 +396,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				if (rs.getString("authorization").equals("0"))
 					return "Request already sent. You are waiting for authorization number "
 							+ rs.getString("id") + "%";
+				else
+					return "Request already sent. You are able to chatup with "
+							+ receiverTel + "%";
 			}
 
 			query = "INSERT INTO chatup (senderTel,receiverTel,authorization)"
