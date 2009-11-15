@@ -302,6 +302,30 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ event.geteRestriction() + "' WHERE id=" + event.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
+			// TODO Update POI table too
+			/*
+			 * note: in poi table, id has to be the same to event id. Aggiungere
+			 * i seguenti attributi alla classe event:
+			 * - infoTel: che è il telefono dell'organizzatore dell'evento (può essere
+			 * diverso dal club)
+			 * - imageURL
+			 */
+			// TODO implement the address2GEOcoordinates() method. input: street
+			// address, output: array of 2 strings
+			// String[] coordinates address2GEOcoordinates(event.geteLocation());
+
+			/*query = "UPDATE poi SET " + "id='" + event.getId() + "',"
+					+ "title='" + event.geteName() + "'," + "attribution='"
+					+ event.getTelInfo() + "'," + "imageURL='"
+					+ event.getImageURL() + "'," + "lat='" + coordinates[0]
+					+ "'," + "'," + "lon='" + coordinates[1] + "'," + "line2='"
+					+ event.geteCategory() + "'," + "line3='"
+					+ event.geteDate() + "'," + "line4='"
+					+ event.geteStartTime() + "'," + "type=3" + "' WHERE id="
+					+ event.getId();
+			statement = connection.createStatement();
+			statement.execute(query);*/
+
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -502,7 +526,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 			userid = rs.getInt("id");
-			
+
 			// CHECK IF USER IS ALREADY ATTENDING
 			query = "SELECT id FROM " + eventCode + " WHERE id='"
 					+ String.valueOf(userid) + "'";
