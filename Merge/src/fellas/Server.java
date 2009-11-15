@@ -1,9 +1,14 @@
 package fellas;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -304,27 +309,27 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement.execute(query);
 			// TODO Update POI table too
 			/*
-			 * note: in poi table, id has to be the same to event id. Aggiunti
-			 * i seguenti attributi alla classe event e alla tabella:
-			 * - infoTel: che è il telefono dell'organizzatore dell'evento (può essere
-			 * diverso dal club)
-			 * - imageURL
+			 * note: in poi table, id has to be the same to event id. Aggiunti i
+			 * seguenti attributi alla classe event e alla tabella: - infoTel:
+			 * che è il telefono dell'organizzatore dell'evento (può essere
+			 * diverso dal club) - imageURL
 			 */
 			// TODO implement the address2GEOcoordinates() method. input: street
 			// address, output: array of 2 strings
-			// String[] coordinates address2GEOcoordinates(event.geteLocation());
+			// String[] coordinates
+			// address2GEOcoordinates(event.geteLocation());
 
-			/*query = "UPDATE poi SET " + "id='" + event.getId() + "',"
-					+ "title='" + event.geteName() + "'," + "attribution='"
-					+ event.getInfoTel() + "'," + "imageURL='"
-					+ event.getImageURL() + "'," + "lat='" + coordinates[0]
-					+ "'," + "'," + "lon='" + coordinates[1] + "'," + "line2='"
-					+ event.geteCategory() + "'," + "line3='"
-					+ event.geteDate() + "'," + "line4='"
-					+ event.geteStartTime() + "'," + "type=3" + "' WHERE id="
-					+ event.getId();
-			statement = connection.createStatement();
-			statement.execute(query);*/
+			/*
+			 * query = "UPDATE poi SET " + "id='" + event.getId() + "'," +
+			 * "title='" + event.geteName() + "'," + "attribution='" +
+			 * event.getInfoTel() + "'," + "imageURL='" + event.getImageURL() +
+			 * "'," + "lat='" + coordinates[0] + "'," + "'," + "lon='" +
+			 * coordinates[1] + "'," + "line2='" + event.geteCategory() + "'," +
+			 * "line3='" + event.geteDate() + "'," + "line4='" +
+			 * event.geteStartTime() + "'," + "type=3" + "' WHERE id=" +
+			 * event.getId(); statement = connection.createStatement();
+			 * statement.execute(query);
+			 */
 
 			return true;
 		} catch (SQLException e) {
@@ -751,5 +756,38 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// e.printStackTrace();
 			return "CHATUPANSWER ERROR%";
 		}
+	}
+
+	public static String[] address2GEOcoordinates(String streetAddress) {
+		streetAddress = streetAddress.replace(",", "+");
+		// use of regular expression(e kka vi futtii!)
+		streetAddress = streetAddress.replaceAll(" {1,}", "");
+		String[] coordinates = new String[2];
+		String tempCoordinates = new String();
+		InputStream ins;
+		InputStreamReader isr;
+		BufferedReader rdr;
+		String tempURL = "http://local.yahooapis.com/MapsService/V1/geocode?appid=YD-9G7bey8_JXxQP6rxl.fBFGgCdNjoDMACQA--&street=";
+		tempURL += streetAddress;
+		System.out.println(tempURL);
+		try {
+			URL url = new URL(tempURL);
+			URLConnection url_conn = url.openConnection();
+			ins = (InputStream) url_conn.getContent();
+			isr = new InputStreamReader(ins);
+			rdr = new BufferedReader(isr);
+			tempCoordinates=rdr.readLine();
+			while (!tempCoordinates.endsWith("</ResultSet>"))
+				tempCoordinates += new String(rdr.readLine());
+			
+			coordinates[0]=tempCoordinates.substring(tempCoordinates.indexOf("<Latitude>")+10, tempCoordinates.indexOf("</Latitude>"));
+			coordinates[1]=tempCoordinates.substring(tempCoordinates.indexOf("<Longitude>")+11, tempCoordinates.indexOf("</Longitude>"));
+			System.out.println(coordinates[0]);
+			System.out.println(coordinates[1]);
+
+		} catch (Exception e) {
+			System.out.println("ERROR in address2GEOcoordinates");
+		}
+		return coordinates;
 	}
 }
