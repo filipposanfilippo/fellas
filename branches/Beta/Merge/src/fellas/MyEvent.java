@@ -20,7 +20,7 @@ public class MyEvent implements Serializable{
 	public MyEvent(int id, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction) {
+			String eRestriction, String infoTel, String imageURL) {
 		super();
 		this.id = id;
 		this.cId = cId;
@@ -33,6 +33,8 @@ public class MyEvent implements Serializable{
 		this.eStartTime = eStartTime;
 		this.eFinishTime = eFinishTime;
 		this.eRestriction = eRestriction;
+		this.infoTel= infoTel;
+		this.imageURL= imageURL;
 	}
 
 	

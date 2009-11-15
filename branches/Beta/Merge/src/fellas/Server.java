@@ -159,14 +159,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 
 			while (rs.next())
-				eventList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
-						.getString("eName"), rs.getString("eShortDescription"),
-						rs.getString("eLongDescription"), rs
+				eventList
+						.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+								.getString("eName"), rs
+								.getString("eShortDescription"), rs
+								.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
 								.getString("eCategory"), rs.getString("eDate"),
-						rs.getString("eStartTime"),
-						rs.getString("eFinishTime"), rs
-								.getString("eRestriction")));
+								rs.getString("eStartTime"), rs
+										.getString("eFinishTime"), rs
+										.getString("eRestriction"), rs
+										.getString("infoTel"), rs
+										.getString("imageURL")));
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
@@ -189,7 +193,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eCategory"), rs.getString("eDate"),
 						rs.getString("eStartTime"),
 						rs.getString("eFinishTime"), rs
-								.getString("eRestriction"));
+								.getString("eRestriction"), rs
+								.getString("infoTel"), rs.getString("imageURL"));
 				return event;
 			} else {
 				return null;
@@ -240,11 +245,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction) throws RemoteException {
+			String eRestriction, String infoTel, String imageURL)
+			throws RemoteException {
 		int idEvent = 0;
+		int poiId = 0;
+		String[] coordinates = new String[2];
+		coordinates = address2GEOcoordinates(eLocation);
 		try {
+			// TODO prima di inserire controlla che eName non esista già
+			query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next())
+				return false;
+
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
-					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction)"
+					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction,infoTel,imageURL)"
 					+ "VALUES ('"
 					+ cId
 					+ "','"
@@ -265,20 +281,59 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ eFinishTime
 					+ "','"
 					+ eRestriction
+					+ "','"
+					+ infoTel
+					+ "','"
+					+ imageURL
 					+ "')";
 			statement = connection.createStatement();
 			statement.execute(query);
+
+			// insert event into poi and add it the actions
+			// recupera id assegnato con autoincrement
+			query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			poiId = rs.getInt("id");
+
+			query = "INSERT INTO poi (id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+					+ "VALUES ('"
+					+ poiId
+					+ "','"
+					+ infoTel
+					+ "','"
+					+ imageURL
+					+ "','"
+					+ coordinates[0]
+					+ "','"
+					+ coordinates[1]
+					+ "','"
+					+ eCategory
+					+ "','"
+					+ eDate
+					+ "','"
+					+ eStartTime
+					+ "','"
+					+ eName + "',3)";
+			statement = connection.createStatement();
+			statement.execute(query);
+			// add actions to poi
+			query = "INSERT INTO action (uri,label,poiId)"
+					+ "VALUES ('http://fellas.netsons.org/events/event" + poiId
+					+ ".php','Join event','" + poiId + "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			
+			//TODO erik ma sta cosa che hai fatto sotto non funge!
 			// TODO SQL error in console,(maybe authentication but it works!
 			// ????????????
-			try {
-				query = "SELECT id FROM events WHERE eName='" + eName + "'";
-				statement = connection.createStatement();
-				rs = statement.executeQuery(query);
-				rs.next();
-				idEvent = rs.getInt("id");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+
+			query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			idEvent = rs.getInt("id");
 
 			// create the event's table for the relative user event list
 			query = "CREATE TABLE IF NOT EXISTS `" + idEvent + "` ("
@@ -308,25 +363,25 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			statement = connection.createStatement();
 			statement.execute(query);
-			// TODO Update POI table too
+			//Update POI table too
 			/*
-			 * note: in poi table, id has to be the same to event id and action id. Aggiunti i
-			 * seguenti attributi alla classe event e alla tabella: - infoTel:
-			 * che è il telefono dell'organizzatore dell'evento (può essere
-			 * diverso dal club) - imageURL
+			 * note: in poi table, id has to be the same to event id and action
+			 * id. Aggiunti i seguenti attributi alla classe event e alla
+			 * tabella: - infoTel: che è il telefono dell'organizzatore
+			 * dell'evento (può essere diverso dal club) - imageURL
 			 */
-			
+
 			String[] coordinates = address2GEOcoordinates(event.geteLocation());
 
-			query = "UPDATE poi SET " + "title='" + event.geteName()
-			+ "'," + "attribution='" + event.getInfoTel() + "',"
-			+ "imageURL='" + event.getImageURL() + "'," + "lat='"
-			+ coordinates[0] + "'," + "lon='" + coordinates[1]
-			+ "'," + "line2='" + event.geteCategory() + "',"
-			+ "line3='" + event.geteDate() + "'," + "line4='"
-			+ event.geteStartTime() + "'," + "type=3" + " WHERE id="
-			+ event.getId();
-			
+			query = "UPDATE poi SET " + "title='" + event.geteName() + "',"
+					+ "attribution='" + event.getInfoTel() + "',"
+					+ "imageURL='" + event.getImageURL() + "'," + "lat='"
+					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
+					+ "line2='" + event.geteCategory() + "'," + "line3='"
+					+ event.geteDate() + "'," + "line4='"
+					+ event.geteStartTime() + "'," + "type=3" + " WHERE id="
+					+ event.getId();
+
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -342,11 +397,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from events where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			//delete item from poi and from actions too
+			// delete item from poi and from actions too
 			query = "DELETE from poi where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			query = "DELETE from action where id='" + eventId + "'";
+			query = "DELETE from action where poiId='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
