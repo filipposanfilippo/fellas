@@ -305,6 +305,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ event.geteStartTime() + "'," + "eFinishTime='"
 					+ event.geteFinishTime() + "'," + "eRestriction='"
 					+ event.geteRestriction() + "' WHERE id=" + event.getId();
+
 			statement = connection.createStatement();
 			statement.execute(query);
 			// TODO Update POI table too
@@ -314,22 +315,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			 * che è il telefono dell'organizzatore dell'evento (può essere
 			 * diverso dal club) - imageURL
 			 */
-			// TODO implement the address2GEOcoordinates() method. input: street
-			// address, output: array of 2 strings
-			// String[] coordinates
-			// address2GEOcoordinates(event.geteLocation());
+			
+			String[] coordinates = address2GEOcoordinates(event.geteLocation());
 
-			/*
-			 * query = "UPDATE poi SET " + "id='" + event.getId() + "'," +
-			 * "title='" + event.geteName() + "'," + "attribution='" +
-			 * event.getInfoTel() + "'," + "imageURL='" + event.getImageURL() +
-			 * "'," + "lat='" + coordinates[0] + "'," + "'," + "lon='" +
-			 * coordinates[1] + "'," + "line2='" + event.geteCategory() + "'," +
-			 * "line3='" + event.geteDate() + "'," + "line4='" +
-			 * event.geteStartTime() + "'," + "type=3" + "' WHERE id=" +
-			 * event.getId(); statement = connection.createStatement();
-			 * statement.execute(query);
-			 */
+			query = "UPDATE poi SET " + "title='" + event.geteName()
+			+ "'," + "attribution='" + event.getInfoTel() + "',"
+			+ "imageURL='" + event.getImageURL() + "'," + "lat='"
+			+ coordinates[0] + "'," + "lon='" + coordinates[1]
+			+ "'," + "line2='" + event.geteCategory() + "',"
+			+ "line3='" + event.geteDate() + "'," + "line4='"
+			+ event.geteStartTime() + "'," + "type=3" + " WHERE id="
+			+ event.getId();
+			
+			statement = connection.createStatement();
+			statement.execute(query);
 
 			return true;
 		} catch (SQLException e) {
@@ -776,12 +775,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			ins = (InputStream) url_conn.getContent();
 			isr = new InputStreamReader(ins);
 			rdr = new BufferedReader(isr);
-			tempCoordinates=rdr.readLine();
+			tempCoordinates = rdr.readLine();
 			while (!tempCoordinates.endsWith("</ResultSet>"))
 				tempCoordinates += new String(rdr.readLine());
-			
-			coordinates[0]=tempCoordinates.substring(tempCoordinates.indexOf("<Latitude>")+10, tempCoordinates.indexOf("</Latitude>"));
-			coordinates[1]=tempCoordinates.substring(tempCoordinates.indexOf("<Longitude>")+11, tempCoordinates.indexOf("</Longitude>"));
+
+			coordinates[0] = tempCoordinates.substring(tempCoordinates
+					.indexOf("<Latitude>") + 10, tempCoordinates
+					.indexOf("</Latitude>"));
+			coordinates[1] = tempCoordinates.substring(tempCoordinates
+					.indexOf("<Longitude>") + 11, tempCoordinates
+					.indexOf("</Longitude>"));
 			System.out.println(coordinates[0]);
 			System.out.println(coordinates[1]);
 
