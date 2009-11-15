@@ -15,7 +15,8 @@ public class MyEvent implements Serializable{
 	private String eStartTime;
 	private String eFinishTime;
 	private String eRestriction;
-
+	private String infoTel;
+	private String imageURL;
 	public MyEvent(int id, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
@@ -106,6 +107,26 @@ public class MyEvent implements Serializable{
 	}
 	public String geteRestriction() {
 		return eRestriction;
+	}
+
+
+	public void setInfoTel(String infoTel) {
+		this.infoTel = infoTel;
+	}
+
+
+	public String getInfoTel() {
+		return infoTel;
+	}
+
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
+
+	public String getImageURL() {
+		return imageURL;
 	}
 
 	

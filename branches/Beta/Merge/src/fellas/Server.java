@@ -304,8 +304,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement.execute(query);
 			// TODO Update POI table too
 			/*
-			 * note: in poi table, id has to be the same to event id. Aggiungere
-			 * i seguenti attributi alla classe event:
+			 * note: in poi table, id has to be the same to event id. Aggiunti
+			 * i seguenti attributi alla classe event e alla tabella:
 			 * - infoTel: che è il telefono dell'organizzatore dell'evento (può essere
 			 * diverso dal club)
 			 * - imageURL
@@ -316,7 +316,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			/*query = "UPDATE poi SET " + "id='" + event.getId() + "',"
 					+ "title='" + event.geteName() + "'," + "attribution='"
-					+ event.getTelInfo() + "'," + "imageURL='"
+					+ event.getInfoTel() + "'," + "imageURL='"
 					+ event.getImageURL() + "'," + "lat='" + coordinates[0]
 					+ "'," + "'," + "lon='" + coordinates[1] + "'," + "line2='"
 					+ event.geteCategory() + "'," + "line3='"
