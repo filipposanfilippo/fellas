@@ -310,7 +310,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement.execute(query);
 			// TODO Update POI table too
 			/*
-			 * note: in poi table, id has to be the same to event id. Aggiunti i
+			 * note: in poi table, id has to be the same to event id and action id. Aggiunti i
 			 * seguenti attributi alla classe event e alla tabella: - infoTel:
 			 * che è il telefono dell'organizzatore dell'evento (può essere
 			 * diverso dal club) - imageURL
@@ -340,6 +340,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean deleteEvent(int eventId) throws RemoteException {
 		try {
 			query = "DELETE from events where id='" + eventId + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			//delete item from poi and from actions too
+			query = "DELETE from poi where id='" + eventId + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			query = "DELETE from action where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
