@@ -21,6 +21,7 @@ import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -177,13 +178,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
 
-		eventJList = new JList(getEventsArray());
-		eventJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		eventJList.setBackground(new Color(153, 204, 255));
-		eventJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		eventJList = createEventList();
 		JScrollPane eventScrollPane = new JScrollPane(eventJList);
 		leftDownP.add(eventScrollPane);
-		eventJList.addListSelectionListener(this);
 
 		// loadUsersB = new JButton("Load Users");
 		// loadUsersB.addActionListener(this);
@@ -249,12 +246,21 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	}
 
 	private JList createEventList() {
-		JList eJList = new JList(getEventsArray());
+		JList eJList = new JList(new DefaultListModel());
 		eJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eJList.setBackground(new Color(153, 204, 255));
 		eJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		eJList.addListSelectionListener(this);
+		populateList(eJList, getEventsArray());
 		return eJList;
+	}
+
+	private void populateList(JList list, String[] elements) {
+		DefaultListModel model = (DefaultListModel) list.getModel();
+		model.clear();
+		for (String e : elements) {
+			model.addElement(e);
+		}
 	}
 
 	// ******************************************************************************
@@ -542,7 +548,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									.getText(), emailR.getText(), typeR
 									.getText(), userR.getText(), new String(
 									pwdR.getPassword()));
-					System.out.println("RISULTATO CONNESSIONE : " + res);
 					if (res) {
 						profileStatus.setForeground(Color.green);
 						profileStatus.setText("Data updated succesfully!");
@@ -577,16 +582,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					// TODO add error message
 					e1.printStackTrace();
 				}
+
+				populateList(eventJList, getEventsArray());
+				populateList(eventJList2, getEventsArray());
+
 				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
 						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
 			}
-			eventJList = createEventList();
-			eventJList2 = createEventList();
 		}
-		if (event == modifyEvB) {
-			// TODO sinc with server
-			// TODO create a refresh function to add to the three buttons for
-			// update the events! (for update create e delete!!)
+		if (event == modifyEvB && eventJList2.getSelectedValue() != null) {
 			String selEv[] = eventJList2.getSelectedValue().toString().split(
 					"]");
 			try {
@@ -598,26 +602,35 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 								.getText(), eFinishTime.getText(), eRestriction
 								.getText(), eInfoTel.getText(), eImageURL
 								.getText()));
+				populateList(eventJList, getEventsArray());
+				populateList(eventJList2, getEventsArray());
+
 				JOptionPane.showMessageDialog(mainFrame,
 						"Modified succesfully " + selEv[1], "Modified!",
 						JOptionPane.INFORMATION_MESSAGE);
-			} catch (NumberFormatException e1) {
+			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
 						"Error", JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
-			} catch (RemoteException e1) {
-				JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
+				ex.printStackTrace();
 			}
-			eventJList = createEventList();
-			eventJList2 = createEventList();
 		}
-		if (event == deleteEvB) {
+		if (event == deleteEvB && eventJList2.getSelectedValue() != null) {
 			String selEv[] = eventJList2.getSelectedValue().toString().split(
 					"]");
 			try {
 				currentClub.deleteEvent(Integer.parseInt(selEv[0]));
+				eName.setText("");
+				eShortDescription.setText("");
+				eLongDescription.setText("");
+				eLocation.setText("");
+				eCategory.setText("");
+				eDate.setText("");
+				eStartTime.setText("");
+				eFinishTime.setText("");
+				eRestriction.setText("");
+				eInfoTel.setText("");
+				eImageURL.setText("");
+				eLongDescription.setText("");
 				JOptionPane
 						.showMessageDialog(mainFrame, "Deleted succesfully"
 								+ selEv[1], "Deleted!",
@@ -631,8 +644,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						+ selEv[1], "Error", JOptionPane.ERROR_MESSAGE);
 				e1.printStackTrace();
 			}
-			eventJList = createEventList();
-			eventJList2 = createEventList();
+			populateList(eventJList2, getEventsArray());
+			populateList(eventJList, getEventsArray());
 		}
 
 		if (event == credits) {
@@ -731,26 +744,24 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 
 	public void valueChanged(ListSelectionEvent e) {
-		if (e.getSource() == eventJList) {
-			if (eventJList.getSelectedValue() != null) {
-				sendMessB.setEnabled(true);
-				String selection = eventJList.getSelectedValue().toString();
-				// TODO collegati al server e ritorna una lista di utenti per
-				// l'evento selezionato
-				String users[] = { "selection: " + selection, "Pippo", "Pluto",
-						"Paperino", "Minnie" };
-				usersJList.setListData(users);
-			}
+		if (e.getSource() == eventJList
+				&& eventJList.getSelectedValue() != null) {
+			sendMessB.setEnabled(true);
+			String selection = eventJList.getSelectedValue().toString();
+			// TODO collegati al server e ritorna una lista di utenti per
+			// l'evento selezionato
+			String users[] = { "selection: " + selection, "Pippo", "Pluto",
+					"Paperino", "Minnie" };
+			usersJList.setListData(users);
 		}
-		// TODO sistemare il controllo..
-		if (e.getSource() == eventJList2) {
+
+		if (e.getSource() == eventJList2
+				&& eventJList2.getSelectedValue() != null) {
 			modifyEvB.setEnabled(true);
 			deleteEvB.setEnabled(true);
-
-			int sel = Integer.parseInt(eventJList2.getSelectedValue()
-					.toString().split("]")[0]);
-
 			try {
+				int sel = Integer.parseInt(eventJList2.getSelectedValue()
+						.toString().split("]")[0]);
 				MyEvent event = currentClub.getEvent(sel);
 
 				eName.setText(event.geteName());
@@ -769,7 +780,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				// TODO add error
 				e1.printStackTrace();
 			}
-
 		}
 	}
 
