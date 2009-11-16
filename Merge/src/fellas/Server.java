@@ -291,7 +291,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			// insert event into poi and add it the actions
 			// recupera id assegnato con autoincrement
-			query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			query = "SELECT id FROM events WHERE eName='" + eName + "',cId='"+cId+"',eDate='"+eDate+"'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
@@ -329,14 +329,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// TODO SQL error in console,(maybe authentication but it works!
 			// ????????????
 
-			query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			/*query = "SELECT id FROM events WHERE eName='" + eName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			idEvent = rs.getInt("id");
+			idEvent = rs.getInt("id");*/
 
 			// create the event's table for the relative user event list
-			query = "CREATE TABLE IF NOT EXISTS `" + idEvent + "` ("
+			query = "CREATE TABLE IF NOT EXISTS `ev" + poiId + "` ("
 					+ "`id` int(11) DEFAULT NULL" + ")";
 			statement = connection.createStatement();
 			statement.execute(query);
