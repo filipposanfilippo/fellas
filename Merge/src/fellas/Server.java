@@ -61,14 +61,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (isClubExisting(oName))
 			return false;
 		try {
-			query = "INSERT INTO clubs (oName,oSurname,cAddress,cTel,cName,psw)"
+			query = "INSERT INTO clubs (oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw)"
 					+ "VALUES ('"
 					+ oName
 					+ "','"
 					+ oSurname
 					+ "','"
 					+ cAddress
-					+ "','" + cTel + "','" + cName + "','" + psw + "')";
+					+ "','"
+					+ cTel
+					+ "','"
+					+ cEMail
+					+ "','"
+					+ cType
+					+ "','"
+					+ cName + "','" + psw + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -159,18 +166,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 
 			while (rs.next())
-				eventList
-						.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
-								.getString("eName"), rs
-								.getString("eShortDescription"), rs
-								.getString("eLongDescription"), rs
+				eventList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+						.getString("eName"), rs.getString("eShortDescription"),
+						rs.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
 								.getString("eCategory"), rs.getString("eDate"),
-								rs.getString("eStartTime"), rs
-										.getString("eFinishTime"), rs
-										.getString("eRestriction"), rs
-										.getString("eInfoTel"), rs
-										.getString("imageURL")));
+						rs.getString("eStartTime"),
+						rs.getString("eFinishTime"), rs
+								.getString("eRestriction"), rs
+								.getString("eInfoTel"), rs
+								.getString("imageURL")));
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
@@ -194,7 +199,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						rs.getString("eStartTime"),
 						rs.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
-								.getString("eInfoTel"), rs.getString("eImageURL"));
+								.getString("eInfoTel"), rs
+								.getString("eImageURL"));
 				return event;
 			} else {
 				return null;
@@ -253,11 +259,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		coordinates = address2GEOcoordinates(eLocation);
 		try {
 			// TODO prima di inserire controlla che eName non esista già
-			/*query = "SELECT id FROM events WHERE eName='" + eName + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			if (rs.next())
-				return false;*/
+			/*
+			 * query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			 * statement = connection.createStatement(); rs =
+			 * statement.executeQuery(query); if (rs.next()) return false;
+			 */
 
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
 					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
@@ -284,14 +290,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ eInfoTel
 					+ "','"
-					+ eImageURL
-					+ "')";
+					+ eImageURL + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
 			// insert event into poi and add it the actions
 			// recupera id assegnato con autoincrement
-			query = "SELECT id FROM events WHERE eName='" + eName + "',cId='"+cId+"',eDate='"+eDate+"'";
+			query = "SELECT id FROM events WHERE eName='" + eName + "',cId='"
+					+ cId + "',eDate='" + eDate + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
@@ -312,10 +318,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ eCategory
 					+ "','"
 					+ eDate
-					+ "','"
-					+ eStartTime
-					+ "','"
-					+ eName + "',3)";
+					+ "','" + eStartTime + "','" + eName + "',3)";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// add actions to poi
@@ -324,16 +327,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ ".php','Join event','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
-			
-			//TODO erik ma sta cosa che hai fatto sotto non funge!
+
+			// TODO erik ma sta cosa che hai fatto sotto non funge!
 			// TODO SQL error in console,(maybe authentication but it works!
 			// ????????????
 
-			/*query = "SELECT id FROM events WHERE eName='" + eName + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			idEvent = rs.getInt("id");*/
+			/*
+			 * query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			 * statement = connection.createStatement(); rs =
+			 * statement.executeQuery(query); rs.next(); idEvent =
+			 * rs.getInt("id");
+			 */
 
 			// create the event's table for the relative user event list
 			query = "CREATE TABLE IF NOT EXISTS `ev" + poiId + "` ("
@@ -363,7 +367,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			statement = connection.createStatement();
 			statement.execute(query);
-			//Update POI table too
+			// Update POI table too
 			/*
 			 * note: in poi table, id has to be the same to event id and action
 			 * id. Aggiunti i seguenti attributi alla classe event e alla
