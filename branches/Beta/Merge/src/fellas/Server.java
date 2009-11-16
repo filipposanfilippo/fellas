@@ -629,6 +629,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "' WHERE uTel = '" + uTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
+
+			// update location in poi
+			String[] coordinates = new String[2];
+			coordinates = address2GEOcoordinates(uLocation);
+			
+			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int id = rs.getInt("id");
+
+			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"+coordinates[1]+"' WHERE id = '"
+			+ id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
 			return "Location updated%";
 		} catch (SQLException e) {
 			// e.printStackTrace();
@@ -647,6 +663,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "' WHERE uTel = '" + uTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
+			// update status in poi
+			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int id = rs.getInt("id");
+
+			query = "UPDATE POI SET line4 = '" + uStatus + "' WHERE id = '"
+					+ id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
 			return "Status updated%";
 		} catch (SQLException e) {
 			// e.printStackTrace();
@@ -656,20 +684,81 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	@Override
 	public String mobileRegistration(String uTel, String username, String psw,
-			String uSex, String uAge, String uLocation) throws RemoteException {
+			String uSex, String uAge, String uLocation, String uPrivacy)
+			throws RemoteException {
 		if (isUserExisting(uTel))
 			return "Already registered%";
 		try {
-			query = "INSERT INTO users (uTel,username,psw,uSex,uAge, uLocation)"
+			query = "INSERT INTO users (uTel,username,psw,uSex,uAge,uLocation,privacy,uName, uStatus, uSurname, imageURL)"
 					+ "VALUES ('"
 					+ uTel
 					+ "','"
 					+ username
 					+ "','"
 					+ psw
-					+ "','" + uSex + "','" + uAge + "', '" + uLocation + "')";
+					+ "','"
+					+ uSex
+					+ "','"
+					+ uAge
+					+ "','"
+					+ uLocation
+					+ "','"
+					+ uPrivacy + "','','','','')";
 			statement = connection.createStatement();
 			statement.execute(query);
+
+			// recupera id user
+			query = "SELECT id, privacy FROM users WHERE username='" + username
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int id = rs.getInt("id");
+			int privacy = rs.getInt("privacy");
+
+			// insert user in POI
+			String[] coordinates = new String[2];
+			coordinates = address2GEOcoordinates(uLocation);
+			if (privacy == 0)
+				query = "INSERT INTO POI (id,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+						+ "VALUES ('"
+						+ id
+						+ "','','"
+						+ coordinates[0]
+						+ "','"
+						+ coordinates[1]
+						+ "','"
+						+ uSex
+						+ "','"
+						+ uAge
+						+ "', '"
+						+ username + "',1,'','')";
+			else
+				query = "INSERT INTO POI (id,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+						+ "VALUES ('"
+						+ id
+						+ "','"
+						+ uTel
+						+ "','"
+						+ coordinates[0]
+						+ "','"
+						+ coordinates[1]
+						+ "','"
+						+ uSex
+						+ "','"
+						+ uAge
+						+ "', '"
+						+ username
+						+ "',1,'','')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			// add action to poi
+			query = "INSERT INTO Action (uri,label,poiId)"
+					+ "VALUES ('http://diana.netsons.org/users/" + username
+					+ ".php','Visit user page','" + id + "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
 			// e.printStackTrace();
@@ -781,11 +870,29 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (!isUserExisting(uTel))
 			return "You are not registered%";
 		try {
+			// recupera id
+			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "You are not registered, please register%";
+			int id = rs.getInt("id");
+
+			// delete user from users
 			query = "DELETE from users WHERE uTel='" + uTel + "'";
-			// System.out.println("DELETE from users where uTel='" + uTel +
-			// "' AND username='"+username+"' AND psw='"+psw+"'");
 			statement = connection.createStatement();
 			statement.execute(query);
+
+			// delete user from poi
+			query = "DELETE from POI WHERE id='" + id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// delete entry from action
+			query = "DELETE from Action WHERE poiId='" + id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
 			return "You have been unregistered%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -827,7 +934,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public static String[] address2GEOcoordinates(String streetAddress) {
 		streetAddress = streetAddress.replace(",", "+");
 		// use of regular expression(e kka vi futtii!)
-		streetAddress = streetAddress.replaceAll(" {1,}", "");
+		streetAddress = streetAddress.replaceAll(" {1,}", "+");
 		String[] coordinates = new String[2];
 		String tempCoordinates = new String();
 		InputStream ins;

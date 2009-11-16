@@ -42,7 +42,7 @@ public interface ServerInterface extends Remote {
 	// __________________________
 
 	public String mobileRegistration(String uTel, String username, String psw,
-			String uSex, String uAge, String uLocation) throws RemoteException;
+			String uSex, String uAge, String uLocation, String uPrivacy) throws RemoteException;
 
 	public String mobileUnregistration(String uTel)
 			throws RemoteException;
