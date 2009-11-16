@@ -169,7 +169,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								rs.getString("eStartTime"), rs
 										.getString("eFinishTime"), rs
 										.getString("eRestriction"), rs
-										.getString("infoTel"), rs
+										.getString("eInfoTel"), rs
 										.getString("imageURL")));
 			return eventList;
 		} catch (SQLException e) {
@@ -194,7 +194,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						rs.getString("eStartTime"),
 						rs.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
-								.getString("infoTel"), rs.getString("imageURL"));
+								.getString("eInfoTel"), rs.getString("eImageURL"));
 				return event;
 			} else {
 				return null;
@@ -245,7 +245,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction, String infoTel, String imageURL)
+			String eRestriction, String eInfoTel, String eImageURL)
 			throws RemoteException {
 		int idEvent = 0;
 		int poiId = 0;
@@ -260,7 +260,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				return false;
 
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
-					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction,infoTel,imageURL)"
+					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
 					+ "VALUES ('"
 					+ cId
 					+ "','"
@@ -282,9 +282,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ eRestriction
 					+ "','"
-					+ infoTel
+					+ eInfoTel
 					+ "','"
-					+ imageURL
+					+ eImageURL
 					+ "')";
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -297,13 +297,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			poiId = rs.getInt("id");
 
-			query = "INSERT INTO POI (id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+			query = "INSERT INTO POI (id,attribution,eImageURL,lat,lon,line2,line3,line4,title,type)"
 					+ "VALUES ('"
 					+ poiId
 					+ "','"
-					+ infoTel
+					+ eInfoTel
 					+ "','"
-					+ imageURL
+					+ eImageURL
 					+ "','"
 					+ coordinates[0]
 					+ "','"
@@ -367,15 +367,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			/*
 			 * note: in poi table, id has to be the same to event id and action
 			 * id. Aggiunti i seguenti attributi alla classe event e alla
-			 * tabella: - infoTel: che è il telefono dell'organizzatore
-			 * dell'evento (può essere diverso dal club) - imageURL
+			 * tabella: - eInfoTel: che è il telefono dell'organizzatore
+			 * dell'evento (può essere diverso dal club) - eImageURL
 			 */
 
 			String[] coordinates = address2GEOcoordinates(event.geteLocation());
 
 			query = "UPDATE POI SET " + "title='" + event.geteName() + "',"
-					+ "attribution='" + event.getInfoTel() + "',"
-					+ "imageURL='" + event.getImageURL() + "'," + "lat='"
+					+ "attribution='" + event.geteInfoTel() + "',"
+					+ "eImageURL='" + event.geteImageURL() + "'," + "lat='"
 					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
 					+ "line2='" + event.geteCategory() + "'," + "line3='"
 					+ event.geteDate() + "'," + "line4='"

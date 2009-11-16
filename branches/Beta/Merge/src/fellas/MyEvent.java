@@ -2,7 +2,7 @@ package fellas;
 
 import java.io.Serializable;
 
-public class MyEvent implements Serializable{
+public class MyEvent implements Serializable {
 
 	private int id;
 	private int cId;
@@ -15,12 +15,13 @@ public class MyEvent implements Serializable{
 	private String eStartTime;
 	private String eFinishTime;
 	private String eRestriction;
-	private String infoTel;
-	private String imageURL;
+	private String eInfoTel;
+	private String eImageURL;
+
 	public MyEvent(int id, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction, String infoTel, String imageURL) {
+			String eRestriction, String eInfoTel, String eImageURL) {
 		super();
 		this.id = id;
 		this.cId = cId;
@@ -33,103 +34,117 @@ public class MyEvent implements Serializable{
 		this.eStartTime = eStartTime;
 		this.eFinishTime = eFinishTime;
 		this.eRestriction = eRestriction;
-		this.infoTel= infoTel;
-		this.imageURL= imageURL;
+		this.eInfoTel = eInfoTel;
+		this.eImageURL = eImageURL;
 	}
 
-	
 	public MyEvent() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public int getId() {
 		return id;
 	}
+
 	public void setcId(int cId) {
 		this.cId = cId;
 	}
+
 	public int getcId() {
 		return cId;
 	}
+
 	public void seteName(String eName) {
 		this.eName = eName;
 	}
+
 	public String geteName() {
 		return eName;
 	}
+
 	public void seteLongDescription(String eLongDescription) {
 		this.eLongDescription = eLongDescription;
 	}
+
 	public void seteShortDescription(String eShortDescription) {
 		this.eShortDescription = eShortDescription;
 	}
+
 	public String geteShortDescription() {
 		return eShortDescription;
 	}
+
 	public String geteLongDescription() {
 		return eLongDescription;
 	}
+
 	public void seteLocation(String eLocation) {
 		this.eLocation = eLocation;
 	}
+
 	public String geteLocation() {
 		return eLocation;
 	}
+
 	public void seteCategory(String eCategory) {
 		this.eCategory = eCategory;
 	}
+
 	public String geteCategory() {
 		return eCategory;
 	}
+
 	public void seteDate(String eDate) {
 		this.eDate = eDate;
 	}
+
 	public String geteDate() {
 		return eDate;
 	}
+
 	public void seteStartTime(String eStartTime) {
 		this.eStartTime = eStartTime;
 	}
+
 	public String geteStartTime() {
 		return eStartTime;
 	}
+
 	public void seteFinishTime(String eFinishTime) {
 		this.eFinishTime = eFinishTime;
 	}
+
 	public String geteFinishTime() {
 		return eFinishTime;
 	}
+
 	public void seteRestriction(String eRestriction) {
 		this.eRestriction = eRestriction;
 	}
+
 	public String geteRestriction() {
 		return eRestriction;
 	}
 
-
-	public void setInfoTel(String infoTel) {
-		this.infoTel = infoTel;
+	public void seteInfoTel(String eInfoTel) {
+		this.eInfoTel = eInfoTel;
 	}
 
-
-	public String getInfoTel() {
-		return infoTel;
+	public String geteInfoTel() {
+		return eInfoTel;
 	}
 
-
-	public void setImageURL(String imageURL) {
-		this.imageURL = imageURL;
+	public void seteImageURL(String eImageURL) {
+		this.eImageURL = eImageURL;
 	}
 
-
-	public String getImageURL() {
-		return imageURL;
+	public String geteImageURL() {
+		return eImageURL;
 	}
 
-	
 }
