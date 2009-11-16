@@ -402,7 +402,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from events where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			// delete item from poi and from actions too
+			// delete item from poi table and from actions too
 			query = "DELETE from POI where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
