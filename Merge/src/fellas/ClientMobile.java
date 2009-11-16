@@ -71,15 +71,17 @@ class ClientMobile extends UnicastRemoteObject {
 					String uSex = new String(splittedString[3]);
 					String uAge = new String(splittedString[4]);
 					String uLocation = new String(splittedString[5]);
+					String uPrivacy = new String(splittedString[6]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nusername: " + username);
 					System.out.println("\npassword: " + psw);
 					System.out.println("\nsex: " + uSex);
 					System.out.println("\nage: " + uAge);
 					System.out.println("\nlocation: " + uLocation);
+					System.out.println("\nprivacy: " + uPrivacy);
 					// invoke remote method
 					serverAnswer = server.mobileRegistration(uTel, username,
-							psw, uSex, uAge, uLocation);
+							psw, uSex, uAge, uLocation, uPrivacy);
 					// System.out.println("\nServerAnswer: " + serverAnswer);
 					served = true;
 					break;
@@ -188,7 +190,7 @@ class ClientMobile extends UnicastRemoteObject {
 					served = true;
 					break;
 				case 'y' | 'Y':
-					System.out.println("\nUNREGISTRATION: ");
+					System.out.println("\nCHATUPANSWER: ");
 					String id = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nid: " + id);
