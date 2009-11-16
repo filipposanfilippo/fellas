@@ -39,7 +39,7 @@ public interface ServerInterface extends Remote {
 	public boolean deleteEvent(int eventId) throws RemoteException;
 
 	// public boolean registerMobile() throws RemoteException;
-	// __________________________
+	// _________________________
 
 	public String mobileRegistration(String uTel, String username, String psw,
 			String uSex, String uAge, String uLocation, String uPrivacy) throws RemoteException;
@@ -76,5 +76,5 @@ public interface ServerInterface extends Remote {
 
 	public String spamMobile(String message, String criterion)
 			throws RemoteException;
-	// __________________________
+	// _________________________
 }
