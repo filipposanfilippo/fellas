@@ -296,14 +296,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			// insert event into poi and add it the actions
 			// recupera id assegnato con autoincrement
-			query = "SELECT id FROM events WHERE eName='" + eName + "',cId='"
-					+ cId + "',eDate='" + eDate + "'";
+			query = "SELECT id FROM events WHERE eName='" + eName
+					+ "' AND cId='" + cId + "' AND eDate='" + eDate + "'";
+
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			poiId = rs.getInt("id");
 
-			query = "INSERT INTO POI (id,attribution,eImageURL,lat,lon,line2,line3,line4,title,type)"
+			query = "INSERT INTO POI (id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 					+ "VALUES ('"
 					+ poiId
 					+ "','"
@@ -379,7 +380,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			query = "UPDATE POI SET " + "title='" + event.geteName() + "',"
 					+ "attribution='" + event.geteInfoTel() + "',"
-					+ "eImageURL='" + event.geteImageURL() + "'," + "lat='"
+					+ "imageURL='" + event.geteImageURL() + "'," + "lat='"
 					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
 					+ "line2='" + event.geteCategory() + "'," + "line3='"
 					+ event.geteDate() + "'," + "line4='"
