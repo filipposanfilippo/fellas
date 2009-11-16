@@ -60,11 +60,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JMenuItem credits;
 
 	// -------------- Message Items ---------------------------
-	JList eventJList;
-	JList usersJList;
 	JButton loadUsersB;
 	JButton sendMessB;
 	JTextArea message;
+
+	JList usersJList;
+	JList eventJList;
 
 	// -------------- Events Items ----------------------------
 	JTextField eName;
@@ -82,6 +83,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JButton createEvB;
 	JButton modifyEvB;
 	JButton deleteEvB;
+
 	JList eventJList2;
 
 	// -------------- Profile Items ---------------------------
@@ -235,13 +237,24 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			// TODO add error alert
 			ex.printStackTrace();
 		}
-
-		String[] events = new String[eventsList.size()];
-		int i = 0;
-		for (MyEvent e : eventsList) {
-			events[i++] = e.getId() + "]" + e.geteName();
+		if (eventsList != null) {
+			String[] events = new String[eventsList.size()];
+			int i = 0;
+			for (MyEvent e : eventsList) {
+				events[i++] = e.getId() + "]" + e.geteName();
+			}
+			return events;
 		}
-		return events;
+		return new String[0];
+	}
+
+	private JList createEventList() {
+		JList eJList = new JList(getEventsArray());
+		eJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		eJList.setBackground(new Color(153, 204, 255));
+		eJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		eJList.addListSelectionListener(this);
+		return eJList;
 	}
 
 	// ******************************************************************************
@@ -257,12 +270,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
 		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 
-		eventJList2 = new JList(getEventsArray());
-		eventJList2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		eventJList2.setBackground(new Color(153, 204, 255));
-		eventJList2.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		eventJList2 = createEventList();
 		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
-		eventJList2.addListSelectionListener(this);
 		leftEvP.add(eventScrollPane);
 
 		// ------------------------ RIGHT ------------------------------------
@@ -484,7 +493,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(800, 600));
+		mainFrame.setPreferredSize(new Dimension(800, 700));
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
 
@@ -536,7 +545,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					System.out.println("RISULTATO CONNESSIONE : " + res);
 					if (res) {
 						profileStatus.setForeground(Color.green);
-						profileStatus.setText("Data update succesfully!");
+						profileStatus.setText("Data updated succesfully!");
 					} else {
 						profileStatus.setForeground(Color.red);
 						profileStatus
@@ -571,6 +580,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
 						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
 			}
+			eventJList = createEventList();
+			eventJList2 = createEventList();
 		}
 		if (event == modifyEvB) {
 			// TODO sinc with server
@@ -599,7 +610,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						"Error", JOptionPane.ERROR_MESSAGE);
 				e1.printStackTrace();
 			}
-
+			eventJList = createEventList();
+			eventJList2 = createEventList();
 		}
 		if (event == deleteEvB) {
 			String selEv[] = eventJList2.getSelectedValue().toString().split(
@@ -619,7 +631,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						+ selEv[1], "Error", JOptionPane.ERROR_MESSAGE);
 				e1.printStackTrace();
 			}
-
+			eventJList = createEventList();
+			eventJList2 = createEventList();
 		}
 
 		if (event == credits) {
@@ -734,24 +747,29 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			modifyEvB.setEnabled(true);
 			deleteEvB.setEnabled(true);
 
-			int sel = Integer.parseInt(((JList) e.getSource())
-					.getSelectedValue().toString());
+			int sel = Integer.parseInt(eventJList2.getSelectedValue()
+					.toString().split("]")[0]);
 
-			MyEvent event = new MyEvent();// currentClub.getEvent(sel);
+			try {
+				MyEvent event = currentClub.getEvent(sel);
 
-			eName.setText(event.geteName());
-			eShortDescription.setText(event.geteShortDescription());
-			eLongDescription.setText(event.geteLongDescription());
-			eLocation.setText(event.geteLocation());
-			eCategory.setText(event.geteCategory());
-			eDate.setText(event.geteDate());
-			eStartTime.setText(event.geteShortDescription());
-			eFinishTime.setText(event.geteFinishTime());
-			eRestriction.setText(event.geteRestriction());
+				eName.setText(event.geteName());
+				eShortDescription.setText(event.geteShortDescription());
+				eLongDescription.setText(event.geteLongDescription());
+				eLocation.setText(event.geteLocation());
+				eCategory.setText(event.geteCategory());
+				eDate.setText(event.geteDate());
+				eStartTime.setText(event.geteStartTime());
+				eFinishTime.setText(event.geteFinishTime());
+				eRestriction.setText(event.geteRestriction());
+				eInfoTel.setText(event.geteInfoTel());
+				eImageURL.setText(event.geteImageURL());
+				eLongDescription.setText(event.geteLongDescription());
+			} catch (RemoteException e1) {
+				// TODO add error
+				e1.printStackTrace();
+			}
 
-			// TODO inserire i dati dell'evento prelevati dal server
-			eLongDescription.setText("Descrizione di "
-					+ ((JList) e.getSource()).getSelectedValue().toString());
 		}
 	}
 
