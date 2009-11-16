@@ -30,7 +30,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			// TODO add connection controlls whether the connection falls down
 			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-			connection = DriverManager.getConnection("jdbc:odbc:FellasMySQL");
+			connection = DriverManager.getConnection("jdbc:odbc:diana");
 		} catch (Exception ex) {
 			// handle any errors
 			ex.printStackTrace();
@@ -297,7 +297,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			poiId = rs.getInt("id");
 
-			query = "INSERT INTO poi (id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+			query = "INSERT INTO POI (id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 					+ "VALUES ('"
 					+ poiId
 					+ "','"
@@ -319,7 +319,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// add actions to poi
-			query = "INSERT INTO action (uri,label,poiId)"
+			query = "INSERT INTO Action (uri,label,poiId)"
 					+ "VALUES ('http://fellas.netsons.org/events/event" + poiId
 					+ ".php','Join event','" + poiId + "')";
 			statement = connection.createStatement();
@@ -373,7 +373,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			String[] coordinates = address2GEOcoordinates(event.geteLocation());
 
-			query = "UPDATE poi SET " + "title='" + event.geteName() + "',"
+			query = "UPDATE POI SET " + "title='" + event.geteName() + "',"
 					+ "attribution='" + event.getInfoTel() + "',"
 					+ "imageURL='" + event.getImageURL() + "'," + "lat='"
 					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
@@ -398,10 +398,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// delete item from poi and from actions too
-			query = "DELETE from poi where id='" + eventId + "'";
+			query = "DELETE from POI where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			query = "DELETE from action where poiId='" + eventId + "'";
+			query = "DELETE from Action where poiId='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
