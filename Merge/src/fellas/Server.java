@@ -29,8 +29,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public Server() throws RemoteException {
 		try {
 			// TODO add connection controlls whether the connection falls down
-			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-			connection = DriverManager.getConnection("jdbc:odbc:diana");
+			Class.forName("sun.jdbc.odbc.JdbcOdbcDrsiver");
+			connection = DriverManager.getConnection("jdbc:odbc:diana4free");
 		} catch (Exception ex) {
 			// handle any errors
 			ex.printStackTrace();
