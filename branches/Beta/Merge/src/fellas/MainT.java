@@ -76,6 +76,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eStartTime;
 	JTextField eFinishTime;
 	JTextField eRestriction;
+	JTextField eInfoTel;
+	JTextField eImageURL;
 
 	JButton createEvB;
 	JButton modifyEvB;
@@ -302,6 +304,16 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eRestriction = new JTextField();
 		eRestriction.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eRestriction);
+
+		rightEvP.add(new JLabel("Telephon Info.:"));
+		eInfoTel = new JTextField();
+		eInfoTel.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eInfoTel);
+
+		rightEvP.add(new JLabel("Event Image:"));
+		eImageURL = new JTextField();
+		eImageURL.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eImageURL);
 
 		rightEvP.add(new JLabel("Short Desciption:"));
 		eShortDescription = new JTextField();
@@ -550,7 +562,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 							.getText(), eLongDescription.getText(), eLocation
 							.getText(), eCategory.getText(), eDate.getText(),
 							eStartTime.getText(), eFinishTime.getText(),
-							eRestriction.getText());
+							eRestriction.getText(), eInfoTel.getText(),
+							eImageURL.getText());
 				} catch (RemoteException e1) {
 					// TODO add error message
 					e1.printStackTrace();
@@ -572,6 +585,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						eLongDescription.getText(), eLocation.getText(),
 						eCategory.getText(), eDate.getText(), eStartTime
 								.getText(), eFinishTime.getText(), eRestriction
+								.getText(), eInfoTel.getText(), eImageURL
 								.getText()));
 				JOptionPane.showMessageDialog(mainFrame,
 						"Modified succesfully " + selEv[1], "Modified!",
@@ -722,8 +736,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 			int sel = Integer.parseInt(((JList) e.getSource())
 					.getSelectedValue().toString());
-			
-			MyEvent event = new MyEvent();//currentClub.getEvent(sel);
+
+			MyEvent event = new MyEvent();// currentClub.getEvent(sel);
 
 			eName.setText(event.geteName());
 			eShortDescription.setText(event.geteShortDescription());
