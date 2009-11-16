@@ -175,7 +175,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						rs.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
-								.getString("imageURL")));
+								.getString("eImageURL")));
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
