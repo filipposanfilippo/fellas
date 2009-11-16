@@ -253,11 +253,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		coordinates = address2GEOcoordinates(eLocation);
 		try {
 			// TODO prima di inserire controlla che eName non esista già
-			query = "SELECT id FROM events WHERE eName='" + eName + "'";
+			/*query = "SELECT id FROM events WHERE eName='" + eName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				return false;
+				return false;*/
 
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
 					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
