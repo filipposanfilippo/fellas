@@ -720,7 +720,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
 			if (privacy == 0)
-				query = "INSERT INTO POI (id,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
 						+ "VALUES ('"
 						+ id
 						+ "','','"
@@ -884,7 +884,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement.execute(query);
 
 			// delete user from poi
-			query = "DELETE from POI WHERE id='" + id + "'";
+			query = "DELETE from POI WHERE idItem='" + id + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 
