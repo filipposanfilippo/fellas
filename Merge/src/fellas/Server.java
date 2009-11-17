@@ -668,15 +668,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// update location in poi
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-
+			
 			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			int id = rs.getInt("id");
 
-			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"
-					+ coordinates[1] + "' WHERE id = '" + id + "'";
+			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"+coordinates[1]+"' WHERE idItem = '"
+			+ id + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -705,7 +705,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			int id = rs.getInt("id");
 
-			query = "UPDATE POI SET line4 = '" + uStatus + "' WHERE id = '"
+			query = "UPDATE POI SET line4 = '" + uStatus + "' WHERE idItem = '"
 					+ id + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -769,7 +769,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "', '"
 						+ username + "',1,'','')";
 			else
-				query = "INSERT INTO POI (id,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
 						+ "VALUES ('"
 						+ id
 						+ "','"
@@ -787,12 +787,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "',1,'','')";
 			statement = connection.createStatement();
 			statement.execute(query);
+			System.out.println("ciao1");
 			// add action to poi
 			query = "INSERT INTO Action (uri,label,poiId)"
 					+ "VALUES ('http://diana.netsons.org/users/" + username
 					+ ".php','Visit user page','" + id + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
+			System.out.println("ciao2");
 
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
