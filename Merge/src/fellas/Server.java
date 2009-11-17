@@ -61,7 +61,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (isClubExisting(oName))
 			return false;
 		try {
-			query = "INSERT INTO clubs (oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw)"
+			// check if there isn't another club with the same name and address
+			System.out.println("inizio registrazione");
+			query = "SELECT id FROM clubs WHERE cName='" + cName
+					+ "' AND cAddress='" + cAddress + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next())
+				return false;
+			System.out.println("club non in db");
+			// adding club in the club's table
+			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw)"
 					+ "VALUES ('"
 					+ oName
 					+ "','"
@@ -78,6 +88,49 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ cName + "','" + psw + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
+			System.out.println("inserito club");
+			// get id-club
+			query = "SELECT id FROM clubs WHERE cName='" + cName
+					+ "' AND cAddress='" + cAddress + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int clubId = rs.getInt("id");
+			System.out.println("id club = " + clubId);
+
+			String geo[];
+			geo = address2GEOcoordinates(cAddress);
+
+			// adding info in POI table
+			query = "INSERT INTO POI (id,attribution,imageURL,lat,lon,line2,line4,type) VALUES "
+					+ "('"
+					+ clubId
+					+ "','"
+					+ cTel
+					+ "','http//diana.netsons.org/clubs/"
+					+ clubId
+					+ ".jpg',"
+					+ "'"
+					+ geo[0]
+					+ "',"
+					+ "'"
+					+ geo[1]
+					+ "','"
+					+ cType
+					+ "','" + cEMail + "','2')";
+			System.out.println(query);
+			statement = connection.createStatement();
+			System.out.println(query);
+			rs = statement.executeQuery(query);
+			System.out.println(query);
+			// rs.next();
+			System.out.println("inserito in poi");
+			// adding info in action table
+			query = "INSERT INTO Action (poiId) VALUES ('" + clubId + "')";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			// rs.next();
+			System.out.println("FINITO!");
 			return true;
 		} catch (SQLException e) {
 			// e.printStackTrace();
@@ -253,7 +306,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eDate, String eStartTime, String eFinishTime,
 			String eRestriction, String eInfoTel, String eImageURL)
 			throws RemoteException {
-		int idEvent = 0;
 		int poiId = 0;
 		String[] coordinates = new String[2];
 		coordinates = address2GEOcoordinates(eLocation);
@@ -304,7 +356,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			poiId = rs.getInt("id");
 
-			query = "INSERT INTO POI (id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+			query = "INSERT INTO POI(id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 					+ "VALUES ('"
 					+ poiId
 					+ "','"
@@ -322,27 +374,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','" + eStartTime + "','" + eName + "',3)";
 			statement = connection.createStatement();
 			statement.execute(query);
-			// add actions to poi
+			// add actions to POI
 			query = "INSERT INTO Action (uri,label,poiId)"
 					+ "VALUES ('http://fellas.netsons.org/events/event" + poiId
 					+ ".php','Join event','" + poiId + "')";
-			statement = connection.createStatement();
-			statement.execute(query);
-
-			// TODO erik ma sta cosa che hai fatto sotto non funge!
-			// TODO SQL error in console,(maybe authentication but it works!
-			// ????????????
-
-			/*
-			 * query = "SELECT id FROM events WHERE eName='" + eName + "'";
-			 * statement = connection.createStatement(); rs =
-			 * statement.executeQuery(query); rs.next(); idEvent =
-			 * rs.getInt("id");
-			 */
-
-			// create the event's table for the relative user event list
-			query = "CREATE TABLE IF NOT EXISTS `ev" + poiId + "` ("
-					+ "`id` int(11) DEFAULT NULL" + ")";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -633,15 +668,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// update location in poi
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-			
+
 			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			int id = rs.getInt("id");
 
-			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"+coordinates[1]+"' WHERE id = '"
-			+ id + "'";
+			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"
+					+ coordinates[1] + "' WHERE id = '" + id + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 
