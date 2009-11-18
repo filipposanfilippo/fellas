@@ -42,8 +42,7 @@ public interface ServerInterface extends Remote {
 
 	public boolean deleteEvent(int eventId) throws RemoteException;
 
-	public LinkedList<User> getUsers4Event(int eventId)
-			throws RemoteException;
+	public LinkedList<User> getUsers4Event(int eventId) throws RemoteException;
 
 	// public boolean registerMobile() throws RemoteException;
 	// _________________________
