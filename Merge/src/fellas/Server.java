@@ -1078,8 +1078,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public boolean clubUnregistration(String cName, String psw)
 			throws RemoteException {
-		//if (!isClubExisting(cName))
-			//return false;
+		// if (!isClubExisting(cName))
+		// return false;
 		try {
 			// recupera id
 			query = "SELECT id FROM clubs WHERE cName='" + cName
