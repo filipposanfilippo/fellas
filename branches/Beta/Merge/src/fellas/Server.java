@@ -356,7 +356,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			poiId = rs.getInt("id");
 
-			query = "INSERT INTO POI(id,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+			query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 					+ "VALUES ('"
 					+ poiId
 					+ "','"
@@ -419,8 +419,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
 					+ "line2='" + event.geteCategory() + "'," + "line3='"
 					+ event.geteDate() + "'," + "line4='"
-					+ event.geteStartTime() + "'," + "type=3" + " WHERE id="
-					+ event.getId();
+					+ event.geteStartTime() + "'" + " WHERE idItem='"
+					+ event.getId() + "' AND type=3";
 
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -438,7 +438,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// delete item from poi table and from actions too
-			query = "DELETE from POI where id='" + eventId + "'";
+			query = "DELETE from POI where idItem='" + eventId + "' AND type=3";
 			statement = connection.createStatement();
 			statement.execute(query);
 			query = "DELETE from Action where poiId='" + eventId + "'";
@@ -668,15 +668,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// update location in poi
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-			
+
 			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			int id = rs.getInt("id");
 
-			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"+coordinates[1]+"' WHERE idItem = '"
-			+ id + "'";
+			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"
+					+ coordinates[1] + "' WHERE idItem = '" + id + "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -706,7 +706,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int id = rs.getInt("id");
 
 			query = "UPDATE POI SET line4 = '" + uStatus + "' WHERE idItem = '"
-					+ id + "'";
+					+ id + "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -785,16 +785,25 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "', '"
 						+ username
 						+ "',1,'','')";
+
 			statement = connection.createStatement();
 			statement.execute(query);
-			System.out.println("ciao1");
+			
 			// add action to poi
+			// recupera id del poi
+			query = "SELECT id FROM POI WHERE type=1 AND idItem='" + id
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId = rs.getInt("id");
+			
+			
 			query = "INSERT INTO Action (uri,label,poiId)"
 					+ "VALUES ('http://diana.netsons.org/users/" + username
-					+ ".php','Visit user page','" + id + "')";
+					+ ".php','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
-			System.out.println("ciao2");
 
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
@@ -921,12 +930,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement.execute(query);
 
 			// delete user from poi
-			query = "DELETE from POI WHERE idItem='" + id + "'";
+			// recupera id poi...mi serve per cancellare la  action corrispondente
+			query = "SELECT id FROM POI WHERE idItem='" + id + "' AND type=1";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId=rs.getInt("id");
+			
+			query = "DELETE from POI WHERE idItem='" + id + "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
 
 			// delete entry from action
-			query = "DELETE from Action WHERE poiId='" + id + "'";
+			query = "DELETE from Action WHERE poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 
