@@ -63,14 +63,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		try {
 			// check if there isn't another club with the same name and address
-			System.out.println("inizio registrazione");
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND cAddress='" + cAddress + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				return false;
-			System.out.println("club non in db");
 			// adding club in the club's table
 			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw)"
 					+ "VALUES ('"
@@ -89,7 +87,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ cName + "','" + psw + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
-			System.out.println("inserito club");
 			// get id-club
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND cAddress='" + cAddress + "'";
@@ -97,10 +94,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int clubId = rs.getInt("id");
-
 			String[] geo = new String[2];
 			geo = address2GEOcoordinates(cAddress);
-
 			// adding info in POI table
 			query = "INSERT INTO POI (idItem,attribution,imageURL,lat,lon,line2,line4,type) VALUES "
 					+ "('"
@@ -118,30 +113,52 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ cType
 					+ "','" + cEMail + "','2')";
-			System.out.println(query);
 			statement = connection.createStatement();
-			System.out.println("follia");
-			rs = statement.executeQuery(query);
+			statement.execute(query);
 
 			// adding info in action table
-			// recupera id del POI
-			System.out.println("inizio inserimento poi");
-			query = "SELECT id FROM POI WHERE type='2' AND idItem=" + clubId
+			query = "SELECT id FROM POI WHERE type='2' AND idItem='" + clubId
 					+ "'";
-			System.out.println(query);
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			int poiId = rs.getInt("id");
-			System.out.println(poiId);
 			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://diana.netsons.org/clubs/"
 					+ cName + ".php','Visit club page','" + poiId + "')";
 			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			System.out.println("fine");
+			statement.execute(query);
+			System.out.println("club added");
 			return true;
 		} catch (SQLException e) {
 			// e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean updateClubData(Club club) throws RemoteException {
+		String[] coordinates = new String[2];
+		try {
+			query = "UPDATE clubs SET oName='" + club.getoName() + "',"
+					+ " oSurname='" + club.getoSurname() + "'," + " cAddress='"
+					+ club.getcAddress() + "'," + " cTel='" + club.getcTel()
+					+ "'," + " cEMail='" + club.getcEMail() + "'," + " cType='"
+					+ club.getcType() + "'," + " cName='" + club.getcName()
+					+ "'," + " psw='" + club.getPsw() + "'" + " WHERE id="
+					+ club.getId();
+			statement = connection.createStatement();
+			statement.execute(query);
+			// update POI table
+			coordinates = address2GEOcoordinates(club.getcAddress());
+			query = "UPDATE POI SET attribution='" + club.getcTel() + "',"
+					+ " lat='" + coordinates[0] + "'," + " lon='"
+					+ coordinates[1] + "'," + " line2='" + club.getcType()
+					+ "'," + " line4='" + club.getcEMail() + "'"
+					+ " WHERE type=2 AND idItem=" + club.getId();
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -198,34 +215,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return new Club();
 		}
 		return new Club();
-	}
-
-	public boolean updateClubData(Club club) throws RemoteException {
-		String[] coordinates = new String[2];
-		try {
-			query = "UPDATE clubs SET oName='" + club.getoName() + "',"
-					+ " oSurname='" + club.getoSurname() + "'," + " cAddress='"
-					+ club.getcAddress() + "'," + " cTel='" + club.getcTel()
-					+ "'," + " cEMail='" + club.getcEMail() + "'," + " cType='"
-					+ club.getcType() + "'," + " cName='" + club.getcName()
-					+ "'," + " psw='" + club.getPsw() + "'" + " WHERE id="
-					+ club.getId();
-			statement = connection.createStatement();
-			statement.execute(query);
-			// update POI table
-			coordinates = address2GEOcoordinates(club.getcAddress());
-			query = "UPDATE POI SET attribution='" + club.getcTel() + "',"
-					+ " lat='" + coordinates[0] + "'," + " lon='"
-					+ coordinates[1] + "'," + " cType='" + club.getcType()
-					+ "'," + " cEMail='" + club.getcEMail() + "'"
-					+ " WHERE type=2 AND idItem=" + club.getId();
-			statement = connection.createStatement();
-			statement.execute(query);
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 	public LinkedList<MyEvent> getClubEventsList(int cId) {
