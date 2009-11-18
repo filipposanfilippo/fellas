@@ -61,8 +61,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JMenuItem credits;
 
 	// -------------- Message Items ---------------------------
-	JButton loadUsersB;
 	JButton sendMessB;
+	JButton sendToAllB;
 	JTextArea message;
 
 	JList usersJList;
@@ -162,16 +162,16 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	private JPanel createMessagePanel() {
 		JPanel messageP = new JPanel();
-		messageP.setLayout(new GridLayout(1, 2));
+		messageP.setLayout(new GridLayout(2, 1));
 
-		// ------------------------ LEFT ------------------------------------
+		// ------------------------ TOP ------------------------------------
 		JPanel leftMsgP = new JPanel();
 		leftMsgP.setBorder(BorderFactory.createTitledBorder(""));
 		leftMsgP.setLayout(new BoxLayout(leftMsgP, BoxLayout.Y_AXIS));
 
 		// leftMsgP.setLayout(new GridLayout(2, 3));
 		JPanel leftUpP = new JPanel();
-		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.X_AXIS));
+		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.Y_AXIS));
 
 		leftUpP.add(new JLabel("Planned Events             "));
 		leftUpP.add(new JLabel("                 Users for Selected Event"));
@@ -181,10 +181,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eventJList = createEventList();
 		JScrollPane eventScrollPane = new JScrollPane(eventJList);
 		leftDownP.add(eventScrollPane);
-
-		// loadUsersB = new JButton("Load Users");
-		// loadUsersB.addActionListener(this);
-		// leftDownP.add(loadUsersB);
 
 		usersJList = new JList();
 		usersJList
@@ -197,7 +193,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftMsgP.add(leftUpP);
 		leftMsgP.add(leftDownP);
 
-		// ------------------------ RIGHT -----------------------------------
+		// ------------------------ BOTTOM -----------------------------------
 		JPanel rightMsgP = new JPanel();
 		// rightMsgP.setLayout(new BoxLayout(rightMsgP, BoxLayout.Y_AXIS));
 		rightMsgP.setBorder(BorderFactory.createTitledBorder(""));
@@ -206,6 +202,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		sendMessB.addActionListener(this);
 		sendMessB.setEnabled(false);
 		rightMsgP.add(sendMessB);
+
+		sendToAllB = new JButton("Send To All");
+		sendToAllB.addActionListener(this);
+		sendToAllB.setEnabled(false);
+		rightMsgP.add(sendToAllB);
 
 		message = new JTextArea("Type here your message...", 13, 28);
 		// message.setBackground(new Color(255, 215, 0));
@@ -241,6 +242,26 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				events[i++] = e.getId() + "]" + e.geteName();
 			}
 			return events;
+		}
+		return new String[0];
+	}
+
+	private String[] getUsersArray(int eventId) {
+		LinkedList<User> userssList = new LinkedList<User>();
+		try {
+			userssList = currentClub.getUsers4Event(eventId);
+		} catch (Exception ex) {
+			// TODO add error alert
+			ex.printStackTrace();
+		}
+		if (userssList != null) {
+			String[] users = new String[userssList.size()];
+			int i = 0;
+			for (User u : userssList) {
+				users[i++] = u.getId() + "]" + u.getuName() + " "
+						+ u.getuSurname() + ":" + u.getuTel();
+			}
+			return users;
 		}
 		return new String[0];
 	}
@@ -525,18 +546,20 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void actionPerformed(ActionEvent e) {
 		Object event = e.getSource();
-		if (event == loadUsersB) {
+		if (event == sendMessB) {
 			if (eventJList.getSelectedValue() != null) {
-				sendMessB.setEnabled(true);
-				String selection = eventJList.getSelectedValue().toString();
-				// TODO collegati al server e ritorna una lista di utenti per
-				// l'evento selezionato
-				String users[] = { "selection: " + selection, "Pippo", "Pluto",
-						"Paperino", "Minnie" };
-				usersJList.setListData(users);
+				int sel = Integer.parseInt(eventJList.getSelectedValue()
+						.toString().split("]")[0]);
+				// usersJList.setListData(getUsersArray(sel));
 			}
 		}
-
+		if (event == sendToAllB) {
+			if (eventJList.getSelectedValue() != null) {
+				int sel = Integer.parseInt(eventJList.getSelectedValue()
+						.toString().split("]")[0]);
+				// usersJList.setListData(getUsersArray(sel));
+			}
+		}
 		if (event == modifyProfB) {
 			if (!Arrays.equals(pwdR.getPassword(), confPwdR.getPassword())) {
 				profileStatus.setForeground(Color.red);
@@ -747,14 +770,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		if (e.getSource() == eventJList
 				&& eventJList.getSelectedValue() != null) {
 			sendMessB.setEnabled(true);
-			String selection = eventJList.getSelectedValue().toString();
-			// TODO collegati al server e ritorna una lista di utenti per
-			// l'evento selezionato
-			String users[] = { "selection: " + selection, "Pippo", "Pluto",
-					"Paperino", "Minnie" };
-			usersJList.setListData(users);
+			sendToAllB.setEnabled(true);
+			int sel = Integer.parseInt(eventJList.getSelectedValue().toString()
+					.split("]")[0]);
+			usersJList.setListData(getUsersArray(sel));
 		}
-
 		if (e.getSource() == eventJList2
 				&& eventJList2.getSelectedValue() != null) {
 			modifyEvB.setEnabled(true);
