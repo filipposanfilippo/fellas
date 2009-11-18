@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 public class LoginT implements Runnable, ActionListener {
 	ClientClub currentClub;
@@ -83,10 +82,9 @@ public class LoginT implements Runnable, ActionListener {
 
 		registrationStatus1 = new JLabel("", JLabel.LEFT);
 		rightP.add(registrationStatus1);
-		
+
 		registrationStatus2 = new JLabel("", JLabel.LEFT);
 		rightP.add(registrationStatus2);
-		
 
 		rightP.setVisible(true);
 		loginP.add(rightP);
@@ -178,8 +176,7 @@ public class LoginT implements Runnable, ActionListener {
 					} else {
 						registrationStatus1.setForeground(Color.red);
 						registrationStatus2.setForeground(Color.red);
-						registrationStatus1
-								.setText("Maybe Club Existing,");
+						registrationStatus1.setText("Maybe Club Existing,");
 						registrationStatus2.setText(" try again.");
 					}
 				} catch (RemoteException e1) {

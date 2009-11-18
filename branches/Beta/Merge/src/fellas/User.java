@@ -1,29 +1,32 @@
 package fellas;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 	int id;
 	String uTel;
 	String uName;
 	String uAge;
 	String uSex;
 	String uStatus;
-	String uUsername;
+	String username;
 	String psw;
 	String uSurname;
 	String uLocation;
 	String uImageURL;
 	int privacy;
 
-	public User(String uTel, String uName, String uAge, String uSex,
-			String uStatus, String uUsername, String psw, String uSurname,
+	public User(int id, String uTel, String uName, String uAge, String uSex,
+			String uStatus, String username, String psw, String uSurname,
 			String uLocation, String uImageURL, int privacy) {
 		super();
+		this.id = id;
 		this.uTel = uTel;
 		this.uName = uName;
 		this.uAge = uAge;
 		this.uSex = uSex;
 		this.uStatus = uStatus;
-		this.uUsername = uUsername;
+		this.username = username;
 		this.psw = psw;
 		this.uSurname = uSurname;
 		this.uLocation = uLocation;
@@ -79,12 +82,12 @@ public class User {
 		this.uStatus = uStatus;
 	}
 
-	public String getuUsername() {
-		return uUsername;
+	public String getusername() {
+		return username;
 	}
 
-	public void setuUsername(String uUsername) {
-		this.uUsername = uUsername;
+	public void setusername(String username) {
+		this.username = username;
 	}
 
 	public String getPsw() {

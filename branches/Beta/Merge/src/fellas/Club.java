@@ -3,11 +3,6 @@ package fellas;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-// server class
-/**
- * @author Lorenzo
- * 
- */
 public class Club implements Serializable {
 	private int id;
 	private String oName;
