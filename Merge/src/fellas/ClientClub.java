@@ -75,7 +75,8 @@ public class ClientClub extends UnicastRemoteObject {
 	public boolean createEvent(String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction, String infoTel, String imageURL) throws RemoteException {
+			String eRestriction, String infoTel, String imageURL)
+			throws RemoteException {
 		return server.createEvent(clubLogged.getId(), eName, eShortDescription,
 				eLongDescription, eLocation, eCategory, eDate, eStartTime,
 				eFinishTime, eRestriction, infoTel, imageURL);
@@ -87,5 +88,9 @@ public class ClientClub extends UnicastRemoteObject {
 
 	public boolean deleteEvent(int eventId) throws RemoteException {
 		return server.deleteEvent(eventId);
+	}
+
+	public LinkedList<User> getUsers4Event(int eventId) throws RemoteException {
+		return server.getUsers4Event(eventId);
 	}
 }
