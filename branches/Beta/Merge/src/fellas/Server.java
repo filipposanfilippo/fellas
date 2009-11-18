@@ -97,7 +97,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			int clubId = rs.getInt("id");
 
-			String[] geo= new String[2];
+			String[] geo = new String[2];
 			geo = address2GEOcoordinates(cAddress);
 
 			// adding info in POI table
@@ -121,7 +121,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			System.out.println("follia");
 			rs = statement.executeQuery(query);
-			
+
 			// adding info in action table
 			// recupera id del POI
 			System.out.println("inizio inserimento poi");
@@ -131,10 +131,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			int poiId=rs.getInt("id");
+			int poiId = rs.getInt("id");
 			System.out.println(poiId);
-			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://diana.netsons.org/clubs/" + cName
-					+ ".php','Visit club page','" + poiId + "')";
+			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://diana.netsons.org/clubs/"
+					+ cName + ".php','Visit club page','" + poiId + "')";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			System.out.println("fine");
@@ -313,7 +313,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eDate, String eStartTime, String eFinishTime,
 			String eRestriction, String eInfoTel, String eImageURL)
 			throws RemoteException {
-		int poiId = 0;
 		String[] coordinates = new String[2];
 		coordinates = address2GEOcoordinates(eLocation);
 		try {
@@ -357,15 +356,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// recupera id assegnato con autoincrement
 			query = "SELECT id FROM events WHERE eName='" + eName
 					+ "' AND cId='" + cId + "' AND eDate='" + eDate + "'";
-
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			poiId = rs.getInt("id");
+			int eventId = rs.getInt("id");
 
 			query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 					+ "VALUES ('"
-					+ poiId
+					+ eventId
 					+ "','"
 					+ eInfoTel
 					+ "','"
@@ -382,6 +380,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// add actions to POI
+			// recupera id poi
+			query = "SELECT id FROM POI WHERE type=3 AND idItem='" + eventId
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId = rs.getInt("id");
+
 			query = "INSERT INTO Action (uri,label,poiId)"
 					+ "VALUES ('http://fellas.netsons.org/events/event" + poiId
 					+ ".php','Join event','" + poiId + "')";
