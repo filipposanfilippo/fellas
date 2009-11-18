@@ -55,6 +55,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return false;
 	}
 
+	// TODO MANCA clunUnregistration
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException {
@@ -200,6 +201,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public boolean updateClubData(Club club) throws RemoteException {
+		String[] coordinates = new String[2];
 		try {
 			query = "UPDATE clubs SET oName='" + club.getoName() + "',"
 					+ " oSurname='" + club.getoSurname() + "'," + " cAddress='"
@@ -208,7 +210,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ club.getcType() + "'," + " cName='" + club.getcName()
 					+ "'," + " psw='" + club.getPsw() + "'" + " WHERE id="
 					+ club.getId();
-			// System.out.println(query);
+			statement = connection.createStatement();
+			statement.execute(query);
+			// update POI table
+			coordinates = address2GEOcoordinates(club.getcAddress());
+			query = "UPDATE POI SET attribution='" + club.getcTel() + "',"
+					+ " lat='" + coordinates[0] + "'," + " lon='"
+					+ coordinates[1] + "'," + " cType='" + club.getcType()
+					+ "'," + " cEMail='" + club.getcEMail() + "'"
+					+ " WHERE type=2 AND idItem=" + club.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -1040,5 +1050,50 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			System.out.println("ERROR in address2GEOcoordinates");
 		}
 		return coordinates;
+	}
+
+	@Override
+	public boolean clubUnregistration(String cName, String psw)
+			throws RemoteException {
+		//if (!isClubExisting(cName))
+			//return false;
+		try {
+			// recupera id
+			query = "SELECT id FROM clubs WHERE cName='" + cName
+					+ "' AND psw='" + psw + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return false;
+			int id = rs.getInt("id");
+
+			// delete user from users
+			query = "DELETE from clubs WHERE id='" + id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// delete user from poi
+			// recupera id poi...mi serve per cancellare la action
+			// corrispondente
+			query = "SELECT id FROM POI WHERE idItem='" + id + "' AND type=2";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId = rs.getInt("id");
+
+			query = "DELETE from POI WHERE idItem='" + id + "' AND type=2";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// delete entry from action
+			query = "DELETE from Action WHERE poiId='" + poiId + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

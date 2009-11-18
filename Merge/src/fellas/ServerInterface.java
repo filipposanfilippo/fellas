@@ -14,6 +14,9 @@ public interface ServerInterface extends Remote {
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException;
 
+	public boolean clubUnregistration(String cName, String psw)
+			throws RemoteException;
+
 	public Club getClubData(String clubName) throws RemoteException;
 
 	public boolean updateClubData(Club club) throws RemoteException;
@@ -32,7 +35,8 @@ public interface ServerInterface extends Remote {
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction, String infoTel, String imageURL) throws RemoteException;
+			String eRestriction, String infoTel, String imageURL)
+			throws RemoteException;
 
 	public boolean updateEvent(MyEvent event) throws RemoteException;
 
@@ -42,10 +46,10 @@ public interface ServerInterface extends Remote {
 	// _________________________
 
 	public String mobileRegistration(String uTel, String username, String psw,
-			String uSex, String uAge, String uLocation, String uPrivacy) throws RemoteException;
-
-	public String mobileUnregistration(String uTel)
+			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException;
+
+	public String mobileUnregistration(String uTel) throws RemoteException;
 
 	public String eventsList(String senderPhone, String criterion)
 			throws RemoteException;
@@ -69,8 +73,9 @@ public interface ServerInterface extends Remote {
 
 	public String chatUp(String senderTel, String username)
 			throws RemoteException;
+
 	public String chatUpAnswer(String senderTel, String id)
-	throws RemoteException;
+			throws RemoteException;
 
 	public boolean checkRegistration(String phoneNumber) throws RemoteException;
 
