@@ -93,4 +93,9 @@ public class ClientClub extends UnicastRemoteObject {
 	public LinkedList<User> getUsers4Event(int eventId) throws RemoteException {
 		return server.getUsers4Event(eventId);
 	}
+
+	public String spamMobile(String message, String criterion)
+			throws RemoteException {
+		return server.spamMobile(message, criterion);
+	}
 }
