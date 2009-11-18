@@ -451,10 +451,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// delete item from poi table and from actions too
+			// recupera id POI
+			query = "SELECT id FROM POI WHERE type=3 AND idItem='" + eventId
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId = rs.getInt("id");
+
 			query = "DELETE from POI where idItem='" + eventId + "' AND type=3";
 			statement = connection.createStatement();
 			statement.execute(query);
-			query = "DELETE from Action where poiId='" + eventId + "'";
+			query = "DELETE from Action where poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
