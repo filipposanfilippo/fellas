@@ -165,17 +165,18 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		messageP.setLayout(new GridLayout(2, 1));
 
 		// ------------------------ TOP ------------------------------------
-		JPanel leftMsgP = new JPanel();
-		leftMsgP.setBorder(BorderFactory.createTitledBorder(""));
-		leftMsgP.setLayout(new BoxLayout(leftMsgP, BoxLayout.Y_AXIS));
+		JPanel topMsgP = new JPanel();
+		topMsgP.setBorder(BorderFactory.createTitledBorder(""));
+		topMsgP.setLayout(new BoxLayout(topMsgP, BoxLayout.Y_AXIS));
 
 		// leftMsgP.setLayout(new GridLayout(2, 3));
 		JPanel leftUpP = new JPanel();
 		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.Y_AXIS));
 
-		leftUpP.add(new JLabel("Planned Events             "));
-		leftUpP.add(new JLabel("                 Users for Selected Event"));
-
+		leftUpP
+				.add(new JLabel(
+						"Planned Events                                 "
+								+ "                                    Users for Selected Event"));
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
 
 		eventJList = createEventList();
@@ -190,34 +191,43 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		JScrollPane usersScrollPane = new JScrollPane(usersJList);
 		leftDownP.add(usersScrollPane);
 
-		leftMsgP.add(leftUpP);
-		leftMsgP.add(leftDownP);
+		topMsgP.add(leftUpP);
+		topMsgP.add(leftDownP);
 
 		// ------------------------ BOTTOM -----------------------------------
-		JPanel rightMsgP = new JPanel();
-		// rightMsgP.setLayout(new BoxLayout(rightMsgP, BoxLayout.Y_AXIS));
-		rightMsgP.setBorder(BorderFactory.createTitledBorder(""));
+		JPanel bottomMsgP = new JPanel();
+		bottomMsgP.setLayout(new GridLayout(1, 2));
+		bottomMsgP.setBorder(BorderFactory.createTitledBorder(""));
+
+		JPanel leftBMsgP = new JPanel();
+		leftBMsgP.setLayout(new GridLayout(2, 1));
 
 		sendMessB = new JButton("Send Message");
 		sendMessB.addActionListener(this);
 		sendMessB.setEnabled(false);
-		rightMsgP.add(sendMessB);
+		leftBMsgP.add(sendMessB);
 
 		sendToAllB = new JButton("Send To All");
 		sendToAllB.addActionListener(this);
 		sendToAllB.setEnabled(false);
-		rightMsgP.add(sendToAllB);
+		leftBMsgP.add(sendToAllB);
+
+		JPanel rightBMsgP = new JPanel();
+		rightBMsgP.setLayout(new GridLayout(1, 1));
 
 		message = new JTextArea("Type here your message...", 13, 28);
 		// message.setBackground(new Color(255, 215, 0));
 		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		message.setLineWrap(true);
 		JScrollPane messageScrollPane = new JScrollPane(message);
-		rightMsgP.add(messageScrollPane);
+		rightBMsgP.add(messageScrollPane);
+
+		bottomMsgP.add(leftBMsgP);
+		bottomMsgP.add(rightBMsgP);
 
 		// ------------------------------------------------------------------
-		messageP.add(leftMsgP);
-		messageP.add(rightMsgP);
+		messageP.add(topMsgP);
+		messageP.add(bottomMsgP);
 
 		messageP.setVisible(true);
 		return messageP;
@@ -259,7 +269,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			int i = 0;
 			for (User u : userssList) {
 				users[i++] = u.getId() + "]" + u.getuName() + " "
-						+ u.getuSurname() + ":" + u.getuTel();
+						+ u.getuSurname() + "( " + u.getusername() + " )";
 			}
 			return users;
 		}
@@ -547,17 +557,38 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	public void actionPerformed(ActionEvent e) {
 		Object event = e.getSource();
 		if (event == sendMessB) {
-			if (eventJList.getSelectedValue() != null) {
-				int sel = Integer.parseInt(eventJList.getSelectedValue()
-						.toString().split("]")[0]);
-				// usersJList.setListData(getUsersArray(sel));
+			if (usersJList.getSelectedValues() != null) {
+				String criterion = "";
+				for (Object s : usersJList.getSelectedValues()) {
+					criterion += "id=" + s.toString().split("]")[0] + " AND ";
+				}
+				if (criterion != "") {
+					try {
+						currentClub.spamMobile(message.getText(), criterion
+								.substring(0, criterion.length() - 3));
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 			}
 		}
 		if (event == sendToAllB) {
-			if (eventJList.getSelectedValue() != null) {
-				int sel = Integer.parseInt(eventJList.getSelectedValue()
-						.toString().split("]")[0]);
-				// usersJList.setListData(getUsersArray(sel));
+			String criterion = "";
+			DefaultListModel model = (DefaultListModel) usersJList.getModel();
+			String[] ele = new String[model.size()];
+			model.copyInto(ele);
+			for (String s : ele) {
+				criterion += "id=" + s.toString().split("]")[0] + " AND ";
+			}
+			if (criterion != "") {
+				try {
+					currentClub.spamMobile(message.getText(), criterion
+							.substring(0, criterion.length() - 3));
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
 		if (event == modifyProfB) {
@@ -675,7 +706,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			JOptionPane
 					.showMessageDialog(
 							mainFrame,
-							"SCIUTO Lorenzo - sciuto.lorenzo@gmail.com\n"
+							"SCIUTO Lorenzo - lorenzo.sciuto@gmail.com\n"
 									+ "URZI' Erik - erik.urzi@gmail.com\n"
 									+ "SANFILIPPO Filippo - filippo.sanfilippo@gmail.com\n"
 									+ "SCIBILIA Giorgio - giorgio.scibilia@gmail.com",
