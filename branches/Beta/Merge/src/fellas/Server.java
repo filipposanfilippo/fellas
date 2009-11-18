@@ -282,6 +282,29 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	public LinkedList<User> getUsers4Event(int eventId) throws RemoteException {
+		try {
+			LinkedList<User> usersList = new LinkedList<User>();
+			query = "SELECT * FROM users RIGHT OUTER JOIN subscription "
+					+ "ON users.id = subscription.uId "
+					+ "WHERE subscription.eId=" + eventId;
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			while (rs.next())
+				usersList.add(new User(rs.getInt("id"), rs.getString("uTel"),
+						rs.getString("uName"), rs.getString("uAge"), rs
+								.getString("uSex"), rs.getString("uStatus"), rs
+								.getString("username"), rs.getString("psw"), rs
+								.getString("uSurname"), rs
+								.getString("uLocation"), rs
+								.getString("imageURL"), rs.getInt("privacy")));
+			return usersList;
+		} catch (SQLException e) {
+			e.printStackTrace(System.err);
+			return null;
+		}
+	}
+
 	@Override
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException {
 		// TODO Auto-generated method stub
