@@ -96,19 +96,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int clubId = rs.getInt("id");
-			System.out.println("id club = " + clubId);
 
-			String geo[];
+			String[] geo= new String[2];
 			geo = address2GEOcoordinates(cAddress);
 
 			// adding info in POI table
-			query = "INSERT INTO POI (id,attribution,imageURL,lat,lon,line2,line4,type) VALUES "
+			query = "INSERT INTO POI (idItem,attribution,imageURL,lat,lon,line2,line4,type) VALUES "
 					+ "('"
 					+ clubId
 					+ "','"
 					+ cTel
-					+ "','http//diana.netsons.org/clubs/"
-					+ clubId
+					+ "','http://diana.netsons.org/clubs/"
+					+ cName
 					+ ".jpg',"
 					+ "'"
 					+ geo[0]
@@ -120,17 +119,25 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','" + cEMail + "','2')";
 			System.out.println(query);
 			statement = connection.createStatement();
-			System.out.println(query);
+			System.out.println("follia");
 			rs = statement.executeQuery(query);
-			System.out.println(query);
-			// rs.next();
-			System.out.println("inserito in poi");
+			
 			// adding info in action table
-			query = "INSERT INTO Action (poiId) VALUES ('" + clubId + "')";
+			// recupera id del POI
+			System.out.println("inizio inserimento poi");
+			query = "SELECT id FROM POI WHERE type='2' AND idItem=" + clubId
+					+ "'";
+			System.out.println(query);
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			// rs.next();
-			System.out.println("FINITO!");
+			rs.next();
+			int poiId=rs.getInt("id");
+			System.out.println(poiId);
+			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://diana.netsons.org/clubs/" + cName
+					+ ".php','Visit club page','" + poiId + "')";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			System.out.println("fine");
 			return true;
 		} catch (SQLException e) {
 			// e.printStackTrace();
@@ -676,7 +683,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int id = rs.getInt("id");
 
 			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"
-					+ coordinates[1] + "' WHERE idItem = '" + id + "' AND type=1";
+					+ coordinates[1] + "' WHERE idItem = '" + id
+					+ "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -788,17 +796,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			statement = connection.createStatement();
 			statement.execute(query);
-			
+
 			// add action to poi
 			// recupera id del poi
-			query = "SELECT id FROM POI WHERE type=1 AND idItem='" + id
-					+ "'";
+			query = "SELECT id FROM POI WHERE type=1 AND idItem='" + id + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			int poiId = rs.getInt("id");
-			
-			
+
 			query = "INSERT INTO Action (uri,label,poiId)"
 					+ "VALUES ('http://diana.netsons.org/users/" + username
 					+ ".php','Visit user page','" + poiId + "')";
@@ -930,13 +936,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement.execute(query);
 
 			// delete user from poi
-			// recupera id poi...mi serve per cancellare la  action corrispondente
+			// recupera id poi...mi serve per cancellare la action
+			// corrispondente
 			query = "SELECT id FROM POI WHERE idItem='" + id + "' AND type=1";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			int poiId=rs.getInt("id");
-			
+			int poiId = rs.getInt("id");
+
 			query = "DELETE from POI WHERE idItem='" + id + "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);

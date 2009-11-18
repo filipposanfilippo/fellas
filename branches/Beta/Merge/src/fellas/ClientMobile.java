@@ -33,6 +33,7 @@ class ClientMobile extends UnicastRemoteObject {
 		// byte[] sendData = new byte[1024];
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
+		server.clubRegistration("sss", "sss", "roma", "222", "sss@sss", "dance", "sss", "sss");
 		//System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
 		while (true) {
 			served = false;
