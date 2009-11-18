@@ -142,7 +142,7 @@ class ClientMobile extends UnicastRemoteObject {
 					
 					String uStatusS = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
-					System.out.println("\nmyLocation: " + uStatusS);
+					System.out.println("\nmyStatus: " + uStatusS);
 					// invoke remote method
 					serverAnswer = server.setStatus(uTel, uStatusS);
 					served = true;
