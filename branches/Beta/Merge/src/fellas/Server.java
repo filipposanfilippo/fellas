@@ -134,7 +134,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
+
 	public boolean updateClubData(Club club) throws RemoteException {
 		String[] coordinates = new String[2];
 		try {
@@ -1028,14 +1028,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public static String[] address2GEOcoordinates(String streetAddress) {
-		//streetAddress = streetAddress.replace(",", "+");
+		// streetAddress = streetAddress.replace(",", "+");
 		// use of regular expression(e kka vi futtii!)
 		streetAddress = streetAddress.replaceAll(" {1,}", "+");
 		String[] coordinates = new String[2];
-		if (streetAddress.equals("")){
+		if (streetAddress.equals("")) {
 			System.out.println("Default location");
-			coordinates[0]="43.318290";
-			coordinates[0]="11.331800";
+			coordinates[0] = "43.318290";
+			coordinates[0] = "11.331800";
 			return coordinates;
 		}
 		String tempCoordinates = new String();
@@ -1112,6 +1112,41 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	@Override
+	public String setPrivacy(String uTel, int privacy) throws RemoteException {
+		if (!isUserExisting(uTel))
+			return "You are not registered, please register%";
+		try {
+			query = "UPDATE users SET privacy  = '" + privacy
+					+ "' WHERE uTel = '" + uTel + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			// update status in poi
+			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int id = rs.getInt("id");
+
+			if (privacy == 1) {
+				query = "UPDATE POI SET attribution = '" + uTel
+						+ "' WHERE idItem = '" + id + "' AND type=1";
+				statement = connection.createStatement();
+				statement.execute(query);
+			} else {
+				query = "UPDATE POI SET attribution = '' WHERE idItem = '" + id + "' AND type=1";
+				statement = connection.createStatement();
+				statement.execute(query);
+
+			}
+
+			return "Privacy updated%";
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			return "PRIVACY UPDATE ERROR%";
 		}
 	}
 }

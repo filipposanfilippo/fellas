@@ -66,6 +66,8 @@ public interface ServerInterface extends Remote {
 			throws RemoteException;
 
 	public String setStatus(String uTel, String uStatus) throws RemoteException;
+	
+	public String setPrivacy(String uTel, int privacy) throws RemoteException;
 
 	public String userList(String senderPhone, String criterion)
 			throws RemoteException;
