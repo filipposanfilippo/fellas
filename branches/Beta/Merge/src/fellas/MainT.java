@@ -631,17 +631,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 								"Are you sure you want to unsubscribe your club from server?",
 								"Club Unsubscription",
 								JOptionPane.YES_NO_OPTION);
-				if (n == 1) {
-					if (currentClub.clubUnregistration()) {
-						JOptionPane.showMessageDialog(mainFrame,
-								"Club Succesfully unregistred!",
-								"Club Unsubscription",
-								JOptionPane.INFORMATION_MESSAGE);
-						System.exit(0);
-						new LoginT();
-					} else {
-						// TODO add error message
-					}
+				if (n == 0) {
+					currentClub.clubUnregistration();
+					JOptionPane.showMessageDialog(mainFrame,
+							"Club Succesfully unregistred!",
+							"Club Unsubscription",
+							JOptionPane.INFORMATION_MESSAGE);
+					System.exit(0);
+					new LoginT();
 				}
 			} catch (RemoteException e1) {
 				// TODO add error message
