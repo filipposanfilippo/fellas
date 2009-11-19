@@ -97,8 +97,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField userR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
-	JButton modifyProfB;
 	JLabel profileStatus;
+
+	JButton modifyProfB;
+	JButton unregProfB;
 
 	// ******************************************************************************
 	// MENU
@@ -455,6 +457,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		confPwdR.setBackground(colorEnf);
 		modifyProfB = new JButton("Save Changes");
 		modifyProfB.addActionListener(this);
+		unregProfB = new JButton("Unregister Club");
+		unregProfB.addActionListener(this);
 		JLabel lb;
 
 		lb = new JLabel("Owner Name:");
@@ -513,6 +517,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		bP.add(new JLabel("                     "));
 		bP.add(modifyProfB);
+		bP.add(unregProfB);
 		leftProfileP.add(bP);
 
 		profileStatus = new JLabel();
@@ -616,6 +621,31 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					profileStatus
 							.setText("Connection Error, try again later. CODE: 3");
 				}
+			}
+		}
+		if (event == unregProfB) {
+			try {
+				int n = JOptionPane
+						.showConfirmDialog(
+								mainFrame,
+								"Are you sure you want to unsubscribe your club from server?",
+								"Club Unsubscription",
+								JOptionPane.YES_NO_OPTION);
+				if (n == 1) {
+					if (currentClub.clubUnregistration()) {
+						JOptionPane.showMessageDialog(mainFrame,
+								"Club Succesfully unregistred!",
+								"Club Unsubscription",
+								JOptionPane.INFORMATION_MESSAGE);
+						System.exit(0);
+						new LoginT();
+					} else {
+						// TODO add error message
+					}
+				}
+			} catch (RemoteException e1) {
+				// TODO add error message
+				e1.printStackTrace();
 			}
 		}
 		if (event == createEvB) {
