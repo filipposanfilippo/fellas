@@ -112,8 +112,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ geo[1]
 					+ "','"
 					+ cType
-					+ "','" + cEMail + "','"
-					+ cName + "','2')";
+					+ "','" + cEMail + "','" + cName + "','2')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -135,7 +134,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
+
 	public boolean updateClubData(Club club) throws RemoteException {
 		String[] coordinates = new String[2];
 		try {
@@ -155,6 +154,52 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ coordinates[1] + "'," + " line2='" + club.getcType()
 					+ "'," + " line4='" + club.getcEMail() + "'"
 					+ " WHERE type=2 AND idItem=" + club.getId();
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean clubUnregistration(String cName, String psw)
+			throws RemoteException {
+		// if (!isClubExisting(cName))
+		// return false;
+		try {
+			// select id club
+			query = "SELECT id FROM clubs WHERE cName='" + cName
+					+ "' AND psw='" + psw + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return false;
+			int id = rs.getInt("id");
+
+			// delete user from users
+			query = "DELETE from clubs WHERE id='" + id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// delete user from poi
+			query = "SELECT id FROM POI WHERE idItem='" + id + "' AND type=2";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId = rs.getInt("id");
+
+			query = "DELETE from POI WHERE idItem='" + id + "' AND type=2";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// delete entry from action
+			query = "DELETE from Action WHERE poiId='" + poiId + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// delete old event of the club
+			query = "DELETE from events WHERE cId='" + id + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			return true;
@@ -1065,48 +1110,4 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return coordinates;
 	}
 
-	@Override
-	public boolean clubUnregistration(String cName, String psw)
-			throws RemoteException {
-		// if (!isClubExisting(cName))
-		// return false;
-		try {
-			// recupera id
-			query = "SELECT id FROM clubs WHERE cName='" + cName
-					+ "' AND psw='" + psw + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			if (!rs.next())
-				return false;
-			int id = rs.getInt("id");
-
-			// delete user from users
-			query = "DELETE from clubs WHERE id='" + id + "'";
-			statement = connection.createStatement();
-			statement.execute(query);
-
-			// delete user from poi
-			// recupera id poi...mi serve per cancellare la action
-			// corrispondente
-			query = "SELECT id FROM POI WHERE idItem='" + id + "' AND type=2";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int poiId = rs.getInt("id");
-
-			query = "DELETE from POI WHERE idItem='" + id + "' AND type=2";
-			statement = connection.createStatement();
-			statement.execute(query);
-
-			// delete entry from action
-			query = "DELETE from Action WHERE poiId='" + poiId + "'";
-			statement = connection.createStatement();
-			statement.execute(query);
-
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 }
