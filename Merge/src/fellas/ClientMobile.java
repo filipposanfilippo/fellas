@@ -178,6 +178,23 @@ class ClientMobile extends UnicastRemoteObject {
 					serverAnswer = server.setStatus(uTel, uStatusS);
 					served = true;
 					break;
+				case 'p' | 'P':
+					System.out.println("\nSET PRYVACY: ");
+					// check registration by phone --> it will be done in
+					// Server.java
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
+					int privacy = Integer.parseInt(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nprivacy: " + privacy);
+					// invoke remote method
+					serverAnswer = server.setPrivacy(uTel, privacy);
+					served = true;
+					break;
 				case 'u' | 'U':
 					System.out.println("\nUSERS LIST: ");
 					// check registration by phone
