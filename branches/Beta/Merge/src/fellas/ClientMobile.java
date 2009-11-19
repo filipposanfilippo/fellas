@@ -23,7 +23,7 @@ class ClientMobile extends UnicastRemoteObject {
 			IOException {
 		// invoke remote methods
 		server = (ServerInterface) Naming.lookup("//" + host + "/SvrMobile");
-		//ClientMobile client = new ClientMobile();
+		// ClientMobile client = new ClientMobile();
 		// to parser gms
 		DatagramSocket serverSocket = new DatagramSocket(4444); // crea un
 		// datagram
@@ -33,13 +33,14 @@ class ClientMobile extends UnicastRemoteObject {
 		// byte[] sendData = new byte[1024];
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
-		server.clubRegistration("sss", "sss", "roma", "222", "sss@sss", "dance", "sss", "sss");
-		//System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
+		server.clubRegistration("sss", "sss", "roma", "222", "sss@sss",
+				"dance", "sss", "sss");
+		// System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
 		while (true) {
 			served = false;
 			byte[] receiveData = new byte[1024];
 			byte[] sendData = new byte[1024];
-			
+
 			String[] splittedString = null;
 			String serverAnswer = new String();
 			DatagramPacket receivePacket = new DatagramPacket(receiveData,
@@ -62,10 +63,15 @@ class ClientMobile extends UnicastRemoteObject {
 
 				switch (splittedString[0].charAt(0)) {
 				case 'r' | 'R': // note: status is not set...but sms is to
-								// short!
+					// short!
 					System.out.println("\nUSER REGISTRATION: ");
 					// check registration by phone
-					
+					if (splittedString.length < 7) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String username = new String(splittedString[1]);
 					String psw = new String(splittedString[2]);
 					String uSex = new String(splittedString[3]);
@@ -88,18 +94,28 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'e' | 'E':
 					System.out.println("\nEVENTSLIST: ");
 					// check registration by phone
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
 
 					String criterionE = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionE);
 					// invoke remote method
-					serverAnswer = server.eventsList(uTel,criterionE);
+					serverAnswer = server.eventsList(uTel, criterionE);
 					served = true;
 					break;
 				case 'j' | 'J':
 					System.out.println("\nJOIN EVENT: ");
 					// check registration by phone
-					
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String eventCode = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCode);
@@ -110,7 +126,12 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'i' | 'I':// TODO need to fix
 					System.out.println("\nINVITE FRIEND: ");
 					// check registration by phone
-					
+					if (splittedString.length < 3) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String friendPhone = new String(splittedString[1]);
 					int eventId = Integer.valueOf(splittedString[2]);
 					System.out.println("\nphone: " + uTel);
@@ -127,7 +148,12 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nSET LOCATION: ");
 					// check registration by phone --> it will be done in
 					// Server.java
-					
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String uLocationL = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyLocation: " + uLocationL);
@@ -139,7 +165,12 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nSET STATUS: ");
 					// check registration by phone --> it will be done in
 					// Server.java
-					
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String uStatusS = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyStatus: " + uStatusS);
@@ -150,7 +181,12 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'u' | 'U':
 					System.out.println("\nUSERS LIST: ");
 					// check registration by phone
-					
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String criterionU = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionU);
@@ -161,19 +197,28 @@ class ClientMobile extends UnicastRemoteObject {
 				case 'b' | 'B':
 					System.out.println("\nBROADCAST MY STATUS: ");
 					// check registration by phone
-					
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String criterionB = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionB);
 					// invoke remote method
-					serverAnswer = server.broadcastMyStatus(uTel,
-							criterionB);
+					serverAnswer = server.broadcastMyStatus(uTel, criterionB);
 					served = true;
 					break;
 				case 'c' | 'C':
 					System.out.println("\nCHAT UP: ");
 					// check registration by phone
-					
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
 					String nicknameC = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nnicknameC: " + nicknameC);
@@ -183,7 +228,7 @@ class ClientMobile extends UnicastRemoteObject {
 					break;
 				case 'x' | 'X':
 					System.out.println("\nUNREGISTRATION: ");
-					
+
 					System.out.println("\nphone: " + uTel);
 					// invoke remote method
 					serverAnswer = server.mobileUnregistration(uTel);
@@ -191,6 +236,11 @@ class ClientMobile extends UnicastRemoteObject {
 					break;
 				case 'y' | 'Y':
 					System.out.println("\nCHATUPANSWER: ");
+					if (splittedString.length < 1) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
 					String id = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nid: " + id);
@@ -209,18 +259,24 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nSERVER ANSWER: " + serverAnswer);
 				}
 			} else {
-				serverAnswer = "SMS is malformed!";
+				serverAnswer = "SMS IS MALFORMED%";
 				System.out.println("SMS is malformed!");
-				/*InetAddress IPAddress = receivePacket.getAddress();
-				int port = receivePacket.getPort();
-				// String capitalizedSentence = sentence.toUpperCase();
-				// sendData = capitalizedSentence.getBytes();
-				sendData = serverAnswer.getBytes();
-				DatagramPacket sendPacket = new DatagramPacket(sendData,
-						sendData.length, IPAddress, port);
-				serverSocket.send(sendPacket);*/
+				/*
+				 * il codice sotto è commentato perchè in fase di test
+				 * l'emulatore fa sia da utente che da parser e quindi andrebbe
+				 * in loop infinito se arriva un sms malformed. Ricordati di
+				 * scommentare quando il sistema sarà finito
+				 * InetAddress IPAddress = receivePacket.getAddress(); int port =
+				 * receivePacket.getPort(); String capitalizedSentence =
+				 * sentence.toUpperCase(); sendData =
+				 * capitalizedSentence.getBytes(); sendData =
+				 * serverAnswer.getBytes(); DatagramPacket sendPacket = new
+				 * DatagramPacket(sendData, sendData.length, IPAddress, port);
+				 * serverSocket.send(sendPacket);
+				 */
+
 			}
-			
+
 		}
 	}
 }
