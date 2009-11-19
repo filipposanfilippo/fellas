@@ -723,15 +723,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			userid = rs.getInt("id");
 
 			// CHECK IF USER IS ALREADY ATTENDING
-			query = "SELECT id FROM " + eventCode + " WHERE id='"
+			query = "SELECT id FROM subscription WHERE id='"
 					+ String.valueOf(userid) + "'";
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				return "You are already attendig at this event%";
 			// INSERT USER IN EVENT TABLE
-			query = "INSERT INTO `" + eventCode + "` (`id`)" + "VALUES (`"
-					+ String.valueOf(userid) + "`)";
-			rs = statement.executeQuery(query);
+			query = "INSERT INTO subscription ('eId','uId) VALUES('"
+					+ eventCode + "','"
+					+ userid +"')";
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "JOINEVENT ERROR%";
