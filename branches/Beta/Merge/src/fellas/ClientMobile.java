@@ -91,6 +91,7 @@ class ClientMobile extends UnicastRemoteObject {
 					// System.out.println("\nServerAnswer: " + serverAnswer);
 					served = true;
 					break;
+					//TODO NEED TO FIX
 				case 'e' | 'E':
 					System.out.println("\nEVENTSLIST: ");
 					// check registration by phone

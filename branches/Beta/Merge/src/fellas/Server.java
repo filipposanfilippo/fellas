@@ -668,29 +668,35 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String joinEvent(String senderPhone, String eventCode)
 			throws RemoteException {
 		int userid;
+		String eName=new String();
 		try {
 			// CHECK IF USER EXISTS
-			query = "SELECT id FROM users WHERE eName='" + senderPhone + "'";
+			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
 			rs = statement.executeQuery(query);
 			if (!rs.next())
 				return "You are not registered, please register%";
 			userid = rs.getInt("id");
 
 			// CHECK IF USER IS ALREADY ATTENDING
-			query = "SELECT id FROM subscription WHERE id='"
-					+ String.valueOf(userid) + "'";
+			query = "SELECT uId FROM subscription WHERE uId='" + userid + "'";
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				return "You are already attendig at this event%";
 			// INSERT USER IN EVENT TABLE
-			query = "INSERT INTO `" + eventCode + "` (`id`)" + "VALUES (`"
-					+ String.valueOf(userid) + "`)";
+			query = "INSERT INTO subscription (eId, uId)" + "VALUES ('"
+					+ eventCode + "', '" + userid + "')";
+			statement.execute(query);
+
+
+			query = "SELECT eName FROM events WHERE id='" + eventCode + "'";
 			rs = statement.executeQuery(query);
+			rs.next();
+			eName=rs.getString("eName");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "JOINEVENT ERROR%";
 		}
-		return "You are attending at event%"; // insert eShortDescription but
+		return "You are attending at event "+eName+" ("+eventCode+")%"; // insert eShortDescription but
 		// dont forget to end sentence
 		// with %
 	}
@@ -910,7 +916,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// ---------
 
 			// Retrieve the ServerName
-			InetAddress serverAddr = InetAddress.getByName("192.168.1.104"); // HTC
+			InetAddress serverAddr = InetAddress.getByName("192.168.1.106"); // HTC
 			// ip
 			// address
 			// where
@@ -1137,7 +1143,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				statement = connection.createStatement();
 				statement.execute(query);
 			} else {
-				query = "UPDATE POI SET attribution = '' WHERE idItem = '" + id + "' AND type=1";
+				query = "UPDATE POI SET attribution = '' WHERE idItem = '" + id
+						+ "' AND type=1";
 				statement = connection.createStatement();
 				statement.execute(query);
 
