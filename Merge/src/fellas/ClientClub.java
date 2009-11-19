@@ -98,4 +98,10 @@ public class ClientClub extends UnicastRemoteObject {
 			throws RemoteException {
 		return server.spamMobile(message, criterion);
 	}
+
+	public boolean clubUnregistration() throws RemoteException {
+		return server.clubUnregistration(clubLogged.getcName(), clubLogged
+				.getPsw());
+	}
+
 }
