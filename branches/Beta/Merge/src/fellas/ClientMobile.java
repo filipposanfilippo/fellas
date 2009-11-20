@@ -37,6 +37,7 @@ class ClientMobile extends UnicastRemoteObject {
 				"dance", "sss", "sss");
 		// System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
 		while (true) {
+			//server.spamMobile("ciao", "uLocation LIKE '%siena%'");
 			served = false;
 			byte[] receiveData = new byte[1024];
 			byte[] sendData = new byte[1024];
@@ -106,6 +107,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\ncriterion: " + criterionE);
 					// invoke remote method
 					serverAnswer = server.eventsList(uTel, criterionE);
+					System.out.println("\nfinito");
 					served = true;
 					break;
 				case 'j' | 'J':
