@@ -494,7 +494,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
 	public String broadcastMyStatus(String senderPhone, String criterion)
 			throws RemoteException {
 		// if(!checkRegistration())
@@ -503,13 +502,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		String answer = "";
 
 		try {
-			query = "SELECT uTel FROM users WHERE " + criterion + "";
+			query = "SELECT uTel FROM users WHERE uLocation LIKE '%"
+					+ criterion + "%'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			while (rs.next()) {
-				// System.out.println("---->"+rs.getString("uTel"));
+			while (rs.next())
 				answer += '@' + rs.getString("uTel");
-			}
 			if (answer.equals(""))
 				return "Any users match with criterion%";
 			answer += '@';
@@ -529,10 +527,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				return "You are not registered, please register%";
 
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "broadcastMyStatus error%";
 		}
-		// break;
 	}
 
 	@Override
@@ -614,22 +611,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 
-			query = "SELECT eName FROM events WHERE " + criterion + "";
+			query = "SELECT eName FROM events WHERE eLocation LIKE '%"
+					+ criterion + "%'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-
 			while (rs.next())
 				answer += rs.getString("eName") + ',';
+			if (answer.equals(""))
+				return "Any events match with criterion%";
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
 
-			if (answer.equals(""))
-				return "Any events match with criterion%";
 			return answer;
-
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "EVENTLIST ERROR%";
 		}
 	}
@@ -668,7 +664,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String joinEvent(String senderPhone, String eventCode)
 			throws RemoteException {
 		int userid;
-		String eName=new String();
+		String eName = new String();
 		try {
 			// CHECK IF USER EXISTS
 			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
@@ -687,16 +683,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ eventCode + "', '" + userid + "')";
 			statement.execute(query);
 
-
 			query = "SELECT eName FROM events WHERE id='" + eventCode + "'";
 			rs = statement.executeQuery(query);
 			rs.next();
-			eName=rs.getString("eName");
+			eName = rs.getString("eName");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "JOINEVENT ERROR%";
 		}
-		return "You are attending at event "+eName+" ("+eventCode+")%"; // insert eShortDescription but
+		return "You are attending at event " + eName + " (" + eventCode + ")%"; // insert
+		// eShortDescription
+		// but
 		// dont forget to end sentence
 		// with %
 	}
@@ -855,12 +852,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "REGISTRATION ERROR%";
 		}
 	}
 
-	@Override
 	public String userList(String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
@@ -874,22 +870,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 
-			query = "SELECT username FROM users WHERE " + criterion + "";
+			query = "SELECT username FROM users WHERE uLocation LIKE '%"
+					+ criterion + "%'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 
 			while (rs.next())
 				answer += rs.getString("username") + ',';
+			if (answer.equals(""))
+				return "Any users match with criterion%";
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
 
-			if (answer.equals(""))
-				return "Any users match with criterion%";
 			return answer;
-
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "USERLIST ERROR%";
 		}
 	}
@@ -1121,7 +1117,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
 	public String setPrivacy(String uTel, int privacy) throws RemoteException {
 		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";
@@ -1152,7 +1147,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			return "Privacy updated%";
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "PRIVACY UPDATE ERROR%";
 		}
 	}
