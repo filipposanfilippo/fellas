@@ -14,11 +14,13 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -344,6 +346,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eImageURL) throws RemoteException {
 		String[] coordinates = new String[2];
 		coordinates = address2GEOcoordinates(eLocation);
+		long startDifference;
+		long finishDifference;
+
 		try {
 			// TODO prima di inserire controlla che eName non esista già
 			/*
@@ -379,18 +384,27 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','" + eInfoTel + "','" + eImageURL + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
-			// timerTask starts
-			// controlla la data di start
-			// se la data di start-data di oggi<5 metti subito poi e action
-			// altrimenti ritarda l'inserimento del poi di startDate-5-todayDate
-			/*
-			 * java.util.Date today = new java.util.Date(); java.sql.Date
-			 * sqlToday = new java.sql.Date(today.getTime()); Timer timer = new
-			 * Timer(); timer.schedule(new Task(), 1000);
-			 */
 
-			// insert event into poi and add it the actions
-			// recupera id assegnato con autoincrement
+			// check start time of event
+			// if dayOfStart.getTime() - today.getTime()<7 than immediately
+			// adding to POI
+			// else wait until 7 days before his starting time
+
+			java.util.Date today = new java.util.Date();
+
+			DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+			java.util.Date dayOfStart = null;
+			java.util.Date dayOfFinish = null;
+			try {
+				dayOfStart = df.parse(eStartDate + " " + eStartTime);
+				dayOfFinish = df.parse(eFinishDate + " " + eFinishTime);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			startDifference = dayOfStart.getTime() - today.getTime();
+
+			// retrieve event id
 			query = "SELECT id FROM events WHERE eName='" + eName
 					+ "' AND cId='" + cId + "' AND eStartDate='" + eStartDate
 					+ "' AND eFinishDate='" + eFinishDate + "'";
@@ -399,45 +413,59 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			int eventId = rs.getInt("id");
 
-			query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
-					+ "VALUES ('"
-					+ eventId
-					+ "','"
-					+ eInfoTel
-					+ "','"
-					+ eImageURL
-					+ "','"
-					+ coordinates[0]
-					+ "','"
-					+ coordinates[1]
-					+ "','"
-					+ eCategory
-					+ "','Starts: "
-					+ eStartDate
-					+ " "
-					+ eStartTime
-					+ "','Ends: "
-					+ eFinishDate
-					+ " "
-					+ eFinishTime
-					+ "','"
-					+ eName + "',3)";
-			statement = connection.createStatement();
-			statement.execute(query);
-			// add actions to POI
-			// recupera id poi
-			query = "SELECT id FROM POI WHERE type=3 AND idItem='" + eventId
-					+ "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int poiId = rs.getInt("id");
+			if (startDifference < 7 * 60 * 60 * 24 * 1000) {
+				System.out.println("Immidiatily adding to POI");
+				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+						+ "VALUES ('"
+						+ eventId
+						+ "','"
+						+ eInfoTel
+						+ "','"
+						+ eImageURL
+						+ "','"
+						+ coordinates[0]
+						+ "','"
+						+ coordinates[1]
+						+ "','"
+						+ eCategory
+						+ "','Starts: "
+						+ eStartDate
+						+ " "
+						+ eStartTime
+						+ "','Ends: "
+						+ eFinishDate
+						+ " "
+						+ eFinishTime + "','" + eName + "',3)";
+				statement = connection.createStatement();
+				statement.execute(query);
+				// add actions to POI
+				// retrieve POI id
+				query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+						+ eventId + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				rs.next();
+				int poiId = rs.getInt("id");
 
-			query = "INSERT INTO Action (uri,label,poiId)"
-					+ "VALUES ('http://fellas.netsons.org/events/event" + poiId
-					+ ".php','Join event','" + poiId + "')";
-			statement = connection.createStatement();
-			statement.execute(query);
+				query = "INSERT INTO Action (uri,label,poiId)"
+						+ "VALUES ('http://fellas.netsons.org/events/event"
+						+ poiId + ".php','Join event','" + poiId + "')";
+				statement = connection.createStatement();
+				statement.execute(query);
+			} else {
+				startDifference = startDifference - 7 * 60 * 60 * 24 * 1000;
+				Timer StartTimer = new Timer();
+				StartTimer.schedule(new starterTask(eventId, eInfoTel,
+						eImageURL, coordinates, eCategory, eStartDate,
+						eFinishDate, eStartTime, eFinishTime, eName),
+						startDifference);
+			}
+
+			// Start terminatorEvent
+			finishDifference=dayOfFinish.getTime()
+			- today.getTime();
+			Timer EndTimer = new Timer();
+			EndTimer.schedule(new terminatorTask(eventId), finishDifference);
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -445,9 +473,112 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	class Task extends TimerTask {
+	class starterTask extends TimerTask {
+		private int eventId;
+		private String eInfoTel;
+		private String eImageURL;
+		private String[] coordinates;
+		private String eCategory;
+		private String eStartDate;
+		private String eFinishDate;
+		private String eStartTime;
+		private String eFinishTime;
+		private String eName;
+
+		public starterTask(int eventId, String eInfoTel, String eImageURL,
+				String[] coordinates, String eCategory, String eStartDate,
+				String eFinishDate, String eStartTime, String eFinishTime,
+				String eName) {
+			this.eventId = eventId;
+			this.eInfoTel = eInfoTel;
+			this.eImageURL = eImageURL;
+			this.coordinates = coordinates;
+			this.eCategory = eCategory;
+			this.eStartDate = eStartDate;
+			this.eFinishDate = eFinishDate;
+			this.eStartTime = eStartTime;
+			this.eFinishTime = eFinishTime;
+			this.eName = eName;
+
+		}
+
 		public void run() {
-			System.out.println("Hello");
+			System.out
+					.println("Adding event to POI 7 days before his starting time");
+			try {
+				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+						+ "VALUES ('"
+						+ eventId
+						+ "','"
+						+ eInfoTel
+						+ "','"
+						+ eImageURL
+						+ "','"
+						+ coordinates[0]
+						+ "','"
+						+ coordinates[1]
+						+ "','"
+						+ eCategory
+						+ "','Starts: "
+						+ eStartDate
+						+ " "
+						+ eStartTime
+						+ "','Ends: "
+						+ eFinishDate
+						+ " "
+						+ eFinishTime + "','" + eName + "',3)";
+				statement = connection.createStatement();
+				statement.execute(query);
+				// add actions to POI
+				// retrieve POI id
+				query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+						+ eventId + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				rs.next();
+				int poiId = rs.getInt("id");
+
+				query = "INSERT INTO Action (uri,label,poiId)"
+						+ "VALUES ('http://fellas.netsons.org/events/event"
+						+ poiId + ".php','Join event','" + poiId + "')";
+				statement = connection.createStatement();
+				statement.execute(query);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	class terminatorTask extends TimerTask {
+		private int eventId;
+
+		public terminatorTask(int eventId) {
+			this.eventId = eventId;
+
+		}
+
+		public void run() {
+			System.out.println("Deleting event from POI");
+			try {
+				// delete item from poi table and from actions too
+				// recupera id POI
+				query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+						+ eventId + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				rs.next();
+				int poiId = rs.getInt("id");
+
+				query = "DELETE from POI where idItem='" + eventId
+						+ "' AND type=3";
+				statement = connection.createStatement();
+				statement.execute(query);
+				query = "DELETE from Action where poiId='" + poiId + "'";
+				statement = connection.createStatement();
+				statement.execute(query);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
