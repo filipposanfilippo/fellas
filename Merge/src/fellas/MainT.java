@@ -74,7 +74,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextArea eLongDescription;
 	JTextField eLocation;
 	JTextField eCategory;
-	JTextField eDate;
+	JTextField eStartDate;
+	JTextField eFinishDate;
 	JTextField eStartTime;
 	JTextField eFinishTime;
 	JTextField eRestriction;
@@ -333,10 +334,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eCategory.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eCategory);
 
-		rightEvP.add(new JLabel("Event Date:"));
-		eDate = new JTextField();
-		eDate.setPreferredSize(new Dimension(390, 20));
-		rightEvP.add(eDate);
+		rightEvP.add(new JLabel("Starting Date: (aaaa-mm-gg)"));
+		eStartDate = new JTextField();
+		eStartDate.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eStartDate);
+
+		rightEvP.add(new JLabel("Finishing Date: (aaaa-mm-gg)"));
+		eFinishDate = new JTextField();
+		eFinishDate.setPreferredSize(new Dimension(390, 20));
+		rightEvP.add(eFinishDate);
 
 		rightEvP.add(new JLabel("Starting Time:"));
 		eStartTime = new JTextField();
@@ -535,7 +541,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(800, 700));
+		mainFrame.setPreferredSize(new Dimension(800, 750));
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
 
@@ -653,12 +659,16 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						"Creation Error!", JOptionPane.ERROR_MESSAGE);
 			} else {
 				try {
-					currentClub.createEvent(eName.getText(), eShortDescription
-							.getText(), eLongDescription.getText(), eLocation
-							.getText(), eCategory.getText(), eDate.getText(),
-							eStartTime.getText(), eFinishTime.getText(),
-							eRestriction.getText(), eInfoTel.getText(),
-							eImageURL.getText());
+					currentClub
+							.createEvent(eName.getText(), eShortDescription
+									.getText(), eLongDescription.getText(),
+									eLocation.getText(), eCategory.getText(),
+									eStartDate.getText(),
+									eFinishDate.getText(),
+									eStartTime.getText(),
+									eFinishTime.getText(), eRestriction
+											.getText(), eInfoTel.getText(),
+									eImageURL.getText());
 				} catch (RemoteException e1) {
 					// TODO add error message
 					e1.printStackTrace();
@@ -679,10 +689,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						currentClub.getClub().getId(), eName.getText(),
 						eShortDescription.getText(),
 						eLongDescription.getText(), eLocation.getText(),
-						eCategory.getText(), eDate.getText(), eStartTime
-								.getText(), eFinishTime.getText(), eRestriction
-								.getText(), eInfoTel.getText(), eImageURL
-								.getText()));
+						eCategory.getText(), eStartDate.getText(), eFinishDate
+								.getText(), eStartTime.getText(), eFinishTime
+								.getText(), eRestriction.getText(), eInfoTel
+								.getText(), eImageURL.getText()));
 				populateList(eventJList, getEventsArray());
 				populateList(eventJList2, getEventsArray());
 
@@ -705,7 +715,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eLongDescription.setText("");
 				eLocation.setText("");
 				eCategory.setText("");
-				eDate.setText("");
+				eStartDate.setText("");
+				eFinishDate.setText("");
 				eStartTime.setText("");
 				eFinishTime.setText("");
 				eRestriction.setText("");
@@ -847,7 +858,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eLongDescription.setText(event.geteLongDescription());
 				eLocation.setText(event.geteLocation());
 				eCategory.setText(event.geteCategory());
-				eDate.setText(event.geteDate());
+				eStartDate.setText(event.geteStartDate());
+				eFinishDate.setText(event.geteFinishDate());
 				eStartTime.setText(event.geteStartTime());
 				eFinishTime.setText(event.geteFinishTime());
 				eRestriction.setText(event.geteRestriction());
