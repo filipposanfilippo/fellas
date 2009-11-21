@@ -34,9 +34,9 @@ class ClientMobile extends UnicastRemoteObject {
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
 		
-		server.createEvent(4, "test finale", "eShortDescription",
+		server.createEvent(4, "spakkiu di eventu", "eShortDescription",
 				"eLongDescription", "siena", "eCategory",
-				"2009/11/21", "2009/11/21", "17:12", "17:17",
+				"2009/11/21", "2009/11/26", "17:12", "17:32",
 				"no", "325888", "eImageURL");
 		// System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
 		while (true) {
