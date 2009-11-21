@@ -14,11 +14,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Server extends UnicastRemoteObject implements ServerInterface {
 	private Connection connection = null;
@@ -229,9 +232,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("eName"), rs.getString("eShortDescription"),
 						rs.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
-								.getString("eCategory"), rs.getString("eDate"),
-						rs.getString("eStartTime"),
-						rs.getString("eFinishTime"), rs
+								.getString("eCategory"), rs
+								.getString("eStartDate"), rs
+								.getString("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL")));
@@ -254,9 +259,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eShortDescription"), rs
 								.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
-								.getString("eCategory"), rs.getString("eDate"),
-						rs.getString("eStartTime"),
-						rs.getString("eFinishTime"), rs
+								.getString("eCategory"), rs
+								.getString("eStartDate"), rs
+								.getString("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL"));
@@ -332,9 +339,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eDate, String eStartTime, String eFinishTime,
-			String eRestriction, String eInfoTel, String eImageURL)
-			throws RemoteException {
+			String eStartDate, String eFinishDate, String eStartTime,
+			String eFinishTime, String eRestriction, String eInfoTel,
+			String eImageURL) throws RemoteException {
 		String[] coordinates = new String[2];
 		coordinates = address2GEOcoordinates(eLocation);
 		try {
@@ -346,7 +353,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			 */
 
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
-					+ "eLocation,eCategory,eDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
+					+ "eLocation,eCategory,eStartDate,eFinishDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
 					+ "VALUES ('"
 					+ cId
 					+ "','"
@@ -360,24 +367,33 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ eCategory
 					+ "','"
-					+ eDate
+					+ eStartDate
+					+ "','"
+					+ eFinishDate
 					+ "','"
 					+ eStartTime
 					+ "','"
 					+ eFinishTime
 					+ "','"
 					+ eRestriction
-					+ "','"
-					+ eInfoTel
-					+ "','"
-					+ eImageURL + "')";
+					+ "','" + eInfoTel + "','" + eImageURL + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
+			// timerTask starts
+			// controlla la data di start
+			// se la data di start-data di oggi<5 metti subito poi e action
+			// altrimenti ritarda l'inserimento del poi di startDate-5-todayDate
+			/*
+			 * java.util.Date today = new java.util.Date(); java.sql.Date
+			 * sqlToday = new java.sql.Date(today.getTime()); Timer timer = new
+			 * Timer(); timer.schedule(new Task(), 1000);
+			 */
 
 			// insert event into poi and add it the actions
 			// recupera id assegnato con autoincrement
 			query = "SELECT id FROM events WHERE eName='" + eName
-					+ "' AND cId='" + cId + "' AND eDate='" + eDate + "'";
+					+ "' AND cId='" + cId + "' AND eStartDate='" + eStartDate
+					+ "' AND eFinishDate='" + eFinishDate + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
@@ -396,9 +412,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ coordinates[1]
 					+ "','"
 					+ eCategory
+					+ "','Starts: "
+					+ eStartDate
+					+ " "
+					+ eStartTime
+					+ "','Ends: "
+					+ eFinishDate
+					+ " "
+					+ eFinishTime
 					+ "','"
-					+ eDate
-					+ "','" + eStartTime + "','" + eName + "',3)";
+					+ eName + "',3)";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// add actions to POI
@@ -422,7 +445,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
+	class Task extends TimerTask {
+		public void run() {
+			System.out.println("Hello");
+		}
+	}
+
 	public boolean updateEvent(MyEvent event) throws RemoteException {
 		try {
 			query = "UPDATE events SET " + "cId='" + event.getcId() + "',"
@@ -430,11 +458,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "eShortDescription='" + event.geteShortDescription()
 					+ "'," + "eLongDescription='" + event.geteLongDescription()
 					+ "'," + "eLocation='" + event.geteLocation() + "',"
-					+ "eCategory='" + event.geteCategory() + "'," + "eDate='"
-					+ event.geteDate() + "'," + "eStartTime='"
-					+ event.geteStartTime() + "'," + "eFinishTime='"
-					+ event.geteFinishTime() + "'," + "eRestriction='"
-					+ event.geteRestriction() + "' WHERE id=" + event.getId();
+					+ "eCategory='" + event.geteCategory() + "',"
+					+ "eStartDate='" + event.geteStartDate() + "',"
+					+ "eFinishDate='" + event.geteFinishDate() + "',"
+					+ "eStartTime='" + event.geteStartTime() + "',"
+					+ "eFinishTime='" + event.geteFinishTime() + "',"
+					+ "eRestriction='" + event.geteRestriction()
+					+ "' WHERE id=" + event.getId();
 
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -452,10 +482,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "attribution='" + event.geteInfoTel() + "',"
 					+ "imageURL='" + event.geteImageURL() + "'," + "lat='"
 					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
-					+ "line2='" + event.geteCategory() + "'," + "line3='"
-					+ event.geteDate() + "'," + "line4='"
-					+ event.geteStartTime() + "'" + " WHERE idItem='"
-					+ event.getId() + "' AND type=3";
+					+ "line2='" + event.geteCategory() + "',"
+					+ "line3='Starts: " + event.geteStartDate() + " "
+					+ event.geteStartTime() + "'," + "line4='Ends: "
+					+ event.geteFinishDate() + " " + event.geteFinishTime()
+					+ "'" + " WHERE idItem='" + event.getId() + "' AND type=3";
 
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -691,11 +722,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			e.printStackTrace();
 			return "JOINEVENT ERROR%";
 		}
-		return "You are attending at event " + eName + " (" + eventCode + ")%"; // insert
-		// eShortDescription
-		// but
-		// dont forget to end sentence
-		// with %
+		return "You are attending at event " + eName + " (" + eventCode + ")%";
 	}
 
 	@Override
@@ -729,12 +756,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			return "Location updated%";
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "LOCATIONUPDATE ERROR%";
 		}
 	}
 
-	@Override
 	public String setStatus(String uTel, String uStatus) throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
@@ -759,12 +785,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			return "Status updated%";
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "STATUS UPDATE ERROR%";
 		}
 	}
 
-	@Override
 	public String mobileRegistration(String uTel, String username, String psw,
 			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException {
@@ -890,7 +915,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
 	public String spamMobile(String message, String criterion)
 			throws RemoteException {
 		String answer = "";
@@ -955,7 +979,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
 	public String mobileUnregistration(String uTel) throws RemoteException {
 		if (!isUserExisting(uTel))
 			return "You are not registered%";
@@ -998,7 +1021,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
 	public String chatUpAnswer(String senderTel, String id)
 			throws RemoteException {
 		String answer = "";
@@ -1024,7 +1046,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return answer;
 
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "CHATUPANSWER ERROR%";
 		}
 	}
@@ -1072,7 +1094,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return coordinates;
 	}
 
-	@Override
 	public boolean clubUnregistration(String cName, String psw)
 			throws RemoteException {
 		// if (!isClubExisting(cName))

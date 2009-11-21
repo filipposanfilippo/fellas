@@ -34,7 +34,7 @@ public interface ServerInterface extends Remote {
 
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eDate, String eStartTime, String eFinishTime,
+			String eStartDate, String eFinishDate, String eStartTime, String eFinishTime,
 			String eRestriction, String infoTel, String imageURL)
 			throws RemoteException;
 

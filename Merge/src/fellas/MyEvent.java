@@ -11,7 +11,8 @@ public class MyEvent implements Serializable {
 	private String eLongDescription;
 	private String eLocation;
 	private String eCategory;
-	private String eDate;
+	private String eStartDate;
+	private String eFinishDate;
 	private String eStartTime;
 	private String eFinishTime;
 	private String eRestriction;
@@ -20,7 +21,7 @@ public class MyEvent implements Serializable {
 
 	public MyEvent(int id, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eDate, String eStartTime, String eFinishTime,
+			String eStartDate, String eFinishDate, String eStartTime, String eFinishTime,
 			String eRestriction, String eInfoTel, String eImageURL) {
 		super();
 		this.id = id;
@@ -30,7 +31,8 @@ public class MyEvent implements Serializable {
 		this.eLongDescription = eLongDescription;
 		this.eLocation = eLocation;
 		this.eCategory = eCategory;
-		this.eDate = eDate;
+		this.eStartDate = eStartDate;
+		this.eFinishDate = eFinishDate;
 		this.eStartTime = eStartTime;
 		this.eFinishTime = eFinishTime;
 		this.eRestriction = eRestriction;
@@ -99,12 +101,12 @@ public class MyEvent implements Serializable {
 		return eCategory;
 	}
 
-	public void seteDate(String eDate) {
-		this.eDate = eDate;
+	public void seteStartDate(String eStartDate) {
+		this.eStartDate = eStartDate;
 	}
 
-	public String geteDate() {
-		return eDate;
+	public String geteStartDate() {
+		return eStartDate;
 	}
 
 	public void seteStartTime(String eStartTime) {
@@ -145,6 +147,14 @@ public class MyEvent implements Serializable {
 
 	public String geteImageURL() {
 		return eImageURL;
+	}
+
+	public void seteFinishDate(String eFinishDate) {
+		this.eFinishDate = eFinishDate;
+	}
+
+	public String geteFinishDate() {
+		return eFinishDate;
 	}
 
 }
