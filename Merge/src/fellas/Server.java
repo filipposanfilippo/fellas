@@ -773,12 +773,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 
-			query = "SELECT eName FROM events WHERE eLocation LIKE '%"
+			query = "SELECT eName, id FROM events WHERE eLocation LIKE '%"
 					+ criterion + "%'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			while (rs.next())
-				answer += rs.getString("eName") + ',';
+			while (rs.next() && answer.length()<120)
+				answer += rs.getString("eName") +' '+ rs.getString("id")+',';
 			if (answer.equals(""))
 				return "Any events match with criterion%";
 			answer = answer.substring(0, answer.lastIndexOf(','));
@@ -1031,7 +1031,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 
-			while (rs.next())
+			while (rs.next() && answer.length()<120)
 				answer += rs.getString("username") + ',';
 			if (answer.equals(""))
 				return "Any users match with criterion%";
