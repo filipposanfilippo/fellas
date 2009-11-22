@@ -80,14 +80,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 		try {
+System.out.println("inizio");
 			// check if there isn't another club with the same name and address
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND cAddress='" + cAddress + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
+System.out.println("1a select");
 			if (rs.next())
 				return false;
 			// adding club in the club's table
+System.out.println("controllo passato");
 			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw)"
 					+ "VALUES ('"
 					+ oName
@@ -149,7 +152,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			closeConnection();
 			return true;
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			closeConnection();
 			return false;
 		}
@@ -350,35 +353,38 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	// TODO check whether it's working or not...
+	// TODO be careful: the connection must be opened before calling this method
 	public boolean isClubExisting(String cName) {
 		boolean res = false;
 		try {
-			openConnection();
+			//openConnection();
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			res = rs.next();
-			closeConnection();
+			//closeConnection();			
 			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
+			//closeConnection();		
 			return true;
 		}
 	}
 
-	// added by Fil
+	// TODO be careful: the connection must be opened before calling this method 
 	public boolean isUserExisting(String uTel) {
+		boolean res=false;
 		try {
-			openConnection();
+			//openConnection();
 			query = "SELECT * FROM users WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			closeConnection();
-			return rs.next();
+			res= rs.next();
+			//closeConnection();
+			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
+			//closeConnection();
 			return true;
 		}
 	}
