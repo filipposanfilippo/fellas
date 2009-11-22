@@ -60,12 +60,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	//TODO to cancel
 	public boolean authenticationClub(String name, String psw)
 			throws RemoteException {
 		// invoke client club method to check user-password
 		return false;
 	}
 
+	//TODO to cancel
 	public boolean authenticationMobile() throws RemoteException {
 		// invoke client club method to check user-password
 		return false;
@@ -76,10 +78,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException {
 		openConnection();
-		if (isClubExisting(oName)) {
-			closeConnection();
+		if (isClubExisting(oName))
 			return false;
-		}
 		try {
 			// check if there isn't another club with the same name and address
 			query = "SELECT id FROM clubs WHERE cName='" + cName
@@ -147,12 +147,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			System.out.println("club added");
-			closeConnection();
 			return true;
 		} catch (SQLException e) {
 			// e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -178,12 +179,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ " WHERE type=2 AND idItem=" + club.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -198,12 +200,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			res = rs.next();
-			closeConnection();
 			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -221,11 +224,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("cType"), rs.getString("cName"), rs
 								.getString("psw")));
 			}
-			closeConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return null;
+		}
+		finally{
+			closeConnection();
 		}
 		return clubList;
 	}
@@ -242,12 +246,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("cTel"), rs.getString("cEMail"), rs
 						.getString("cType"), rs.getString("cName"), rs
 						.getString("psw"));
-			closeConnection();
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubData: " + clubName);
 			e.printStackTrace();
-			closeConnection();
 			return new Club();
+		}
+		finally{
+			closeConnection();
 		}
 		return new Club();
 	}
@@ -272,13 +277,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL")));
-			closeConnection();
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
 			e.printStackTrace();
-			closeConnection();
 			return null;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -302,17 +308,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL"));
-				closeConnection();
 				return event;
-			} else {
-				closeConnection();
+			} else
 				return null;
-			}
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getEvent: " + id);
 			e.printStackTrace();
-			closeConnection();
 			return null;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -333,20 +338,29 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("uSurname"), rs
 								.getString("uLocation"), rs
 								.getString("imageURL"), rs.getInt("privacy")));
-			closeConnection();
 			return usersList;
 		} catch (SQLException e) {
 			e.printStackTrace(System.err);
-			closeConnection();
 			return null;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
 	@Override
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException {
 		// TODO Auto-generated method stub
-		openConnection();
-		closeConnection();
+		try{
+			openConnection();
+		}
+		//catch(SQLException e){
+		catch(Exception e){	// TODO use the line above
+			
+		}
+		finally{
+			closeConnection();
+		}
 		return null;
 	}
 
@@ -529,12 +543,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			finishDifference = dayOfFinish.getTime() - today.getTime();
 			Timer EndTimer = new Timer();
 			EndTimer.schedule(new terminatorTask(eventId), finishDifference);
-			closeConnection();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -609,10 +624,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ poiId + ".php','Join event','" + poiId + "')";
 				statement = connection.createStatement();
 				statement.execute(query);
-				closeConnection();
 			} catch (SQLException e) {
-				closeConnection();
 				e.printStackTrace();
+			}
+			finally{
+				closeConnection();
 			}
 		}
 	}
@@ -645,9 +661,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				query = "DELETE from Action where poiId='" + poiId + "'";
 				statement = connection.createStatement();
 				statement.execute(query);
-				closeConnection();
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+			finally{
 				closeConnection();
 			}
 		}
@@ -696,12 +713,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ event.getId() + "' AND type=3";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -726,12 +744,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from Action where poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -762,16 +781,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				answer += rs.getString("username") + '+'
 						+ rs.getString("uStatus") + "%";
 				System.out.println(answer);
-				closeConnection();
 				return answer;
-			} else {
-				closeConnection();
+			} else
 				return "You are not registered, please register%";
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "broadcastMyStatus error%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -796,10 +814,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				answer += "User " + rs.getString("username");
-			else {
-				closeConnection();
+			else
 				return "You are not registered, please register%";
-			}
 
 			// check if there is already an entry in chatup table
 
@@ -809,15 +825,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 
 			if (rs.next()) {
-				if (rs.getString("authorization").equals("0")) {
-					closeConnection();
+				if (rs.getString("authorization").equals("0"))
 					return "Request already sent. You are waiting for authorization number "
 							+ rs.getString("id") + "%";
-				} else {
-					closeConnection();
+				else
 					return "Request already sent. You are able to chatup with "
 							+ receiverTel + "%";
-				}
 			}
 
 			query = "INSERT INTO chatup (senderTel,receiverTel,authorization)"
@@ -832,11 +845,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			answer += " asks to chatup with you. If you agree, respond 'y&"
 					+ rs.getString("id") + "$'%";
-			closeConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "CHATUP ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 		return answer;
 	}
@@ -873,12 +887,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
-			closeConnection();
 			return answer;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "EVENTLIST ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -895,10 +910,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			if (rs.next())
 				answer += rs.getString("username") + ">invite you at>";
-			else {
-				closeConnection();
+			else
 				return "You are not registered, please register%";
-			}
 
 			query = "SELECT eShortDescription FROM events WHERE id='" + eventId
 					+ "'";
@@ -906,16 +919,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				answer += rs.getString("eShortDescription") + '%';
-			else {
-				closeConnection();
+			else
 				return "Any events match with id%";
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "INVITEFRIEND ERROR%";
 		}
-		closeConnection();
+		finally{
+			closeConnection();
+		}
 		return answer;
 	}
 
@@ -947,11 +959,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			eName = rs.getString("eName");
-			closeConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "JOINEVENT ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 		return "You are attending at event " + eName + " (" + eventCode + ")%";
 	}
@@ -962,10 +975,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		openConnection();
-		if (!isUserExisting(uTel)) {
-			closeConnection();
+		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";
-		}
 		try {
 			query = "UPDATE users SET uLocation = '" + uLocation
 					+ "' WHERE uTel = '" + uTel + "'";
@@ -987,12 +998,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return "Location updated%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "LOCATIONUPDATE ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1000,10 +1012,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		openConnection();
-		if (!isUserExisting(uTel)) {
-			closeConnection();
+		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";
-		}
 		try {
 			query = "UPDATE users SET uStatus = '" + uStatus
 					+ "' WHERE uTel = '" + uTel + "'";
@@ -1020,12 +1030,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ id + "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return "Status updated%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "STATUS UPDATE ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1033,10 +1044,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException {
 		openConnection();
-		if (isUserExisting(uTel)) {
-			closeConnection();
+		if (isUserExisting(uTel))
 			return "Already registered%";
-		}
 		try {
 			query = "INSERT INTO users (uTel,username,psw,uSex,uAge,uLocation,privacy,uName, uStatus, uSurname, imageURL)"
 					+ "VALUES ('"
@@ -1116,12 +1125,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ ".php','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "REGISTRATION ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1136,10 +1146,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 
-			if (!rs.next()) {
-				closeConnection();
+			if (!rs.next())
 				return "You are not registered, please register%";
-			}
 
 			query = "SELECT username FROM users WHERE uLocation LIKE '%"
 					+ criterion + "%'";
@@ -1153,12 +1161,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
-			closeConnection();
 			return answer;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "USERLIST ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1207,15 +1216,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			/* Send out the packet */
 			socket.send(packet);
 			System.out.println("\nSent...");
-			closeConnection();
 			return "Mobile spammed%";
 
 			// ---------
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			closeConnection();
 			return "SPAMMOBILE error%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1231,10 +1241,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public String mobileUnregistration(String uTel) throws RemoteException {
 		openConnection();
-		if (!isUserExisting(uTel)) {
-			closeConnection();
+		if (!isUserExisting(uTel))
 			return "You are not registered%";
-		}
 		try {
 			// recupera id
 			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
@@ -1266,12 +1274,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from Action WHERE poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return "You have been unregistered%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "MOBILEUNREGISTRATION ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1285,15 +1294,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next()) {
-				if (rs.getInt("authorization") == 1) {
-					closeConnection();
+				if (rs.getInt("authorization") == 1)
 					return "You have already accepted this chatup request%";
-				}
 				answer += '@' + rs.getString("senderTel") + '@';
-			} else {
-				closeConnection();
+			} else
 				return "Any chatup requests are pending for you%";
-			}
 
 			query = "UPDATE chatup SET authorization='1' WHERE id='" + id + "'";
 			// System.out.println(query);
@@ -1302,13 +1307,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			answer += "User has accepted to chatup with you. Here the phone number "
 					+ senderTel + "%";
-			closeConnection();
 			return answer;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "CHATUPANSWER ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -1320,7 +1326,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (streetAddress.equals("")) {
 			System.out.println("Default location");
 			coordinates[0] = "43.318290";
-			coordinates[0] = "11.331800";
+			coordinates[1] = "11.331800";
 			return coordinates;
 		}
 		String tempCoordinates = new String();
@@ -1392,21 +1398,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from Action WHERE poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			closeConnection();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
 	public String setPrivacy(String uTel, int privacy) throws RemoteException {
 		openConnection();
-		if (!isUserExisting(uTel)) {
-			closeConnection();
+		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";
-		}
 		try {
 			query = "UPDATE users SET privacy  = '" + privacy
 					+ "' WHERE uTel = '" + uTel + "'";
@@ -1430,12 +1435,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
-			closeConnection();
 			return "Privacy updated%";
 		} catch (SQLException e) {
 			e.printStackTrace();
-			closeConnection();
 			return "PRIVACY UPDATE ERROR%";
+		}
+		finally{
+			closeConnection();
 		}
 	}
 }
