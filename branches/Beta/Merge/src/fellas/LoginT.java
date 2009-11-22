@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -72,6 +73,8 @@ public class LoginT implements Runnable, ActionListener {
 		pwdL = new JPasswordField(10);
 		loginB = new JButton("Login");
 		loginB.addActionListener(this);
+		loginB.setMnemonic(KeyEvent.VK_L);
+		loginB.setActionCommand("enable");
 
 		rightP.add(new JLabel("Club Name:"));
 		rightP.add(userL);
@@ -129,6 +132,7 @@ public class LoginT implements Runnable, ActionListener {
 		leftP.add(pwdR);
 		leftP.add(new JLabel("Confirm Pwd:"));
 		leftP.add(confPwdR);
+		leftP.add(new JLabel(""));
 		leftP.add(registerB);
 
 		leftP.setVisible(true);

@@ -349,8 +349,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eCategory.setText("");
 		eStartDate.setDate(new Date());
 		eFinishDate.setDate(new Date());
-		eStartTime.setText("");
-		eFinishTime.setText("");
+		eStartTime.setText("00:00");
+		eFinishTime.setText("00:00");
 		eRestriction.setText("");
 		eInfoTel.setText("");
 		eImageURL.setText("");
@@ -410,12 +410,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(eFinishDate);
 
 		rightEvP.add(new JLabel("Starting Time: (hh:mm)"));
-		eStartTime = new JTextField();
+		eStartTime = new JTextField("00:00");
 		eStartTime.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eStartTime);
 
 		rightEvP.add(new JLabel("Finishing Time: (hh:mm)"));
-		eFinishTime = new JTextField();
+		eFinishTime = new JTextField("00:00");
 		eFinishTime.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eFinishTime);
 
@@ -721,10 +721,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				JOptionPane.showMessageDialog(mainFrame,
 						"Type a correct event name to preceed.",
 						"Creation Error!", JOptionPane.ERROR_MESSAGE);
-			} else if (!eStartDate.isValid() || !eFinishDate.isValid()) {
+			} else if (eStartDate.getDate() == null
+					|| eFinishDate.getDate() == null) {
 				JOptionPane.showMessageDialog(mainFrame,
 						"Date are not well formatted!", "Creation Error!",
 						JOptionPane.ERROR_MESSAGE);
+			} else if (eStartDate.getDate().after(eFinishDate.getDate())) {
+				JOptionPane.showMessageDialog(mainFrame,
+						"FinishDate must be greater than StartDate!",
+						"Creation Error!", JOptionPane.ERROR_MESSAGE);
 			} else {
 				try {
 					currentClub
