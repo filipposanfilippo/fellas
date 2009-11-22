@@ -2,6 +2,7 @@ package fellas;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.LinkedList;
 
 public interface ServerInterface extends Remote {
@@ -34,9 +35,9 @@ public interface ServerInterface extends Remote {
 
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eStartDate, String eFinishDate, String eStartTime, String eFinishTime,
-			String eRestriction, String infoTel, String imageURL)
-			throws RemoteException;
+			Date eStartDate, Date eFinishDate, String eStartTime,
+			String eFinishTime, String eRestriction, String infoTel,
+			String imageURL) throws RemoteException;
 
 	public boolean updateEvent(MyEvent event) throws RemoteException;
 
@@ -66,7 +67,7 @@ public interface ServerInterface extends Remote {
 			throws RemoteException;
 
 	public String setStatus(String uTel, String uStatus) throws RemoteException;
-	
+
 	public String setPrivacy(String uTel, int privacy) throws RemoteException;
 
 	public String userList(String senderPhone, String criterion)
