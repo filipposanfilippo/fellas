@@ -21,6 +21,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,8 +36,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		openConnection();
 		closeConnection();
 	}
-	
-	public boolean openConnection(){
+
+	public boolean openConnection() {
 		try {
 			// TODO add connection controls whether the connection falls down
 			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
@@ -48,8 +49,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
-	public boolean closeConnection(){
+
+	public boolean closeConnection() {
 		try {
 			connection.close();
 			return true;
@@ -75,22 +76,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException {
 		openConnection();
-		if (isClubExisting(oName)){
+		if (isClubExisting(oName)) {
 			closeConnection();
 			return false;
 		}
 		try {
-System.out.println("inizio");
 			// check if there isn't another club with the same name and address
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND cAddress='" + cAddress + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-System.out.println("1a select");
 			if (rs.next())
 				return false;
 			// adding club in the club's table
-System.out.println("controllo passato");
 			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw)"
 					+ "VALUES ('"
 					+ oName
@@ -152,7 +150,7 @@ System.out.println("controllo passato");
 			closeConnection();
 			return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 			closeConnection();
 			return false;
 		}
@@ -267,8 +265,8 @@ System.out.println("controllo passato");
 						rs.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
 								.getString("eCategory"), rs
-								.getString("eStartDate"), rs
-								.getString("eFinishDate"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
 								.getString("eStartTime"), rs
 								.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
@@ -297,8 +295,8 @@ System.out.println("controllo passato");
 								.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
 								.getString("eCategory"), rs
-								.getString("eStartDate"), rs
-								.getString("eFinishDate"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
 								.getString("eStartTime"), rs
 								.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
@@ -353,7 +351,6 @@ System.out.println("controllo passato");
 	}
 
 	// TODO check whether it's working or not...
-	// TODO be careful: the connection must be opened before calling this method
 	public boolean isClubExisting(String cName) {
 		boolean res = false;
 		try {
@@ -371,7 +368,7 @@ System.out.println("controllo passato");
 		}
 	}
 
-	// TODO be careful: the connection must be opened before calling this method 
+	// added by Fil
 	public boolean isUserExisting(String uTel) {
 		boolean res=false;
 		try {
@@ -397,7 +394,7 @@ System.out.println("controllo passato");
 
 	public boolean createEvent(int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eStartDate, String eFinishDate, String eStartTime,
+			Date eStartDate, Date eFinishDate, String eStartTime,
 			String eFinishTime, String eRestriction, String eInfoTel,
 			String eImageURL) throws RemoteException {
 		String[] coordinates = new String[2];
@@ -405,6 +402,8 @@ System.out.println("controllo passato");
 		long startDifference;
 		long finishDifference;
 
+		String formattedStartDate = fomatDate(eStartDate);
+		String formattedFinishDate = fomatDate(eFinishDate);
 		try {
 			// TODO prima di inserire controlla che eName non esista già
 			/*
@@ -428,32 +427,38 @@ System.out.println("controllo passato");
 					+ "','"
 					+ eCategory
 					+ "','"
-					+ eStartDate
+					+ formattedStartDate
 					+ "','"
-					+ eFinishDate
+					+ formattedFinishDate
 					+ "','"
 					+ eStartTime
 					+ "','"
 					+ eFinishTime
 					+ "','"
 					+ eRestriction
-					+ "','" + eInfoTel + "','" + eImageURL + "')";
+					+ "','"
+					+ eInfoTel
+					+ "','"
+					+ eImageURL
+					+ "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
+			System.out.println(formattedStartDate + " " + eStartTime);
+			System.out.println(formattedFinishDate + " " + eFinishTime);
 			// check start time of event
 			// if dayOfStart.getTime() - today.getTime()<7 than immediately
 			// adding to POI
 			// else wait until 7 days before his starting time
 
-			java.util.Date today = new java.util.Date();
+			Date today = new Date();
 
 			DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-			java.util.Date dayOfStart = null;
-			java.util.Date dayOfFinish = null;
+			Date dayOfStart = null;
+			Date dayOfFinish = null;
 			try {
-				dayOfStart = df.parse(eStartDate + " " + eStartTime);
-				dayOfFinish = df.parse(eFinishDate + " " + eFinishTime);
+				dayOfStart = df.parse(formattedStartDate + " " + eStartTime);
+				dayOfFinish = df.parse(formattedFinishDate + " " + eFinishTime);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -462,8 +467,9 @@ System.out.println("controllo passato");
 
 			// retrieve event id
 			query = "SELECT id FROM events WHERE eName='" + eName
-					+ "' AND cId='" + cId + "' AND eStartDate='" + eStartDate
-					+ "' AND eFinishDate='" + eFinishDate + "'";
+					+ "' AND cId='" + cId + "' AND eStartDate='"
+					+ formattedStartDate + "' AND eFinishDate='"
+					+ formattedFinishDate + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
@@ -485,13 +491,15 @@ System.out.println("controllo passato");
 						+ "','"
 						+ eCategory
 						+ "','Starts: "
-						+ eStartDate
+						+ formattedStartDate
 						+ " "
 						+ eStartTime
 						+ "','Ends: "
-						+ eFinishDate
+						+ formattedFinishDate
 						+ " "
-						+ eFinishTime + "','" + eName + "',3)";
+						+ eFinishTime
+						+ "','"
+						+ eName + "',3)";
 				statement = connection.createStatement();
 				statement.execute(query);
 				// add actions to POI
@@ -512,14 +520,13 @@ System.out.println("controllo passato");
 				startDifference = startDifference - 7 * 60 * 60 * 24 * 1000;
 				Timer StartTimer = new Timer();
 				StartTimer.schedule(new starterTask(eventId, eInfoTel,
-						eImageURL, coordinates, eCategory, eStartDate,
-						eFinishDate, eStartTime, eFinishTime, eName),
+						eImageURL, coordinates, eCategory, formattedStartDate,
+						formattedFinishDate, eStartTime, eFinishTime, eName),
 						startDifference);
 			}
 
 			// Start terminatorEvent
-			finishDifference=dayOfFinish.getTime()
-			- today.getTime();
+			finishDifference = dayOfFinish.getTime() - today.getTime();
 			Timer EndTimer = new Timer();
 			EndTimer.schedule(new terminatorTask(eventId), finishDifference);
 			closeConnection();
@@ -646,18 +653,24 @@ System.out.println("controllo passato");
 		}
 	}
 
+	private String fomatDate(Date date) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		return new StringBuilder(dateFormat.format(date)).toString();
+	}
+
 	public boolean updateEvent(MyEvent event) throws RemoteException {
 		try {
 			openConnection();
+
 			query = "UPDATE events SET " + "cId='" + event.getcId() + "',"
 					+ "eName='" + event.geteName() + "',"
 					+ "eShortDescription='" + event.geteShortDescription()
 					+ "'," + "eLongDescription='" + event.geteLongDescription()
 					+ "'," + "eLocation='" + event.geteLocation() + "',"
 					+ "eCategory='" + event.geteCategory() + "',"
-					+ "eStartDate='" + event.geteStartDate() + "',"
-					+ "eFinishDate='" + event.geteFinishDate() + "',"
-					+ "eStartTime='" + event.geteStartTime() + "',"
+					+ "eStartDate='" + fomatDate(event.geteStartDate()) + "',"
+					+ "eFinishDate='" + fomatDate(event.geteFinishDate())
+					+ "'," + "eStartTime='" + event.geteStartTime() + "',"
 					+ "eFinishTime='" + event.geteFinishTime() + "',"
 					+ "eRestriction='" + event.geteRestriction()
 					+ "' WHERE id=" + event.getId();
@@ -676,10 +689,11 @@ System.out.println("controllo passato");
 					+ "imageURL='" + event.geteImageURL() + "'," + "lat='"
 					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
 					+ "line2='" + event.geteCategory() + "',"
-					+ "line3='Starts: " + event.geteStartDate() + " "
-					+ event.geteStartTime() + "'," + "line4='Ends: "
-					+ event.geteFinishDate() + " " + event.geteFinishTime()
-					+ "'" + " WHERE idItem='" + event.getId() + "' AND type=3";
+					+ "line3='Starts: " + fomatDate(event.geteStartDate())
+					+ " " + event.geteStartTime() + "'," + "line4='Ends: "
+					+ fomatDate(event.geteFinishDate()) + " "
+					+ event.geteFinishTime() + "'" + " WHERE idItem='"
+					+ event.getId() + "' AND type=3";
 			statement = connection.createStatement();
 			statement.execute(query);
 			closeConnection();
@@ -750,7 +764,7 @@ System.out.println("controllo passato");
 				System.out.println(answer);
 				closeConnection();
 				return answer;
-			} else{
+			} else {
 				closeConnection();
 				return "You are not registered, please register%";
 			}
@@ -782,7 +796,7 @@ System.out.println("controllo passato");
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				answer += "User " + rs.getString("username");
-			else{
+			else {
 				closeConnection();
 				return "You are not registered, please register%";
 			}
@@ -795,12 +809,11 @@ System.out.println("controllo passato");
 			rs = statement.executeQuery(query);
 
 			if (rs.next()) {
-				if (rs.getString("authorization").equals("0")){
+				if (rs.getString("authorization").equals("0")) {
 					closeConnection();
 					return "Request already sent. You are waiting for authorization number "
 							+ rs.getString("id") + "%";
-				}
-				else{
+				} else {
 					closeConnection();
 					return "Request already sent. You are able to chatup with "
 							+ receiverTel + "%";
@@ -852,8 +865,9 @@ System.out.println("controllo passato");
 					+ criterion + "%'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			while (rs.next() && answer.length()<120)
-				answer += rs.getString("eName") +' '+ rs.getString("id")+',';
+			while (rs.next() && answer.length() < 120)
+				answer += rs.getString("eName") + ' ' + rs.getString("id")
+						+ ',';
 			if (answer.equals(""))
 				return "Any events match with criterion%";
 			answer = answer.substring(0, answer.lastIndexOf(','));
@@ -881,7 +895,7 @@ System.out.println("controllo passato");
 
 			if (rs.next())
 				answer += rs.getString("username") + ">invite you at>";
-			else{
+			else {
 				closeConnection();
 				return "You are not registered, please register%";
 			}
@@ -892,7 +906,7 @@ System.out.println("controllo passato");
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				answer += rs.getString("eShortDescription") + '%';
-			else{
+			else {
 				closeConnection();
 				return "Any events match with id%";
 			}
@@ -948,7 +962,7 @@ System.out.println("controllo passato");
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		openConnection();
-		if (!isUserExisting(uTel)){
+		if (!isUserExisting(uTel)) {
 			closeConnection();
 			return "You are not registered, please register%";
 		}
@@ -986,7 +1000,7 @@ System.out.println("controllo passato");
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		openConnection();
-		if (!isUserExisting(uTel)){
+		if (!isUserExisting(uTel)) {
 			closeConnection();
 			return "You are not registered, please register%";
 		}
@@ -1019,7 +1033,7 @@ System.out.println("controllo passato");
 			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException {
 		openConnection();
-		if (isUserExisting(uTel)){
+		if (isUserExisting(uTel)) {
 			closeConnection();
 			return "Already registered%";
 		}
@@ -1122,7 +1136,7 @@ System.out.println("controllo passato");
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 
-			if (!rs.next()){
+			if (!rs.next()) {
 				closeConnection();
 				return "You are not registered, please register%";
 			}
@@ -1132,7 +1146,7 @@ System.out.println("controllo passato");
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 
-			while (rs.next() && answer.length()<120)
+			while (rs.next() && answer.length() < 120)
 				answer += rs.getString("username") + ',';
 			if (answer.equals(""))
 				return "Any users match with criterion%";
@@ -1217,7 +1231,7 @@ System.out.println("controllo passato");
 
 	public String mobileUnregistration(String uTel) throws RemoteException {
 		openConnection();
-		if (!isUserExisting(uTel)){
+		if (!isUserExisting(uTel)) {
 			closeConnection();
 			return "You are not registered%";
 		}
@@ -1271,12 +1285,12 @@ System.out.println("controllo passato");
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next()) {
-				if (rs.getInt("authorization") == 1){
+				if (rs.getInt("authorization") == 1) {
 					closeConnection();
 					return "You have already accepted this chatup request%";
 				}
 				answer += '@' + rs.getString("senderTel") + '@';
-			} else{
+			} else {
 				closeConnection();
 				return "Any chatup requests are pending for you%";
 			}
@@ -1389,7 +1403,7 @@ System.out.println("controllo passato");
 
 	public String setPrivacy(String uTel, int privacy) throws RemoteException {
 		openConnection();
-		if (!isUserExisting(uTel)){
+		if (!isUserExisting(uTel)) {
 			closeConnection();
 			return "You are not registered, please register%";
 		}
