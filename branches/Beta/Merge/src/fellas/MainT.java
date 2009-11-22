@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,9 +24,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -373,7 +376,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eventJList2 = createEventList();
 		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
 		leftEvP.add(eventScrollPane);
-
+		try {
+			URL url = new URL("http://diana.netsons.org/img/ct.jpg");
+			JLabel img = new JLabel(new ImageIcon(ImageIO.read(url)));
+			//img.setPreferredSize(new Dimension(50, 50));
+			leftEvP.add(img);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		// ------------------------ RIGHT ------------------------------------
 		JPanel rightEvP = new JPanel();
 		rightEvP.setBorder(BorderFactory.createTitledBorder(""));
