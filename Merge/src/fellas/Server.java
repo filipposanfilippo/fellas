@@ -553,7 +553,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 
 			// Start terminatorEvent
-			finishDifference = dayOfFinish.getTime() - today.getTime();
+			finishDifference = dayOfFinish.getTime() - today.getTime();		
 			Timer EndTimer = new Timer();
 			EndTimer.schedule(new terminatorTask(eventId), finishDifference);
 			return true;
