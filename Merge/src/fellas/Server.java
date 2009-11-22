@@ -31,6 +31,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	private Statement statement = null;
 	private String query = "";
 	private ResultSet rs = null;
+	private static String keyword ="perorapassworddiprova";
 
 	public Server() throws RemoteException {
 		openConnection();
@@ -212,7 +213,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public LinkedList<Club> getClubList() throws RemoteException {
+	/*public LinkedList<Club> getClubList() throws RemoteException {
 		LinkedList<Club> clubList = new LinkedList<Club>();
 		try {
 			openConnection();
@@ -234,7 +235,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			closeConnection();
 		}
 		return clubList;
-	}
+	}*/
 
 	public Club getClubData(String cName, String psw) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty club
@@ -770,11 +771,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String broadcastMyStatus(String senderPhone, String criterion)
+	public String broadcastMyStatus(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		String answer = "";
+		if(keyword.equals(key))
+			return "You are not authorized";
 		try {
 			openConnection();
 			query = "SELECT uTel FROM users WHERE uLocation LIKE '%"
@@ -810,8 +813,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public String chatUp(String senderTel, String username)
+	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException {
+		if(keyword.equals(key))
+			return "You are not authorized";
 		String answer = "";
 		String receiverTel = "";
 		try {
@@ -872,15 +877,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public boolean checkRegistration(String phoneNumber) throws RemoteException {
+	public boolean checkRegistration(String key, String phoneNumber) throws RemoteException {
 		// TODO IS IT NECESSARY?
+		if(keyword.equals(key))
+			return false;
 		return false;
 	}
 
 	@Override
-	public String eventsList(String senderPhone, String criterion)
+	public String eventsList(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
+		if(keyword.equals(key))
+			return "You are not authorized";
 		try {
 			openConnection();
 			query = "SELECT username FROM users WHERE uTel='" + senderPhone
@@ -914,8 +923,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public String inviteFriend(String senderPhone, String friendPhone,
+	public String inviteFriend(String key, String senderPhone, String friendPhone,
 			int eventId) throws RemoteException {
+		if(keyword.equals(key))
+			return "You are not authorized";
 		String answer = new String('@' + friendPhone + '@');
 		try {
 			openConnection();
@@ -948,10 +959,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public String joinEvent(String senderPhone, String eventCode)
+	public String joinEvent(String key, String senderPhone, String eventCode)
 			throws RemoteException {
 		int userid;
 		String eName = new String();
+		if(keyword.equals(key))
+			return "You are not authorized";
 		try {
 			openConnection();
 			// CHECK IF USER EXISTS
@@ -986,10 +999,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public String setLocation(String uTel, String uLocation)
+	public String setLocation(String key, String uTel, String uLocation)
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
+		if(keyword.equals(key))
+			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";
@@ -1024,9 +1039,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String setStatus(String uTel, String uStatus) throws RemoteException {
+	public String setStatus(String key, String uTel, String uStatus) throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
+		if(keyword.equals(key))
+			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";
@@ -1056,9 +1073,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String mobileRegistration(String uTel, String username, String psw,
+	public String mobileRegistration(String key, String uTel, String username, String psw,
 			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException {
+		if(keyword.equals(key))
+			return "You are not authorized";
 		openConnection();
 		if (isUserExisting(uTel))
 			return "Already registered%";
@@ -1151,10 +1170,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String userList(String senderPhone, String criterion)
+	public String userList(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
-
+		if(keyword.equals(key))
+			return "You are not authorized";
 		try {
 			openConnection();
 			query = "SELECT username FROM users WHERE uTel='" + senderPhone
@@ -1258,7 +1278,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String mobileUnregistration(String uTel) throws RemoteException {
+	public String mobileUnregistration(String key, String uTel) throws RemoteException {
+		if(keyword.equals(key))
+			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
 			return "You are not registered%";
@@ -1303,9 +1325,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String chatUpAnswer(String senderTel, String id)
+	public String chatUpAnswer(String key, String senderTel, String id)
 			throws RemoteException {
 		String answer = "";
+		if(keyword.equals(key))
+			return "You are not authorized";
 		try {
 			openConnection();
 			query = "SELECT senderTel, authorization FROM chatup WHERE id='"
@@ -1427,7 +1451,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String setPrivacy(String uTel, int privacy) throws RemoteException {
+	public String setPrivacy(String key, String uTel, int privacy) throws RemoteException {
+		if(keyword.equals(key))
+			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
 			return "You are not registered, please register%";

@@ -46,46 +46,46 @@ public interface ServerInterface extends Remote {
 	public String spamMobile(String cName, String psw, String message, String criterion)
 	throws RemoteException;
 	
+	//public LinkedList<Club> getClubList(String key) throws RemoteException;
+	
 	// public boolean registerMobile() throws RemoteException;
 	// _________________________
 
-	public String mobileRegistration(String uTel, String username, String psw,
+	public String mobileRegistration(String key, String uTel, String username, String psw,
 			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException;
-
-	public LinkedList<Club> getClubList() throws RemoteException;
 	
-	public String mobileUnregistration(String uTel) throws RemoteException;
+	public String mobileUnregistration(String key, String uTel) throws RemoteException;
 
-	public String eventsList(String senderPhone, String criterion)
+	public String eventsList(String key, String senderPhone, String criterion)
 			throws RemoteException;
 
-	public String joinEvent(String senderPhone, String eventCode)
+	public String joinEvent(String key, String senderPhone, String eventCode)
 			throws RemoteException;
 
-	public String inviteFriend(String senderPhone, String friendPhone,
+	public String inviteFriend(String key, String senderPhone, String friendPhone,
 			int eventId) throws RemoteException;
 
-	public String setLocation(String uTel, String uLocation)
+	public String setLocation(String key, String uTel, String uLocation)
 			throws RemoteException;
 
-	public String setStatus(String uTel, String uStatus) throws RemoteException;
+	public String setStatus(String key, String uTel, String uStatus) throws RemoteException;
 
-	public String setPrivacy(String uTel, int privacy) throws RemoteException;
+	public String setPrivacy(String key, String uTel, int privacy) throws RemoteException;
 
-	public String userList(String senderPhone, String criterion)
+	public String userList(String key, String senderPhone, String criterion)
 			throws RemoteException;
 
-	public String broadcastMyStatus(String senderPhone, String criterion)
+	public String broadcastMyStatus(String key, String senderPhone, String criterion)
 			throws RemoteException;
 
-	public String chatUp(String senderTel, String username)
+	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException;
 
-	public String chatUpAnswer(String senderTel, String id)
+	public String chatUpAnswer(String key, String senderTel, String id)
 			throws RemoteException;
 
-	public boolean checkRegistration(String phoneNumber) throws RemoteException;
+	public boolean checkRegistration(String key, String phoneNumber) throws RemoteException;
 
 	// _________________________
 }
