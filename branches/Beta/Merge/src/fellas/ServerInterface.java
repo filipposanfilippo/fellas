@@ -18,13 +18,11 @@ public interface ServerInterface extends Remote {
 	public boolean clubUnregistration(String cName, String psw)
 			throws RemoteException;
 
-	public Club getClubData(String clubName) throws RemoteException;
+	public Club getClubData(String cName, String psw) throws RemoteException;
 
-	public boolean updateClubData(Club club) throws RemoteException;
+	public boolean updateClubData(String cName, String psw, Club club) throws RemoteException;
 
-	public LinkedList<Club> getClubList() throws RemoteException;
-
-	public LinkedList<MyEvent> getClubEventsList(int cId)
+	public LinkedList<MyEvent> getClubEventsList(String cName, String psw, int cId)
 			throws RemoteException;
 
 	public MyEvent getEvent(int id) throws RemoteException;
@@ -33,18 +31,21 @@ public interface ServerInterface extends Remote {
 
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
 
-	public boolean createEvent(int cId, String eName, String eShortDescription,
+	public boolean createEvent(String cName, String psw, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			Date eStartDate, Date eFinishDate, String eStartTime,
 			String eFinishTime, String eRestriction, String infoTel,
 			String imageURL) throws RemoteException;
 
-	public boolean updateEvent(MyEvent event) throws RemoteException;
+	public boolean updateEvent(String cName, String psw, MyEvent event) throws RemoteException;
 
-	public boolean deleteEvent(int eventId) throws RemoteException;
+	public boolean deleteEvent(String cName, String psw, int eventId) throws RemoteException;
 
-	public LinkedList<User> getUsers4Event(int eventId) throws RemoteException;
+	public LinkedList<User> getEventUsersList(String cName, String psw, int eventId) throws RemoteException;
 
+	public String spamMobile(String cName, String psw, String message, String criterion)
+	throws RemoteException;
+	
 	// public boolean registerMobile() throws RemoteException;
 	// _________________________
 
@@ -52,6 +53,8 @@ public interface ServerInterface extends Remote {
 			String uSex, String uAge, String uLocation, String uPrivacy)
 			throws RemoteException;
 
+	public LinkedList<Club> getClubList() throws RemoteException;
+	
 	public String mobileUnregistration(String uTel) throws RemoteException;
 
 	public String eventsList(String senderPhone, String criterion)
@@ -84,7 +87,5 @@ public interface ServerInterface extends Remote {
 
 	public boolean checkRegistration(String phoneNumber) throws RemoteException;
 
-	public String spamMobile(String message, String criterion)
-			throws RemoteException;
 	// _________________________
 }

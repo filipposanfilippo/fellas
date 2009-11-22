@@ -286,7 +286,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	private String[] getUsersArray(int eventId) {
 		LinkedList<User> userssList = new LinkedList<User>();
 		try {
-			userssList = currentClub.getUsers4Event(eventId);
+			userssList = currentClub.getEventUsersList(eventId);
 		} catch (Exception ex) {
 			// TODO add error alert
 			ex.printStackTrace();

@@ -157,8 +157,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public boolean updateClubData(Club club) throws RemoteException {
+	public boolean updateClubData(String cName, String psw, Club club) throws RemoteException {
 		String[] coordinates = new String[2];
+		if(!clubAccess(cName,psw))
+			return false;
 		try {
 			openConnection();
 			query = "UPDATE clubs SET oName='" + club.getoName() + "',"
@@ -234,12 +236,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return clubList;
 	}
 
-	public Club getClubData(String clubName) throws RemoteException {
+	public Club getClubData(String cName, String psw) throws RemoteException {
+		// TODO be careful: if cName & psw are wrong, we return an empty club
+		if(!clubAccess(cName,psw))
+			return new Club();		
 		try {
-			openConnection();
-			query = "SELECT * FROM clubs WHERE cName='" + clubName + "'";
+			openConnection();			
+			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
+			rs = statement.executeQuery(query);			
 			if (rs.next())
 				return new Club(rs.getInt("id"), rs.getString("oName"), rs
 						.getString("oSurname"), rs.getString("cAddress"), rs
@@ -247,8 +252,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("cType"), rs.getString("cName"), rs
 						.getString("psw"));
 		} catch (SQLException e) {
-			System.out.println("ERRORE IN SERVER getClubData: " + clubName);
-			e.printStackTrace();
+			System.out.println("ERRORE IN SERVER getClubData: " + cName);
+			e.printStackTrace();			
 			return new Club();
 		}
 		finally{
@@ -257,7 +262,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new Club();
 	}
 
-	public LinkedList<MyEvent> getClubEventsList(int cId) {
+	public LinkedList<MyEvent> getClubEventsList(String cName, String psw, int cId) throws RemoteException {
+		if(!clubAccess(cName,psw))
+			return null;
 		try {
 			openConnection();
 			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
@@ -320,8 +327,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			closeConnection();
 		}
 	}
-
-	public LinkedList<User> getUsers4Event(int eventId) throws RemoteException {
+	
+	public LinkedList<User> getEventUsersList(String cName, String psw, int eventId) throws RemoteException {
+		// TODO be careful: if cName & psw are wrong, we return an empty list
+		if(!clubAccess(cName,psw))
+			return null;
 		try {
 			openConnection();
 			LinkedList<User> usersList = new LinkedList<User>();
@@ -350,7 +360,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	@Override
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException {
-		// TODO Auto-generated method stub
+		// TODO IS IT NECESSARY???
 		try{
 			openConnection();
 		}
@@ -401,12 +411,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public MobileUser getMobileUser(String name) {
+		// TODO IS IT NECESSARY???
 		openConnection();
 		closeConnection();
 		return null;
 	}
 
-	public boolean createEvent(int cId, String eName, String eShortDescription,
+	public boolean createEvent(String cName, String psw, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
 			Date eStartDate, Date eFinishDate, String eStartTime,
 			String eFinishTime, String eRestriction, String eInfoTel,
@@ -418,6 +429,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 		String formattedStartDate = fomatDate(eStartDate);
 		String formattedFinishDate = fomatDate(eFinishDate);
+		if(!clubAccess(cName,psw))
+			return false;
 		try {
 			// TODO prima di inserire controlla che eName non esista già
 			/*
@@ -675,10 +688,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new StringBuilder(dateFormat.format(date)).toString();
 	}
 
-	public boolean updateEvent(MyEvent event) throws RemoteException {
+	public boolean updateEvent(String cName, String psw, MyEvent event) throws RemoteException {
+		if(!clubAccess(cName,psw))
+			return false;
 		try {
 			openConnection();
-
 			query = "UPDATE events SET " + "cId='" + event.getcId() + "',"
 					+ "eName='" + event.geteName() + "',"
 					+ "eShortDescription='" + event.geteShortDescription()
@@ -723,7 +737,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public boolean deleteEvent(int eventId) throws RemoteException {
+	public boolean deleteEvent(String cName, String psw, int eventId) throws RemoteException {
+		if(!clubAccess(cName,psw))
+			return false;
 		try {
 			openConnection();
 			query = "DELETE from events where id='" + eventId + "'";
@@ -857,7 +873,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	@Override
 	public boolean checkRegistration(String phoneNumber) throws RemoteException {
-		// TODO Auto-generated method stub
+		// TODO IS IT NECESSARY?
 		return false;
 	}
 
@@ -1171,9 +1187,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String spamMobile(String message, String criterion)
+	public String spamMobile(String cName, String psw, String message, String criterion)
 			throws RemoteException {
 		String answer = "";
+		// TODO be careful: if cName & psw are wrong we return an empty string
+		if(!clubAccess(cName,psw))
+			return "";
 		try {
 			openConnection();
 			query = "SELECT uTel FROM users WHERE " + criterion + "";
