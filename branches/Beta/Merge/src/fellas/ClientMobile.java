@@ -12,6 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 class ClientMobile extends UnicastRemoteObject {
 	private static ServerInterface server;
 	private static String host = "localhost";
+	private static String keyword ="perorapassworddiprova";
 
 	// comunica con SmsReceiver
 	protected ClientMobile() throws RemoteException {
@@ -90,7 +91,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nlocation: " + uLocation);
 					System.out.println("\nprivacy: " + uPrivacy);
 					// invoke remote method
-					serverAnswer = server.mobileRegistration(uTel, username,
+					serverAnswer = server.mobileRegistration(keyword, uTel, username,
 							psw, uSex, uAge, uLocation, uPrivacy);
 					// System.out.println("\nServerAnswer: " + serverAnswer);
 					served = true;
@@ -109,7 +110,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionE);
 					// invoke remote method
-					serverAnswer = server.eventsList(uTel, criterionE);
+					serverAnswer = server.eventsList(keyword, uTel, criterionE);
 					System.out.println("\nfinito");
 					served = true;
 					break;
@@ -126,7 +127,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCode);
 					// invoke remote method
-					serverAnswer = server.joinEvent(uTel, eventCode);
+					serverAnswer = server.joinEvent(keyword, uTel, eventCode);
 					served = true;
 					break;
 				case 'i' | 'I':// TODO need to fix
@@ -144,7 +145,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nfriendPhone: " + friendPhone);
 					System.out.println("\neventId: " + eventId);
 					// invoke remote method
-					serverAnswer = server.inviteFriend(uTel, friendPhone,
+					serverAnswer = server.inviteFriend(keyword, uTel, friendPhone,
 							eventId);
 					// serverAnswer = server.inviteFriend("+393202186626",
 					// "+393280332489", 1);
@@ -164,7 +165,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyLocation: " + uLocationL);
 					// invoke remote method
-					serverAnswer = server.setLocation(uTel, uLocationL);
+					serverAnswer = server.setLocation(keyword, uTel, uLocationL);
 					served = true;
 					break;
 				case 's' | 'S':
@@ -181,7 +182,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyStatus: " + uStatusS);
 					// invoke remote method
-					serverAnswer = server.setStatus(uTel, uStatusS);
+					serverAnswer = server.setStatus(keyword, uTel, uStatusS);
 					served = true;
 					break;
 				case 'p' | 'P':
@@ -198,7 +199,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nprivacy: " + privacy);
 					// invoke remote method
-					serverAnswer = server.setPrivacy(uTel, privacy);
+					serverAnswer = server.setPrivacy(keyword, uTel, privacy);
 					served = true;
 					break;
 				case 'u' | 'U':
@@ -214,7 +215,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionU);
 					// invoke remote method
-					serverAnswer = server.userList(uTel, criterionU);
+					serverAnswer = server.userList(keyword, uTel, criterionU);
 					served = true;
 					break;
 				case 'b' | 'B':
@@ -230,7 +231,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionB);
 					// invoke remote method
-					serverAnswer = server.broadcastMyStatus(uTel, criterionB);
+					serverAnswer = server.broadcastMyStatus(keyword, uTel, criterionB);
 					served = true;
 					break;
 				case 'c' | 'C':
@@ -246,7 +247,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nnicknameC: " + nicknameC);
 					// invoke remote method
-					serverAnswer = server.chatUp(uTel, nicknameC);
+					serverAnswer = server.chatUp(keyword, uTel, nicknameC);
 					served = true;
 					break;
 				case 'x' | 'X':
@@ -254,7 +255,7 @@ class ClientMobile extends UnicastRemoteObject {
 
 					System.out.println("\nphone: " + uTel);
 					// invoke remote method
-					serverAnswer = server.mobileUnregistration(uTel);
+					serverAnswer = server.mobileUnregistration(keyword, uTel);
 					served = true;
 					break;
 				case 'y' | 'Y':
@@ -268,7 +269,7 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nid: " + id);
 					// invoke remote method
-					serverAnswer = server.chatUpAnswer(uTel, id);
+					serverAnswer = server.chatUpAnswer(keyword, uTel, id);
 					served = true;
 					break;
 				}

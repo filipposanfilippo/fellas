@@ -33,9 +33,9 @@ public class ClientClub extends UnicastRemoteObject {
 				cType, cName, psw);
 	}
 
-	public LinkedList<Club> getClubList() throws RemoteException {
-		return server.getClubList();
-	}
+	/*public LinkedList<Club> getClubList() throws RemoteException {
+		return server.getClubList(keyword);
+	}*/
 
 	private Club getClubData(String cName, String psw) throws RemoteException {
 		return server.getClubData(cName, psw);
