@@ -33,14 +33,14 @@ class ClientMobile extends UnicastRemoteObject {
 		// byte[] sendData = new byte[1024];
 		System.out.println("SERVER IS WAITING FOR REQUEST");
 		boolean served;
-		
-		server.createEvent(4, "spakkiu di eventu", "eShortDescription",
-				"eLongDescription", "siena", "eCategory",
-				"2009/11/21", "2009/11/26", "17:12", "17:32",
-				"no", "325888", "eImageURL");
+
+		// server.createEvent(4, "spakkiu di eventu", "eShortDescription",
+		// "eLongDescription", "siena", "eCategory",
+		// "2009/11/21", "2009/11/26", "17:12", "17:32",
+		// "no", "325888", "eImageURL");
 		// System.out.println(server.spamMobile("stasera maudit!","uLocation = 'siena'"));//test
 		while (true) {
-			//server.spamMobile("ciao", "uLocation LIKE '%siena%'");
+			// server.spamMobile("ciao", "uLocation LIKE '%siena%'");
 			served = false;
 			byte[] receiveData = new byte[1024];
 			byte[] sendData = new byte[1024];
@@ -95,7 +95,7 @@ class ClientMobile extends UnicastRemoteObject {
 					// System.out.println("\nServerAnswer: " + serverAnswer);
 					served = true;
 					break;
-					//TODO NEED TO FIX
+				// TODO NEED TO FIX
 				case 'e' | 'E':
 					System.out.println("\nEVENTSLIST: ");
 					// check registration by phone
@@ -288,8 +288,8 @@ class ClientMobile extends UnicastRemoteObject {
 				 * il codice sotto è commentato perchè in fase di test
 				 * l'emulatore fa sia da utente che da parser e quindi andrebbe
 				 * in loop infinito se arriva un sms malformed. Ricordati di
-				 * scommentare quando il sistema sarà finito
-				 * InetAddress IPAddress = receivePacket.getAddress(); int port =
+				 * scommentare quando il sistema sarà finito InetAddress
+				 * IPAddress = receivePacket.getAddress(); int port =
 				 * receivePacket.getPort(); String capitalizedSentence =
 				 * sentence.toUpperCase(); sendData =
 				 * capitalizedSentence.getBytes(); sendData =

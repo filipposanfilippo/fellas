@@ -16,7 +16,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -41,6 +45,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.toedter.calendar.JDateChooser;
+
 public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		FocusListener {
 	ClientClub currentClub;
@@ -56,6 +62,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	// -------------- Menu Items -------------------
 	JMenuItem logout;
+	JMenuItem newEvent;
+	JMenuItem reloadEvents;
 	JMenuItem exit;
 	JMenuItem help;
 	JMenuItem credits;
@@ -74,8 +82,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextArea eLongDescription;
 	JTextField eLocation;
 	JTextField eCategory;
-	JTextField eStartDate;
-	JTextField eFinishDate;
+	JDateChooser eStartDate;
+	JDateChooser eFinishDate;
 	JTextField eStartTime;
 	JTextField eFinishTime;
 	JTextField eRestriction;
@@ -126,6 +134,22 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		logout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,
 				Event.CTRL_MASK));
 		file.add(logout);
+
+		file.addSeparator();
+
+		// Create a menu item
+		newEvent = new JMenuItem("New Event");
+		newEvent.addActionListener(this);
+		newEvent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+				Event.CTRL_MASK));
+		file.add(newEvent);
+
+		// Create a menu item
+		reloadEvents = new JMenuItem("Reload Events");
+		reloadEvents.addActionListener(this);
+		reloadEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
+				Event.CTRL_MASK));
+		file.add(reloadEvents);
 
 		file.addSeparator();
 
@@ -297,6 +321,42 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 	}
 
+	private boolean isDateValid(String date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+		Date testDate = null;
+		try {
+			testDate = df.parse(date);
+		} catch (ParseException e) {
+			return false;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		if (cal.getTime().after(testDate))
+			return false;
+		if (!df.format(testDate).equals(date))
+			return false;
+		return true;
+	}
+
+	private void cleanBoxes() {
+		eName.setText("");
+		eShortDescription.setText("");
+		eLongDescription.setText("");
+		eLocation.setText("");
+		eCategory.setText("");
+		eStartDate.setDate(new Date());
+		eFinishDate.setDate(new Date());
+		eStartTime.setText("");
+		eFinishTime.setText("");
+		eRestriction.setText("");
+		eInfoTel.setText("");
+		eImageURL.setText("");
+		eLongDescription.setText("");
+	}
+
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
@@ -334,22 +394,27 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eCategory.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eCategory);
 
-		rightEvP.add(new JLabel("Starting Date: (aaaa-mm-gg)"));
-		eStartDate = new JTextField();
+		rightEvP.add(new JLabel("Starting Date:"));
+		eStartDate = new JDateChooser(new Date());
+		eStartDate.setDateFormatString("yyyy/MM/dd");
 		eStartDate.setPreferredSize(new Dimension(390, 20));
+		eStartDate.setMinSelectableDate(new Date());
+		eStartDate.enableInputMethods(false);
 		rightEvP.add(eStartDate);
 
-		rightEvP.add(new JLabel("Finishing Date: (aaaa-mm-gg)"));
-		eFinishDate = new JTextField();
+		rightEvP.add(new JLabel("Finishing Date:"));
+		eFinishDate = new JDateChooser(new Date());
+		eFinishDate.setDateFormatString("yyyy/MM/dd");
 		eFinishDate.setPreferredSize(new Dimension(390, 20));
+		eFinishDate.setMinSelectableDate(new Date());
 		rightEvP.add(eFinishDate);
 
-		rightEvP.add(new JLabel("Starting Time:"));
+		rightEvP.add(new JLabel("Starting Time: (hh:mm)"));
 		eStartTime = new JTextField();
 		eStartTime.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eStartTime);
 
-		rightEvP.add(new JLabel("Finishing Time:"));
+		rightEvP.add(new JLabel("Finishing Time: (hh:mm)"));
 		eFinishTime = new JTextField();
 		eFinishTime.setPreferredSize(new Dimension(390, 20));
 		rightEvP.add(eFinishTime);
@@ -436,7 +501,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		Club clubData = new Club();
 		try {
 			clubData = currentClub.getClub();
-			System.out.println(clubData);
 		} catch (Exception ex) {
 			// TODO add error alert
 		}
@@ -657,14 +721,18 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				JOptionPane.showMessageDialog(mainFrame,
 						"Type a correct event name to preceed.",
 						"Creation Error!", JOptionPane.ERROR_MESSAGE);
+			} else if (!eStartDate.isValid() || !eFinishDate.isValid()) {
+				JOptionPane.showMessageDialog(mainFrame,
+						"Date are not well formatted!", "Creation Error!",
+						JOptionPane.ERROR_MESSAGE);
 			} else {
 				try {
 					currentClub
 							.createEvent(eName.getText(), eShortDescription
 									.getText(), eLongDescription.getText(),
 									eLocation.getText(), eCategory.getText(),
-									eStartDate.getText(),
-									eFinishDate.getText(),
+									eStartDate.getDate(),
+									eFinishDate.getDate(),
 									eStartTime.getText(),
 									eFinishTime.getText(), eRestriction
 											.getText(), eInfoTel.getText(),
@@ -679,6 +747,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
 						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
+				cleanBoxes();
+				modifyEvB.setEnabled(false);
+				deleteEvB.setEnabled(false);
 			}
 		}
 		if (event == modifyEvB && eventJList2.getSelectedValue() != null) {
@@ -689,8 +760,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						currentClub.getClub().getId(), eName.getText(),
 						eShortDescription.getText(),
 						eLongDescription.getText(), eLocation.getText(),
-						eCategory.getText(), eStartDate.getText(), eFinishDate
-								.getText(), eStartTime.getText(), eFinishTime
+						eCategory.getText(), eStartDate.getDate(), eFinishDate
+								.getDate(), eStartTime.getText(), eFinishTime
 								.getText(), eRestriction.getText(), eInfoTel
 								.getText(), eImageURL.getText()));
 				populateList(eventJList, getEventsArray());
@@ -699,6 +770,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				JOptionPane.showMessageDialog(mainFrame,
 						"Modified succesfully " + selEv[1], "Modified!",
 						JOptionPane.INFORMATION_MESSAGE);
+				cleanBoxes();
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
 						"Error", JOptionPane.ERROR_MESSAGE);
@@ -710,21 +782,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					"]");
 			try {
 				currentClub.deleteEvent(Integer.parseInt(selEv[0]));
-				eName.setText("");
-				eShortDescription.setText("");
-				eLongDescription.setText("");
-				eLocation.setText("");
-				eCategory.setText("");
-				eStartDate.setText("");
-				eFinishDate.setText("");
-				eStartTime.setText("");
-				eFinishTime.setText("");
-				eRestriction.setText("");
-				eInfoTel.setText("");
-				eImageURL.setText("");
-				eLongDescription.setText("");
+				cleanBoxes();
 				JOptionPane
-						.showMessageDialog(mainFrame, "Deleted succesfully"
+						.showMessageDialog(mainFrame, "Deleted succesfully "
 								+ selEv[1], "Deleted!",
 								JOptionPane.INFORMATION_MESSAGE);
 			} catch (NumberFormatException e1) {
@@ -750,6 +810,18 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									+ "SCIBILIA Giorgio - giorgio.scibilia@gmail.com",
 
 							"DIANA: Authors", JOptionPane.INFORMATION_MESSAGE);
+		}
+		if (event == newEvent) {
+			cleanBoxes();
+			modifyEvB.setEnabled(false);
+			deleteEvB.setEnabled(false);
+		}
+		if (event == reloadEvents) {
+			cleanBoxes();
+			modifyEvB.setEnabled(false);
+			deleteEvB.setEnabled(false);
+			populateList(eventJList, getEventsArray());
+			populateList(eventJList2, getEventsArray());
 		}
 		if (event == exit) {
 			int answer = JOptionPane.showConfirmDialog(mainFrame,
@@ -858,8 +930,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eLongDescription.setText(event.geteLongDescription());
 				eLocation.setText(event.geteLocation());
 				eCategory.setText(event.geteCategory());
-				eStartDate.setText(event.geteStartDate());
-				eFinishDate.setText(event.geteFinishDate());
+				eStartDate.setDate(event.geteStartDate());
+				eFinishDate.setDate(event.geteFinishDate());
 				eStartTime.setText(event.geteStartTime());
 				eFinishTime.setText(event.geteFinishTime());
 				eRestriction.setText(event.geteRestriction());

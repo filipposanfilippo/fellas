@@ -5,6 +5,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class ClientClub extends UnicastRemoteObject {
@@ -74,7 +75,7 @@ public class ClientClub extends UnicastRemoteObject {
 
 	public boolean createEvent(String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eStartDate, String eFinishDate, String eStartTime,
+			Date eStartDate, Date eFinishDate, String eStartTime,
 			String eFinishTime, String eRestriction, String infoTel,
 			String imageURL) throws RemoteException {
 		return server.createEvent(clubLogged.getId(), eName, eShortDescription,

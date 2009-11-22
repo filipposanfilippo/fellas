@@ -1,6 +1,7 @@
 package fellas;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class MyEvent implements Serializable {
 
@@ -11,8 +12,8 @@ public class MyEvent implements Serializable {
 	private String eLongDescription;
 	private String eLocation;
 	private String eCategory;
-	private String eStartDate;
-	private String eFinishDate;
+	private Date eStartDate;
+	private Date eFinishDate;
 	private String eStartTime;
 	private String eFinishTime;
 	private String eRestriction;
@@ -21,8 +22,9 @@ public class MyEvent implements Serializable {
 
 	public MyEvent(int id, int cId, String eName, String eShortDescription,
 			String eLongDescription, String eLocation, String eCategory,
-			String eStartDate, String eFinishDate, String eStartTime, String eFinishTime,
-			String eRestriction, String eInfoTel, String eImageURL) {
+			Date eStartDate, Date eFinishDate, String eStartTime,
+			String eFinishTime, String eRestriction, String eInfoTel,
+			String eImageURL) {
 		super();
 		this.id = id;
 		this.cId = cId;
@@ -101,12 +103,20 @@ public class MyEvent implements Serializable {
 		return eCategory;
 	}
 
-	public void seteStartDate(String eStartDate) {
+	public void seteStartDate(Date eStartDate) {
 		this.eStartDate = eStartDate;
 	}
 
-	public String geteStartDate() {
+	public Date geteStartDate() {
 		return eStartDate;
+	}
+
+	public void seteFinishDate(Date eFinishDate) {
+		this.eFinishDate = eFinishDate;
+	}
+
+	public Date geteFinishDate() {
+		return eFinishDate;
 	}
 
 	public void seteStartTime(String eStartTime) {
@@ -148,13 +158,4 @@ public class MyEvent implements Serializable {
 	public String geteImageURL() {
 		return eImageURL;
 	}
-
-	public void seteFinishDate(String eFinishDate) {
-		this.eFinishDate = eFinishDate;
-	}
-
-	public String geteFinishDate() {
-		return eFinishDate;
-	}
-
 }
