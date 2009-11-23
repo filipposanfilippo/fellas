@@ -18,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -637,7 +638,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ " " + formatDate(eStartDate));
 				// if(oldEvent.geteStartTime().equals(eStartTime))
 				System.out.println("stesse ore: " + oldEvent.geteStartTime()
-						+ " " + eStartTime);
+						+ " " + formatTime(eStartTime));
 
 				if (oldEvent.geteName().equals(eName)
 						&& oldEvent.geteInfoTel().equals(eInfoTel)
@@ -780,6 +781,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	private String formatDate(Date date) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		return new StringBuilder(dateFormat.format(date)).toString();
+	}
+	
+	private String formatTime(String eStartTime) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+		return new StringBuilder(dateFormat.format(eStartTime)).toString();
 	}
 
 	public boolean updateEvent(String cName, String psw, MyEvent event)
