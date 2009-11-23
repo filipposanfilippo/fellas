@@ -12,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 class ClientMobile extends UnicastRemoteObject {
 	private static ServerInterface server;
 	private static String host = "localhost";
-	private static String keyword ="perorapassworddiprova";
+	private static String keyword = "perorapassworddiprova";
 
 	// comunica con SmsReceiver
 	protected ClientMobile() throws RemoteException {
@@ -91,8 +91,8 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nlocation: " + uLocation);
 					System.out.println("\nprivacy: " + uPrivacy);
 					// invoke remote method
-					serverAnswer = server.mobileRegistration(keyword, uTel, username,
-							psw, uSex, uAge, uLocation, uPrivacy);
+					serverAnswer = server.mobileRegistration(keyword, uTel,
+							username, psw, uSex, uAge, uLocation, uPrivacy);
 					// System.out.println("\nServerAnswer: " + serverAnswer);
 					served = true;
 					break;
@@ -130,6 +130,22 @@ class ClientMobile extends UnicastRemoteObject {
 					serverAnswer = server.joinEvent(keyword, uTel, eventCode);
 					served = true;
 					break;
+				case 'd' | 'D':
+					System.out.println("\nDISJOIN EVENT: ");
+					// check registration by phone
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
+					String eventCodeD = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\neventCode: " + eventCodeD);
+					// invoke remote method
+					serverAnswer = server.disJoinEvent(keyword, uTel, eventCodeD);
+					served = true;
+					break;
 				case 'i' | 'I':// TODO need to fix
 					System.out.println("\nINVITE FRIEND: ");
 					// check registration by phone
@@ -145,8 +161,8 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nfriendPhone: " + friendPhone);
 					System.out.println("\neventId: " + eventId);
 					// invoke remote method
-					serverAnswer = server.inviteFriend(keyword, uTel, friendPhone,
-							eventId);
+					serverAnswer = server.inviteFriend(keyword, uTel,
+							friendPhone, eventId);
 					// serverAnswer = server.inviteFriend("+393202186626",
 					// "+393280332489", 1);
 					served = true;
@@ -165,7 +181,8 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\nmyLocation: " + uLocationL);
 					// invoke remote method
-					serverAnswer = server.setLocation(keyword, uTel, uLocationL);
+					serverAnswer = server
+							.setLocation(keyword, uTel, uLocationL);
 					served = true;
 					break;
 				case 's' | 'S':
@@ -231,7 +248,8 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionB);
 					// invoke remote method
-					serverAnswer = server.broadcastMyStatus(keyword, uTel, criterionB);
+					serverAnswer = server.broadcastMyStatus(keyword, uTel,
+							criterionB);
 					served = true;
 					break;
 				case 'c' | 'C':

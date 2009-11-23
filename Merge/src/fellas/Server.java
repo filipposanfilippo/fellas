@@ -584,8 +584,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 
 		public void run() {
-			System.out
-					.println("Adding event "+eventId+" to POI 7 days before his starting time");
+			System.out.println("Adding event " + eventId
+					+ " to POI 7 days before his starting time");
 			try {
 				openConnection();
 				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
@@ -642,7 +642,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 
 		public void run() {
-			System.out.println("Deleting event "+eventId+" from POI");
+			System.out.println("Deleting event " + eventId + " from POI");
 			try {
 				// delete item from poi table and from actions too
 				// recupera id POI
@@ -761,7 +761,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		String answer = "";
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -799,7 +799,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException {
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		String answer = "";
 		String receiverTel = "";
@@ -863,7 +863,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean checkRegistration(String key, String phoneNumber)
 			throws RemoteException {
 		// TODO IS IT NECESSARY?
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return false;
 		return false;
 	}
@@ -872,7 +872,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String eventsList(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -908,7 +908,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public String inviteFriend(String key, String senderPhone,
 			String friendPhone, int eventId) throws RemoteException {
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		String answer = new String('@' + friendPhone + '@');
 		try {
@@ -940,33 +940,37 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return answer;
 	}
 
-	@Override
 	public String joinEvent(String key, String senderPhone, String eventCode)
 			throws RemoteException {
 		int userid;
 		String eName = new String();
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
 			// CHECK IF USER EXISTS
 			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
+			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (!rs.next())
 				return "You are not registered, please register%";
 			userid = rs.getInt("id");
 
 			// CHECK IF USER IS ALREADY ATTENDING
-			query = "SELECT uId FROM subscription WHERE uId='" + userid + "'";
+			query = "SELECT uId FROM subscription WHERE uId='" + userid
+					+ "' AND eId='" + eventCode + "'";
+			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				return "You are already attendig at this event%";
 			// INSERT USER IN EVENT TABLE
 			query = "INSERT INTO subscription (eId, uId)" + "VALUES ('"
 					+ eventCode + "', '" + userid + "')";
+			statement = connection.createStatement();
 			statement.execute(query);
 
 			query = "SELECT eName FROM events WHERE id='" + eventCode + "'";
+			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			eName = rs.getString("eName");
@@ -979,12 +983,54 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return "You are attending at event " + eName + " (" + eventCode + ")%";
 	}
 
-	@Override
+	public String disJoinEvent(String key, String senderPhone, String eventCode)
+			throws RemoteException {
+		int userid;
+		String eName = new String();
+		if (!keyword.equals(key))
+			return "You are not authorized";
+		try {
+			openConnection();
+			// CHECK IF USER EXISTS
+			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "You are not registered, please register%";
+			userid = rs.getInt("id");
+
+			// CHECK IF USER IS ALREADY ATTENDING
+			query = "SELECT uId FROM subscription WHERE uId='" + userid
+					+ "' AND eId='" + eventCode + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next()) {
+				query = "DELETE from subscription where eId='" + eventCode
+						+ "' AND uId='" + userid + "'";
+				statement = connection.createStatement();
+				statement.execute(query);
+			} else
+				return "You are not attendig at this event%";
+
+			query = "SELECT eName FROM events WHERE id='" + eventCode + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			eName = rs.getString("eName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "DISJOINEVENT ERROR%";
+		} finally {
+			closeConnection();
+		}
+		return "You have disjoined the event " + eName + " (" + eventCode + ")%";
+	}
+
 	public String setLocation(String key, String uTel, String uLocation)
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1023,7 +1069,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1056,7 +1102,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String mobileRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
 			String uPrivacy) throws RemoteException {
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (isUserExisting(uTel))
@@ -1152,7 +1198,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String userList(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -1257,7 +1303,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public String mobileUnregistration(String key, String uTel)
 			throws RemoteException {
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1305,7 +1351,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String chatUpAnswer(String key, String senderTel, String id)
 			throws RemoteException {
 		String answer = "";
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -1428,7 +1474,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public String setPrivacy(String key, String uTel, int privacy)
 			throws RemoteException {
-		if (keyword.equals(key))
+		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1524,8 +1570,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						}
 
 					} else {
-						System.out.println("Event "
-								+ primaryRs.getInt("id")
+						System.out.println("Event " + primaryRs.getInt("id")
 								+ " is fresh");
 						coordinates = address2GEOcoordinates(primaryRs
 								.getString("eLocation"));
