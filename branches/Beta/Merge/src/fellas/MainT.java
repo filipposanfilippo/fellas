@@ -47,6 +47,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -60,7 +61,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	String TITLE = "FELLAS: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
-	
+
 	// TODO check if is better move all ftp sending operation to clientclub
 	final String _HOST = "diana.netsons.org";
 	final String _USERNAME = "diananet";
@@ -104,8 +105,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eInfoTel;
 	JTextField eLocalImageURL;
 	JTextField eRemoteImageURL;
-	JButton selectImgB;
-	JLabel img;
+	JButton selectEImgB;
+	JLabel eImg;
 	JPanel centerEvP;
 
 	JButton saveEvB;
@@ -125,6 +126,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
 	JLabel profileStatus;
+
+	JTextField cLocalImageURL;
+	JTextField cRemoteImageURL;
+	JButton selectCImgB;
+	JLabel cImg;
 
 	JButton modifyProfB;
 	JButton unregProfB;
@@ -377,7 +383,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eInfoTel.setText("");
 		eLocalImageURL.setText("");
 		eRemoteImageURL.setText("");
-		img.setIcon(new ImageIcon("default.jpg"));
+		eImg.setIcon(new ImageIcon("default.jpg"));
 		eLongDescription.setText("");
 	}
 
@@ -387,18 +393,18 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	private void refreshImage(String imgURL) {
 		try {
 			if (imgURL.equals("")) {
-				img.setIcon(new ImageIcon("default.jpg"));
+				eImg.setIcon(new ImageIcon("default.jpg"));
 			} else {
 				if (imgURL.startsWith("C:")) {
-					img.setIcon(new ImageIcon(imgURL));
+					eImg.setIcon(new ImageIcon(imgURL));
 				} else {
 					URL url = new URL(_URL + imgURL);
 					ImageIcon ic = new ImageIcon(ImageIO.read(url));
-					img.setIcon(ic);
+					eImg.setIcon(ic);
 				}
 			}
 		} catch (IOException e) {
-			img.setIcon(new ImageIcon("default.jpg"));
+			eImg.setIcon(new ImageIcon("default.jpg"));
 			e.printStackTrace();
 		}
 	}
@@ -421,14 +427,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		centerEvP.setBorder(BorderFactory.createTitledBorder(""));
 		// centerEvP.setLayout(new BoxLayout(centerEvP, BoxLayout.Y_AXIS));
 
-		img = new JLabel(new ImageIcon("default.jpg"));
+		eImg = new JLabel(new ImageIcon("default.jpg"));
 		// img.setPreferredSize(new Dimension(50, 50));
-		img.setHorizontalAlignment(SwingConstants.CENTER);
-		centerEvP.add(img);
+		eImg.setHorizontalAlignment(SwingConstants.CENTER);
+		centerEvP.add(eImg);
 
 		eLocalImageURL = new JTextField();
 		eLocalImageURL.setPreferredSize(new Dimension(300, 20));
-		eRemoteImageURL.setEditable(false);
+		eLocalImageURL.setEditable(false);
 		centerEvP.add(eLocalImageURL);
 
 		eRemoteImageURL = new JTextField();
@@ -436,9 +442,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eRemoteImageURL.setEditable(false);
 		centerEvP.add(eRemoteImageURL);
 
-		selectImgB = new JButton("Select Event Image");
-		selectImgB.addActionListener(this);
-		centerEvP.add(selectImgB);
+		selectEImgB = new JButton("Select Event Image");
+		selectEImgB.addActionListener(this);
+		centerEvP.add(selectEImgB);
 
 		// ------------------------ RIGHT ------------------------------------
 		JPanel rightEvP = new JPanel();
@@ -537,30 +543,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftProfileP.setLayout(new BoxLayout(leftProfileP, BoxLayout.Y_AXIS));
 		leftProfileP.setBorder(BorderFactory.createTitledBorder("Club Data"));
 
-		JPanel nP = new JPanel();
-		// nP.setBackground(Color.WHITE);
-		JPanel sP = new JPanel();
-		// sP.setBackground(Color.WHITE);
-		JPanel aP = new JPanel();
-		// aP.setBackground(Color.WHITE);
-		JPanel tP = new JPanel();
-		// tP.setBackground(Color.WHITE);
-		JPanel eP = new JPanel();
-		// tP.setBackground(Color.WHITE);
-		JPanel yP = new JPanel();
-		// tP.setBackground(Color.WHITE);
-		JPanel uP = new JPanel();
-		// uP.setBackground(Color.WHITE);
-		JPanel pP = new JPanel();
-		// pP.setBackground(Color.WHITE);
-		JPanel cP = new JPanel();
-		// cP.setBackground(Color.WHITE);
-		JPanel bP = new JPanel();
-		// bP.setBackground(Color.WHITE);
-		JPanel lP = new JPanel();
-		// bP.setBackground(Color.WHITE);
-
+		JPanel dataP = new JPanel(new SpringLayout());
+		JPanel imgP = new JPanel();
+		JPanel buttonsP = new JPanel();
+		JPanel statusP = new JPanel();
 		Club clubData = new Club();
+
 		try {
 			clubData = currentClub.getClub();
 		} catch (Exception ex) {
@@ -591,71 +579,65 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		modifyProfB.addActionListener(this);
 		unregProfB = new JButton("Unregister Club");
 		unregProfB.addActionListener(this);
+
 		JLabel lb;
-
-		lb = new JLabel("Owner Name:");
+		lb = new JLabel("Owner Name:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		nP.add(lb);
-		nP.add(nameR);
-		leftProfileP.add(nP);
+		dataP.add(lb);
+		dataP.add(nameR);
 
-		lb = new JLabel("Owner Surname:");
+		lb = new JLabel("Owner Surname:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		sP.add(lb);
-		sP.add(surnameR);
-		leftProfileP.add(sP);
+		dataP.add(lb);
+		dataP.add(surnameR);
 
-		lb = new JLabel("Club Address:");
+		lb = new JLabel("Club Address:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		aP.add(lb);
-		aP.add(addressR);
-		leftProfileP.add(aP);
+		dataP.add(lb);
+		dataP.add(addressR);
 
-		lb = new JLabel("Club Tel.:");
+		lb = new JLabel("Club Tel.:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		tP.add(lb);
-		tP.add(telR);
-		leftProfileP.add(tP);
+		dataP.add(lb);
+		dataP.add(telR);
 
-		lb = new JLabel("Club E-Mail:");
+		lb = new JLabel("Club E-Mail:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		eP.add(lb);
-		eP.add(emailR);
-		leftProfileP.add(eP);
+		dataP.add(lb);
+		dataP.add(emailR);
 
-		lb = new JLabel("Club Type:");
+		lb = new JLabel("Club Type:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		yP.add(lb);
-		yP.add(typeR);
-		leftProfileP.add(yP);
+		dataP.add(lb);
+		dataP.add(typeR);
 
-		lb = new JLabel("Club Name:");
+		lb = new JLabel("Club Name:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		uP.add(lb);
-		uP.add(userR);
-		leftProfileP.add(uP);
+		dataP.add(lb);
+		dataP.add(userR);
 
-		lb = new JLabel("Password:");
+		lb = new JLabel("Password:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		pP.add(lb);
-		pP.add(pwdR);
-		leftProfileP.add(pP);
+		dataP.add(lb);
+		dataP.add(pwdR);
 
-		lb = new JLabel("Confirm Pwd:");
+		lb = new JLabel("Confirm Pwd:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
-		cP.add(lb);
-		cP.add(confPwdR);
-		leftProfileP.add(cP);
+		dataP.add(lb);
+		dataP.add(confPwdR);
 
-		bP.add(new JLabel("                     "));
-		bP.add(modifyProfB);
-		bP.add(unregProfB);
-		leftProfileP.add(bP);
+		SpringUtilities.makeCompactGrid(dataP, 9, 2, 6, 6, 6, 6);
+		leftProfileP.add(dataP);
+
+		buttonsP.add(new JLabel("", JLabel.TRAILING));
+		buttonsP.add(modifyProfB);
+		buttonsP.add(unregProfB);
+		leftProfileP.add(buttonsP);
 
 		profileStatus = new JLabel();
-		lP.add(new JLabel("                     "));
-		lP.add(profileStatus);
-		leftProfileP.add(lP);
+		statusP.add(new JLabel(""));
+		statusP.add(profileStatus);
+		leftProfileP.add(statusP);
 
 		leftProfileP.setVisible(true);
 		return leftProfileP;
@@ -740,7 +722,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 							surnameR.getText(), addressR.getText(), telR
 									.getText(), emailR.getText(), typeR
 									.getText(), userR.getText(), new String(
-									pwdR.getPassword()));
+									pwdR.getPassword()), cRemoteImageURL
+									.getText());
 					if (res) {
 						profileStatus.setForeground(Color.green);
 						profileStatus.setText("Data updated succesfully!");
@@ -779,7 +762,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				e1.printStackTrace();
 			}
 		}
-		if (event == selectImgB) {
+		if (event == selectEImgB) {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new java.io.File("."));
 			chooser.setDialogTitle("Choose Event Image");
@@ -803,8 +786,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						.getAbsolutePath());
 				// TODO controlla che succede se inserisco stringa vuota al
 				// posto dell'img.
-				String[] extSplit = eLocalImageURL.getText().split(".");
-				String ext = extSplit[extSplit.length - 1];
+				// String[] extSplit = eLocalImageURL.getText().split(".");
+				String ext = "jpg";// = extSplit[extSplit.length - 1];
 				eRemoteImageURL.setText("events/"
 						+ currentClub.getClub().getId() + "/"
 						+ eStartDate.getDate().getTime() + "." + ext);
