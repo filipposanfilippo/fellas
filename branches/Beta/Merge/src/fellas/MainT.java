@@ -377,8 +377,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// eStartDate.setEnabled(false);
 		// eFinishDate.setEnabled(false);
 
-		eStartTime.setText("00:00");
-		eFinishTime.setText("00:00");
+		eStartTime.setText("00:00:00");
+		eFinishTime.setText("00:00:00");
 		eRestriction.setText("");
 		eInfoTel.setText("");
 		eLocalImageURL.setText("");
@@ -482,12 +482,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(eFinishDate);
 
 		rightEvP.add(new JLabel("Starting Time: (hh:mm)"));
-		eStartTime = new JTextField("00:00");
+		eStartTime = new JTextField("00:00:00");
 		eStartTime.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eStartTime);
 
 		rightEvP.add(new JLabel("Finishing Time: (hh:mm)"));
-		eFinishTime = new JTextField("00:00");
+		eFinishTime = new JTextField("00:00:00");
 		eFinishTime.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eFinishTime);
 
