@@ -378,7 +378,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return true;
 		}
 	}
-	
+
 	// BE CAREFUL: before calling this method, you need to open connection
 	public int getUserId(String uTel) {
 		int userId;
@@ -751,19 +751,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "SELECT uId from subscription  where eId='" + eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			//rs.next();
-			String criterion="";
-			while(rs.next()){
+			// rs.next();
+			String criterion = "";
+			while (rs.next()) {
 				criterion += "id='" + rs.getInt("uId") + "' OR ";
 			}
 			// send an abort message to all users that have joined the event
-			if (criterion != ""){
+			if (criterion != "") {
 				query = "SELECT eName from events  where id='" + eventId + "'";
 				statement = connection.createStatement();
 				rs = statement.executeQuery(query);
 				rs.next();
-				String message = "The event " + rs.getString("eName") + "(" + eventId + ")" + " of club " + cName+ " was abort" ;
-				spamMobile(cName, psw, message, criterion.substring(0, criterion.length() - 4));
+				String message = "The event " + rs.getString("eName") + "("
+						+ eventId + ")" + " of club " + cName + " was abort";
+				spamMobile(cName, psw, message, criterion.substring(0,
+						criterion.length() - 4));
 			}
 			query = "DELETE from events where id='" + eventId + "'";
 			statement = connection.createStatement();
@@ -1067,6 +1069,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String eventCode) throws RemoteException {
 		String eShortDescription = new String();
 		String eName = new String();
+		String start = new String();
+		String temp2split = new String();
+		String[] splittedString=new String[3];
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
@@ -1078,7 +1083,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 
-			query = "SELECT eName, eShortDescription FROM events WHERE id='"
+			query = "SELECT eName, eShortDescription, eStartDate, eStartTime FROM events WHERE id='"
 					+ eventCode + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -1086,13 +1091,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				return "Any event match with your code%";
 			eShortDescription = rs.getString("eShortDescription");
 			eName = rs.getString("eName");
+			temp2split = rs.getString("eStartTime");
+			splittedString=temp2split.split(":");
+			start = rs.getString("eStartDate") + " "
+					+ splittedString[0]+":"+splittedString[1];
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "GETDESCRIPTIONEVENT ERROR%";
 		} finally {
 			closeConnection();
 		}
-		return eName.toUpperCase() + ": " + eShortDescription + "%";
+		return eName.toUpperCase() + " " + start + ": " + eShortDescription
+				+ "%";
 	}
 
 	public String setLocation(String key, String uTel, String uLocation)
@@ -1103,7 +1113,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "You are not authorized";
 		openConnection();
 		int id = getUserId(uTel);
-		if (id<0)
+		if (id < 0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET uLocation = '" + uLocation
@@ -1137,7 +1147,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "You are not authorized";
 		openConnection();
 		int id = getUserId(uTel);
-		if (id<0)
+		if (id < 0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET uStatus = '" + uStatus
@@ -1299,7 +1309,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			openConnection();
 			query = "SELECT uTel FROM users WHERE " + criterion + "";
-System.out.println("SPAM QUERY: " + query);			
+			System.out.println("SPAM QUERY: " + query);
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			// if (!rs.next())
@@ -1367,7 +1377,7 @@ System.out.println("SPAM QUERY: " + query);
 			return "You are not authorized";
 		openConnection();
 		int id = getUserId(uTel);
-		if(id<0)
+		if (id < 0)
 			return "You are not registered%";
 		try {
 			// delete user from users
@@ -1531,7 +1541,7 @@ System.out.println("SPAM QUERY: " + query);
 			return "You are not authorized";
 		openConnection();
 		int id = getUserId(uTel);
-		if (id<0)
+		if (id < 0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET privacy  = '" + privacy
