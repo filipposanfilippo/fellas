@@ -1,27 +1,34 @@
 package fellas;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.filechooser.FileFilter;
 
 public class LoginT implements Runnable, ActionListener {
 	ClientClub currentClub;
-	final String TITLE = "DIANA: Feel Like Doing... (Club Client)";
+	final String TITLE = "FELLAS: Feel Like Doing... (Club Client)";
 	final String VERSION = " v.1.0";
 
 	// --------------Default Operations ------------------------------
@@ -45,8 +52,10 @@ public class LoginT implements Runnable, ActionListener {
 	JTextField userR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
-	JLabel registrationStatus1;
-	JLabel registrationStatus2;
+	JLabel registrationStatus;
+	JButton selectImgB;
+	JTextField cImageURL;
+	JLabel img;
 
 	// ------------------- RIGHT PANEL (Login) ---------------------------
 
@@ -54,45 +63,69 @@ public class LoginT implements Runnable, ActionListener {
 		try {
 			currentClub = new ClientClub();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	private JPanel createRightPanel() {
-		JPanel loginP = new JPanel();
-		loginP.setBorder(BorderFactory.createTitledBorder("Login"));
-
 		JPanel rightP = new JPanel();
-		rightP.setLayout(new GridLayout(5, 2));
+		rightP.setLayout(new BoxLayout(rightP, BoxLayout.Y_AXIS));
 
-		userL = new JTextField(10);
-		pwdL = new JPasswordField(10);
+		JPanel loginP = new JPanel(new SpringLayout());
+		loginP.setBorder(BorderFactory.createTitledBorder("Login"));
+		// loginP.setLayout(new BoxLayout(loginP, BoxLayout.Y_AXIS));
+
+		userL = new JTextField();
+		// userL.setPreferredSize(new Dimension(20, 20));
+		pwdL = new JPasswordField();
+		// pwdL.setPreferredSize(new Dimension(20, 20));
+
 		loginB = new JButton("Login");
 		loginB.addActionListener(this);
 		loginB.setMnemonic(KeyEvent.VK_L);
 		loginB.setActionCommand("enable");
 
-		rightP.add(new JLabel("Club Name:"));
-		rightP.add(userL);
-		rightP.add(new JLabel("Password:"));
-		rightP.add(pwdL);
-		rightP.add(new JLabel(""));
-		rightP.add(loginB);
+		loginP.add(new JLabel("Club Name:", JLabel.TRAILING));
+		loginP.add(userL);
+		loginP.add(new JLabel("Password:", JLabel.TRAILING));
+		loginP.add(pwdL);
+		loginP.add(new JLabel("", JLabel.TRAILING));
+		loginP.add(loginB);
 
-		registrationStatus1 = new JLabel("", JLabel.LEFT);
-		rightP.add(registrationStatus1);
+		SpringUtilities.makeCompactGrid(loginP, 3, 2, 6, 6, 6, 6);
+		// --------------------- CENTER PANEL -------------------------------
 
-		registrationStatus2 = new JLabel("", JLabel.LEFT);
-		rightP.add(registrationStatus2);
+		JPanel statusP = new JPanel();
+		statusP.setBorder(BorderFactory.createTitledBorder(""));
 
-		rightP.setVisible(true);
-		loginP.add(rightP);
+		registrationStatus = new JLabel("", JLabel.LEFT);
+		statusP.add(registrationStatus);
 
-		return loginP;
+		// -------------- BOTTOM PANEL (Club Image) ------------------------
+
+		JPanel imgP = new JPanel();
+		// imgP.setLayout(new BoxLayout(imgP, BoxLayout.Y_AXIS));
+		imgP.setBorder(BorderFactory.createTitledBorder("Club Image"));
+
+		img = new JLabel(new ImageIcon("default.jpg"));
+		img.setPreferredSize(new Dimension(100, 100));
+		imgP.add(img);
+
+		cImageURL = new JTextField("default.jpg");
+		cImageURL.setEditable(false);
+		cImageURL.setVisible(false);
+		imgP.add(cImageURL);
+
+		selectImgB = new JButton("Select Club Image");
+		selectImgB.addActionListener(this);
+		imgP.add(selectImgB);
+
+		rightP.add(loginP);
+		rightP.add(statusP);
+		rightP.add(imgP);
+		return rightP;
 	}
 
 	// -------------- LEFT PANEL (Registration) ----------------------------
@@ -161,10 +194,9 @@ public class LoginT implements Runnable, ActionListener {
 		if (event == registerB) {
 			// Checks whether confirm psw is the same of psw or not
 			if (!Arrays.equals(pwdR.getPassword(), confPwdR.getPassword())) {
-				registrationStatus1.setForeground(Color.red);
-				registrationStatus2.setForeground(Color.red);
-				registrationStatus1.setText("Different Passwords,");
-				registrationStatus2.setText(" correct and retry!");
+				registrationStatus.setForeground(Color.red);
+				registrationStatus
+						.setText("Different Passwords, correct and retry!");
 			} else {
 				boolean isRegistrationCorrect = false;
 				try {
@@ -173,25 +205,44 @@ public class LoginT implements Runnable, ActionListener {
 							telR.getText(), emailR.getText(), typeR.getText(),
 							userR.getText(), new String(pwdR.getPassword()));
 					if (isRegistrationCorrect) {
-						registrationStatus1.setForeground(Color.green);
-						registrationStatus2.setForeground(Color.green);
-						registrationStatus1.setText(userR.getText());
-						registrationStatus2.setText("Registered!");
+						registrationStatus.setForeground(Color.green);
+						registrationStatus.setText(userR.getText()
+								+ "Registered!");
 					} else {
-						registrationStatus1.setForeground(Color.red);
-						registrationStatus2.setForeground(Color.red);
-						registrationStatus1.setText("Maybe Club Existing,");
-						registrationStatus2.setText(" try again.");
+						registrationStatus.setForeground(Color.red);
+						registrationStatus
+								.setText("Maybe Club Existing, try again.");
 					}
 				} catch (RemoteException e1) {
-					registrationStatus1.setForeground(Color.red);
-					registrationStatus2.setForeground(Color.red);
-					registrationStatus1.setText("Error:");
-					registrationStatus1.setText(" Server Disconnected.");
+					registrationStatus.setForeground(Color.red);
+					registrationStatus.setText("Error: Server Disconnected.");
 				}
 			}
 		}
+		if (event == selectImgB) {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setCurrentDirectory(new java.io.File("."));
+			chooser.setDialogTitle("Choose Club Image");
+			FileFilter filter = new FileFilter() {
+				public boolean accept(File f) {
+					if (f.getName().endsWith(".jpg")
+							|| f.getName().endsWith(".jpeg")
+							|| f.getName().endsWith(".gif"))
+						return true;
+					return false;
+				}
 
+				public String getDescription() {
+					return "jpg,jpeg,gif";
+				}
+			};
+			chooser.setFileFilter(filter);
+			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
+				cImageURL.setText(chooser.getSelectedFile().getAbsolutePath());
+				// TODO allow all img extensions
+				updateImage(cImageURL.getText());
+			}
+		}
 		if (event == loginB) {
 			boolean isLogged = false;
 			try {
@@ -200,7 +251,7 @@ public class LoginT implements Runnable, ActionListener {
 				// System.out.println("Logged = " + isLogged);
 				if (isLogged) {
 					JOptionPane.showMessageDialog(null,
-							"Welcome to Diana: Feel Like Doing...",
+							"Welcome to Fellas: Feel Like Doing...",
 							"Logged-in!", JOptionPane.INFORMATION_MESSAGE);
 					mainFrame.setVisible(false);
 					new Thread(new MainT(currentClub)).start();
@@ -214,6 +265,14 @@ public class LoginT implements Runnable, ActionListener {
 						"Connection with server error...", "Login Refused",
 						JOptionPane.ERROR_MESSAGE);
 			}
+		}
+	}
+
+	private void updateImage(String imgURL) {
+		if (imgURL.equals("")) {
+			img.setIcon(new ImageIcon("default.jpg"));
+		} else {
+			img.setIcon(new ImageIcon(imgURL));
 		}
 	}
 

@@ -12,6 +12,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -56,7 +58,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		FocusListener {
 	ClientClub currentClub;
 
-	String TITLE = "DIANA: Feel Like Doing... ";
+	String TITLE = "FELLAS: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
 
 	final String _HOST = "diana.netsons.org";
@@ -385,23 +387,17 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		try {
 			if (imgURL.equals("")) {
 				img.setIcon(new ImageIcon("default.jpg"));
-				img.setHorizontalAlignment(SwingConstants.CENTER);
 			} else {
 				if (imgURL.startsWith("C:")) {
 					img.setIcon(new ImageIcon(imgURL));
-					// img.setPreferredSize(new Dimension(50, 50));
-					img.setHorizontalAlignment(SwingConstants.CENTER);
 				} else {
 					URL url = new URL(_URL + imgURL);
 					ImageIcon ic = new ImageIcon(ImageIO.read(url));
 					img.setIcon(ic);
-					// img.setPreferredSize(new Dimension(50, 50));
-					img.setHorizontalAlignment(SwingConstants.CENTER);
 				}
 			}
 		} catch (IOException e) {
 			img.setIcon(new ImageIcon("default.jpg"));
-			img.setHorizontalAlignment(SwingConstants.CENTER);
 			e.printStackTrace();
 		}
 	}
@@ -423,7 +419,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		centerEvP = new JPanel();
 		centerEvP.setBorder(BorderFactory.createTitledBorder(""));
 		// centerEvP.setLayout(new BoxLayout(centerEvP, BoxLayout.Y_AXIS));
+		
 		img = new JLabel(new ImageIcon("default.jpg"));
+		//img.setPreferredSize(new Dimension(50, 50));
+		img.setHorizontalAlignment(SwingConstants.CENTER);
 		centerEvP.add(img);
 
 		eLocalImageURL = new JTextField();
@@ -783,6 +782,20 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new java.io.File("."));
 			chooser.setDialogTitle("Choose Event Image");
+			FileFilter filter = new FileFilter() {
+				public boolean accept(File f) {
+					if (f.getName().endsWith(".jpg")
+							|| f.getName().endsWith(".jpeg")
+							|| f.getName().endsWith(".gif"))
+						return true;
+					return false;
+				}
+
+				public String getDescription() {
+					return "jpg,jpeg,gif";
+				}
+			};
+			chooser.setFileFilter(filter);
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
 				eLocalImageURL.setText(chooser.getSelectedFile()
 						.getAbsolutePath());
@@ -900,7 +913,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									+ "URZI' Erik - erik.urzi@gmail.com\n"
 									+ "SANFILIPPO Filippo - filippo.sanfilippo@gmail.com\n"
 									+ "SCIBILIA Giorgio - giorgio.scibilia@gmail.com",
-							"DIANA: Authors", JOptionPane.INFORMATION_MESSAGE);
+							"FELLAS: Authors", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (event == newEvent) {
 			cleanBoxes();
