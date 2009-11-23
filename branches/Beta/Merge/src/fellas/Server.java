@@ -729,6 +729,24 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		try {
 			openConnection();
+			// check if there are user subscripted to that event
+			query = "SELECT uId from subscription  where eId='" + eventId + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			//rs.next();
+			String criterion="";
+			while(rs.next()){
+				criterion += "id='" + rs.getInt("uId") + "' OR ";
+			}
+			// send an abort message to all users that have joined the event
+			if (criterion != ""){
+				query = "SELECT eName from events  where id='" + eventId + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				rs.next();
+				String message = "The event " + rs.getString("eName") + "(" + eventId + ")" + " of club " + cName+ " was abort" ;
+				spamMobile(cName, psw, message, criterion.substring(0, criterion.length() - 4));
+			}
 			query = "DELETE from events where id='" + eventId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -1240,6 +1258,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			openConnection();
 			query = "SELECT uTel FROM users WHERE " + criterion + "";
+System.out.println("SPAM QUERY: " + query);			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			// if (!rs.next())
