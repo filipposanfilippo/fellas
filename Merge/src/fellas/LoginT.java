@@ -3,6 +3,7 @@ package fellas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -186,6 +187,11 @@ public class LoginT implements Runnable, ActionListener {
 		mainFrame.add(mainPanel);
 		mainFrame.pack();
 		mainFrame.setVisible(true);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
+		mainFrame.setLocation(screenWidth / 4, screenHeight / 4);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -203,7 +209,7 @@ public class LoginT implements Runnable, ActionListener {
 					isRegistrationCorrect = currentClub.clubRegistration(nameR
 							.getText(), surnameR.getText(), addressR.getText(),
 							telR.getText(), emailR.getText(), typeR.getText(),
-							userR.getText(), new String(pwdR.getPassword()));
+							userR.getText(), new String(pwdR.getPassword()),cImageURL.getText());
 					if (isRegistrationCorrect) {
 						registrationStatus.setForeground(Color.green);
 						registrationStatus.setText(userR.getText()
@@ -227,19 +233,19 @@ public class LoginT implements Runnable, ActionListener {
 				public boolean accept(File f) {
 					if (f.getName().endsWith(".jpg")
 							|| f.getName().endsWith(".jpeg")
-							|| f.getName().endsWith(".gif"))
+							|| f.getName().endsWith(".gif")
+							|| f.getName().endsWith(".png"))
 						return true;
 					return false;
 				}
 
 				public String getDescription() {
-					return "jpg,jpeg,gif";
+					return "jpg,jpeg,gif,png";
 				}
 			};
 			chooser.setFileFilter(filter);
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
 				cImageURL.setText(chooser.getSelectedFile().getAbsolutePath());
-				// TODO allow all img extensions
 				updateImage(cImageURL.getText());
 			}
 		}
