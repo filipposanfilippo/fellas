@@ -13,11 +13,13 @@ public class Club implements Serializable {
 	private String cType;
 	private String cName;
 	private String psw;
+	private String cImageURL;
 
 	ArrayList<MyEvent> eventList = new ArrayList<MyEvent>();
 
 	public Club(int id, String oName, String oSurname, String cAddress,
-			String cTel, String cEMail, String cType, String cName, String psw) {
+			String cTel, String cEMail, String cType, String cName, String psw,
+			String cImageURL) {
 		this.id = id;
 		this.oName = oName;
 		this.oSurname = oSurname;
@@ -27,6 +29,7 @@ public class Club implements Serializable {
 		this.cType = cType;
 		this.cName = cName;
 		this.psw = psw;
+		this.cImageURL = cImageURL;
 	}
 
 	public Club() {
@@ -39,6 +42,7 @@ public class Club implements Serializable {
 		this.cType = "";
 		this.cName = "";
 		this.psw = "";
+		this.cImageURL = "";
 	}
 
 	public int getId() {
@@ -113,9 +117,18 @@ public class Club implements Serializable {
 		this.psw = psw;
 	}
 
+	public String getcImageURL() {
+		return cImageURL;
+	}
+
+	public void setcImageURL(String cImageURL) {
+		this.cImageURL = cImageURL;
+	}
+
 	public String toString() {
 		return "Club [cAddress=" + cAddress + ", cEMail=" + cEMail + ", cName="
 				+ cName + ", cTel=" + cTel + ", cType=" + cType + ", oName="
-				+ oName + ", oSurname=" + oSurname + ", psw=" + psw + "]";
+				+ oName + ", oSurname=" + oSurname + ", psw=" + psw
+				+ ", imgURL=" + cImageURL + "]";
 	}
 }
