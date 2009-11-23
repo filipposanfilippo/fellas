@@ -379,8 +379,27 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return true;
 		}
 	}
+	
+	// BE CAREFUL: before calling this method, you need to open connection
+	public int getUserId(String uTel) {
+		int userId;
+		try {
+			// openConnection();
+			query = "SELECT * FROM users WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			userId = rs.getInt("id");
+			// closeConnection();
+			return userId;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// closeConnection();
+			return -1;
+		}
+	}
 
-	// added by Fil
+	// BE CAREFUL: before calling this method, you need to open connection
 	public boolean isUserExisting(String uTel) {
 		boolean res = false;
 		try {
@@ -1051,7 +1070,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		if (!isUserExisting(uTel))
+		int id = getUserId(uTel);
+		if (id<0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET uLocation = '" + uLocation
@@ -1062,12 +1082,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// update location in poi
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-
-			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int id = rs.getInt("id");
 
 			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"
 					+ coordinates[1] + "' WHERE idItem = '" + id
@@ -1090,7 +1104,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		if (!isUserExisting(uTel))
+		int id = getUserId(uTel);
+		if (id<0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET uStatus = '" + uStatus
@@ -1098,12 +1113,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update status in poi
-			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int id = rs.getInt("id");
-
 			query = "UPDATE POI SET line4 = '" + uStatus + "' WHERE idItem = '"
 					+ id + "' AND type=1";
 			statement = connection.createStatement();
@@ -1325,17 +1334,10 @@ System.out.println("SPAM QUERY: " + query);
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		if (!isUserExisting(uTel))
+		int id = getUserId(uTel);
+		if(id<0)
 			return "You are not registered%";
 		try {
-			// recupera id
-			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			if (!rs.next())
-				return "You are not registered, please register%";
-			int id = rs.getInt("id");
-
 			// delete user from users
 			query = "DELETE from users WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
@@ -1496,7 +1498,8 @@ System.out.println("SPAM QUERY: " + query);
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		if (!isUserExisting(uTel))
+		int id = getUserId(uTel);
+		if (id<0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET privacy  = '" + privacy
@@ -1504,12 +1507,6 @@ System.out.println("SPAM QUERY: " + query);
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update status in poi
-			query = "SELECT id FROM users WHERE uTel='" + uTel + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int id = rs.getInt("id");
-
 			if (privacy == 1) {
 				query = "UPDATE POI SET attribution = '" + uTel
 						+ "' WHERE idItem = '" + id + "' AND type=1";
