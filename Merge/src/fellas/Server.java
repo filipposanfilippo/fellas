@@ -478,8 +478,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 
-			System.out.println(formattedStartDate + " " + eStartTime);
-			System.out.println(formattedFinishDate + " " + eFinishTime);
+			//System.out.println(formattedStartDate + " " + eStartTime);
+			//System.out.println(formattedFinishDate + " " + eFinishTime);
 			// check start time of event
 			// if dayOfStart.getTime() - today.getTime()<7 than immediately
 			// adding to POI
@@ -510,7 +510,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int eventId = rs.getInt("id");
 
 			if (startDifference < 7 * 60 * 60 * 24 * 1000) {
-				System.out.println("Immidiatily adding to POI");
+				System.out.println("Immediatily adding to POI");
 				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 						+ "VALUES ('"
 						+ eventId
@@ -1640,7 +1640,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							statement = connection.createStatement();
 							rs = statement.executeQuery(query);
 							if (!rs.next()) {
-								System.out.println("Immidiatily adding event "
+								System.out.println("Immediatily adding event "
 										+ primaryRs.getInt("id") + "to POI");
 								query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 										+ "VALUES ('"
