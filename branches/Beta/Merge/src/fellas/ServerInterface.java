@@ -64,6 +64,9 @@ public interface ServerInterface extends Remote {
 			throws RemoteException;
 	public String joinEvent(String key, String senderPhone, String eventCode)
 	throws RemoteException;
+	
+	public String getDescriptionEvent(String key, String senderPhone, String eventCode)
+	throws RemoteException;
 
 	public String inviteFriend(String key, String senderPhone, String friendPhone,
 			int eventId) throws RemoteException;

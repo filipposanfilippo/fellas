@@ -645,7 +645,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			if (usersJList.getSelectedValues() != null) {
 				String criterion = "";
 				for (Object s : usersJList.getSelectedValues()) {
-					criterion += "id=" + s.toString().split("]")[0] + " AND ";
+					criterion += "id=" + s.toString().split("]")[0] + " OR ";
 				}
 				if (criterion != "") {
 					try {
@@ -664,7 +664,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			String[] ele = new String[model.size()];
 			model.copyInto(ele);
 			for (String s : ele) {
-				criterion += "id=" + s.toString().split("]")[0] + " AND ";
+				criterion += "id=" + s.toString().split("]")[0] + " OR ";
 			}
 			if (criterion != "") {
 				try {

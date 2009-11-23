@@ -130,6 +130,22 @@ class ClientMobile extends UnicastRemoteObject {
 					serverAnswer = server.joinEvent(keyword, uTel, eventCode);
 					served = true;
 					break;
+				case 'g' | 'G':
+					System.out.println("\nGET DESCRIPTION EVENT: ");
+					// check registration by phone
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
+					String eventCodeG = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\neventCode: " + eventCodeG);
+					// invoke remote method
+					serverAnswer = server.getDescriptionEvent(keyword, uTel, eventCodeG);
+					served = true;
+					break;
 				case 'd' | 'D':
 					System.out.println("\nDISJOIN EVENT: ");
 					// check registration by phone
@@ -143,7 +159,8 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCodeD);
 					// invoke remote method
-					serverAnswer = server.disJoinEvent(keyword, uTel, eventCodeD);
+					serverAnswer = server.disJoinEvent(keyword, uTel,
+							eventCodeD);
 					served = true;
 					break;
 				case 'i' | 'I':// TODO need to fix
