@@ -585,7 +585,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 		public void run() {
 			System.out
-					.println("Adding event to POI 7 days before his starting time");
+					.println("Adding event "+eventId+" to POI 7 days before his starting time");
 			try {
 				openConnection();
 				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
@@ -642,7 +642,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 
 		public void run() {
-			System.out.println("Deleting event from POI");
+			System.out.println("Deleting event "+eventId+" from POI");
 			try {
 				// delete item from poi table and from actions too
 				// recupera id POI
@@ -1485,15 +1485,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				primaryRs = statement.executeQuery(query);
 				while (primaryRs.next()) {
 					try {
-						dayOfStart = df.parse(primaryRs.getDate("eStartDate") + " "
-								+ primaryRs.getTime("eStartTime"));
-						dayOfFinish = df.parse(primaryRs.getDate("eFinishDate") + " "
-								+ primaryRs.getTime("eFinishTime"));
+						dayOfStart = df.parse(primaryRs.getDate("eStartDate")
+								+ " " + primaryRs.getTime("eStartTime"));
+						dayOfFinish = df.parse(primaryRs.getDate("eFinishDate")
+								+ " " + primaryRs.getTime("eFinishTime"));
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
 					today = new Date();
 					if (today.after(dayOfFinish)) {
+						System.out.println("Event " + primaryRs.getInt("id")
+								+ " is expired");
 						query = "SELECT id FROM POI WHERE type=3 AND idItem='"
 								+ primaryRs.getInt("id") + "'";
 						statement = connection.createStatement();
@@ -1511,8 +1513,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 									+ "'";
 							statement = connection.createStatement();
 							statement.execute(query);
+							System.out
+									.println("___________________________________________________________");
+						} else {
+							System.out.println("Expired event "
+									+ primaryRs.getInt("id")
+									+ " was already deleted from POI");
+							System.out
+									.println("___________________________________________________________");
 						}
+
 					} else {
+						System.out.println("Event "
+								+ primaryRs.getInt("id")
+								+ " is fresh");
 						coordinates = address2GEOcoordinates(primaryRs
 								.getString("eLocation"));
 						startDifference = dayOfStart.getTime()
@@ -1523,7 +1537,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							statement = connection.createStatement();
 							rs = statement.executeQuery(query);
 							if (!rs.next()) {
-								System.out.println("Immidiatily adding to POI");
+								System.out.println("Immidiatily adding event "
+										+ primaryRs.getInt("id") + "to POI");
 								query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 										+ "VALUES ('"
 										+ primaryRs.getInt("id")
@@ -1546,7 +1561,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 										+ " "
 										+ primaryRs.getTime("eFinishTime")
 										+ "','"
-										+ primaryRs.getString("eName") + "',3)";
+										+ primaryRs.getString("eName")
+										+ "',3)";
 								statement = connection.createStatement();
 								statement.execute(query);
 								// add actions to POI
@@ -1564,7 +1580,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 										+ poiId + "')";
 								statement = connection.createStatement();
 								statement.execute(query);
-							}
+							} else
+								System.out.println("Event "
+										+ primaryRs.getInt("id")
+										+ " was already added POI");
 						} else {
 							System.out
 									.println("Starting starterTask for event: "
@@ -1572,15 +1591,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							startDifference = startDifference - 7 * 60 * 60
 									* 24 * 1000;
 							Timer StartTimer = new Timer();
-							StartTimer.schedule(new starterTask(
-									primaryRs.getInt("id"), primaryRs.getString("eInfoTel"),
-									primaryRs.getString("eImageURL"), coordinates, primaryRs
-											.getString("eCategory"), primaryRs
+							StartTimer.schedule(new starterTask(primaryRs
+									.getInt("id"), primaryRs
+									.getString("eInfoTel"), primaryRs
+									.getString("eImageURL"), coordinates,
+									primaryRs.getString("eCategory"), primaryRs
 											.getString("eStartDate"), primaryRs
-											.getString("eFinishDate"), primaryRs
-											.getString("eStartTime"), primaryRs
-											.getString("eFinishTime"), primaryRs
-											.getString("eName")),
+											.getString("eFinishDate"),
+									primaryRs.getString("eStartTime"),
+									primaryRs.getString("eFinishTime"),
+									primaryRs.getString("eName")),
 									startDifference);
 						}
 
@@ -1591,8 +1611,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						finishDifference = dayOfFinish.getTime()
 								- today.getTime();
 						Timer EndTimer = new Timer();
-						EndTimer.schedule(new terminatorTask(primaryRs.getInt("id")),
-								finishDifference);
+						EndTimer.schedule(new terminatorTask(primaryRs
+								.getInt("id")), finishDifference);
+						System.out
+								.println("___________________________________________________________");
 					}
 				}
 			} catch (SQLException e) {
