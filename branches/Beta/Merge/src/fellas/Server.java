@@ -488,7 +488,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			Date today = new Date();
 
-			DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date dayOfStart = null;
 			Date dayOfFinish = null;
 			try {
@@ -604,8 +604,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 
 		public void run() {
-			System.out.println("Adding event " + eventId
-					+ " to POI 7 days before his starting time");
 
 			MyEvent oldEvent;
 
@@ -632,28 +630,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eImageURL"));
 
 				// if nothing was changed
-				if (oldEvent.geteStartDate().equals(formatDate(eStartDate)))
-					System.out.println("ciao");
-				System.out.println("stesse date: " + oldEvent.geteStartDate()
-						+ " " + formatDate(eStartDate));
-				// if(oldEvent.geteStartTime().equals(eStartTime))
-				System.out.println("stesse ore: " + oldEvent.geteStartTime()
-						+ " " + formatTime(eStartTime));
 
 				if (oldEvent.geteName().equals(eName)
 						&& oldEvent.geteInfoTel().equals(eInfoTel)
 						&& oldEvent.geteImageURL().equals(eImageURL)
 						&& oldEvent.geteLocation().equals(eLocation)
 						&& oldEvent.geteCategory().equals(eCategory)
-						&& oldEvent.geteStartDate().equals(
+						&& oldEvent.geteStartDate().toString().equals(
 								formatDate(eStartDate))
-						&& oldEvent.geteFinishDate().equals(
+						&& oldEvent.geteFinishDate().toString().equals(
 								formatDate(eFinishDate))
 						&& oldEvent.geteStartTime().equals(eStartTime)
 						&& oldEvent.geteFinishTime().equals(eFinishTime))
 
 				{
-					System.out.println("intra");
+					System.out.println("Adding event " + eventId
+							+ " to POI 7 days before his starting time");
 					coordinates = address2GEOcoordinates(rs
 							.getString("eLocation"));
 
@@ -703,10 +695,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 		}
 
-		private String dateFormat(String eStartDate2) {
-			// TODO Auto-generated method stub
-			return null;
-		}
 	}
 
 	class terminatorTask extends TimerTask {
@@ -749,7 +737,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eImageURL"));
 
 				// if nothing was changed
-				if (oldEvent.geteFinishDate().equals(eFinishDate)
+				if (oldEvent.geteFinishDate().toString().equals(
+						formatDate(eFinishDate))
 
 				&& oldEvent.geteFinishTime().equals(eFinishTime)) {
 
@@ -782,11 +771,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		return new StringBuilder(dateFormat.format(date)).toString();
 	}
-	
-	private String formatTime(String eStartTime) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-		return new StringBuilder(dateFormat.format(eStartTime)).toString();
-	}
 
 	public boolean updateEvent(String cName, String psw, MyEvent event)
 			throws RemoteException {
@@ -794,7 +778,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		Date today;
 
-		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date dayOfStart = null;
 		Date dayOfFinish = null;
 		long startDifference;
