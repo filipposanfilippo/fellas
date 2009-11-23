@@ -13,6 +13,11 @@ public class ClientClub extends UnicastRemoteObject {
 	private String host = "localhost";
 	private Club clubLogged;
 
+	final String _HOST = "diana.netsons.org";
+	final String _USERNAME = "diananet";
+	final String _PASSWORD = "password1234";
+	final String _URL = "http://diana.netsons.org/";
+
 	public ClientClub() throws RemoteException, MalformedURLException,
 			NotBoundException {
 		server = (ServerInterface) Naming.lookup("//" + host + "/SvrMobile");
@@ -21,21 +26,30 @@ public class ClientClub extends UnicastRemoteObject {
 	public boolean clubAccess(String cName, String psw) throws RemoteException {
 		boolean res = server.clubAccess(cName, psw);
 		if (res) {
-			clubLogged = getClubData(cName,psw);
+			clubLogged = getClubData(cName, psw);
 		}
 		return res;
 	}
 
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
-			String cName, String psw) throws RemoteException {
+			String cName, String psw, String imgLocalURL)
+			throws RemoteException {
+		String ext = imgLocalURL.split(".")[imgLocalURL.split(".").length - 1];
+		String imgRemoteURL = "clubs/" + cName + "." + ext;
+
+		FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
+		System.out.println("Save UPLOAD : "
+				+ up.uploadFile(imgLocalURL, imgRemoteURL));
+
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
-				cType, cName, psw);
+				cType, cName, psw, imgRemoteURL);
 	}
 
-	/*public LinkedList<Club> getClubList() throws RemoteException {
-		return server.getClubList(keyword);
-	}*/
+	/*
+	 * public LinkedList<Club> getClubList() throws RemoteException { return
+	 * server.getClubList(keyword); }
+	 */
 
 	private Club getClubData(String cName, String psw) throws RemoteException {
 		return server.getClubData(cName, psw);
@@ -46,7 +60,8 @@ public class ClientClub extends UnicastRemoteObject {
 			String cName, String psw) throws RemoteException {
 		final Club tempClub = new Club(clubLogged.getId(), oName, oSurname,
 				cAddress, cTel, cEMail, cType, cName, psw);
-		if (server.updateClubData(clubLogged.getcName(), clubLogged.getPsw(), tempClub)) {
+		if (server.updateClubData(clubLogged.getcName(), clubLogged.getPsw(),
+				tempClub)) {
 			clubLogged = tempClub;
 			return true;
 		} else
@@ -66,7 +81,8 @@ public class ClientClub extends UnicastRemoteObject {
 	}
 
 	public LinkedList<MyEvent> getClubEventsList() throws RemoteException {
-		return server.getClubEventsList(clubLogged.getcName(), clubLogged.getPsw(), clubLogged.getId());
+		return server.getClubEventsList(clubLogged.getcName(), clubLogged
+				.getPsw(), clubLogged.getId());
 	}
 
 	public MyEvent getEvent(int id) throws RemoteException {
@@ -78,27 +94,32 @@ public class ClientClub extends UnicastRemoteObject {
 			Date eStartDate, Date eFinishDate, String eStartTime,
 			String eFinishTime, String eRestriction, String infoTel,
 			String imageURL) throws RemoteException {
-		return server.createEvent(clubLogged.getcName(), clubLogged.getPsw(), clubLogged.getId(), eName, eShortDescription,
-				eLongDescription, eLocation, eCategory, eStartDate,
-				eFinishDate, eStartTime, eFinishTime, eRestriction, infoTel,
-				imageURL);
+		return server.createEvent(clubLogged.getcName(), clubLogged.getPsw(),
+				clubLogged.getId(), eName, eShortDescription, eLongDescription,
+				eLocation, eCategory, eStartDate, eFinishDate, eStartTime,
+				eFinishTime, eRestriction, infoTel, imageURL);
 	}
 
 	public boolean updateEvent(MyEvent event) throws RemoteException {
-		return server.updateEvent(clubLogged.getcName(), clubLogged.getPsw(), event);
+		return server.updateEvent(clubLogged.getcName(), clubLogged.getPsw(),
+				event);
 	}
 
 	public boolean deleteEvent(int eventId) throws RemoteException {
-		return server.deleteEvent(clubLogged.getcName(), clubLogged.getPsw(), eventId);
+		return server.deleteEvent(clubLogged.getcName(), clubLogged.getPsw(),
+				eventId);
 	}
 
-	public LinkedList<User> getEventUsersList(int eventId) throws RemoteException {
-		return server.getEventUsersList(clubLogged.getcName(), clubLogged.getPsw(), eventId);
+	public LinkedList<User> getEventUsersList(int eventId)
+			throws RemoteException {
+		return server.getEventUsersList(clubLogged.getcName(), clubLogged
+				.getPsw(), eventId);
 	}
 
 	public String spamMobile(String message, String criterion)
 			throws RemoteException {
-		return server.spamMobile(clubLogged.getcName(), clubLogged.getPsw(), message, criterion);
+		return server.spamMobile(clubLogged.getcName(), clubLogged.getPsw(),
+				message, criterion);
 	}
 
 	public boolean clubUnregistration() throws RemoteException {

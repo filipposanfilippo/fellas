@@ -60,7 +60,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	String TITLE = "FELLAS: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
-
+	
+	// TODO check if is better move all ftp sending operation to clientclub
 	final String _HOST = "diana.netsons.org";
 	final String _USERNAME = "diananet";
 	final String _PASSWORD = "password1234";
@@ -366,10 +367,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eCategory.setText("");
 		eStartDate.setDate(new Date());
 		eFinishDate.setDate(new Date());
-		
-		//eStartDate.setEnabled(false);
-		//eFinishDate.setEnabled(false);
-		
+
+		// eStartDate.setEnabled(false);
+		// eFinishDate.setEnabled(false);
+
 		eStartTime.setText("00:00");
 		eFinishTime.setText("00:00");
 		eRestriction.setText("");
@@ -383,7 +384,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
-	private void updateImage(String imgURL) {
+	private void refreshImage(String imgURL) {
 		try {
 			if (imgURL.equals("")) {
 				img.setIcon(new ImageIcon("default.jpg"));
@@ -419,9 +420,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		centerEvP = new JPanel();
 		centerEvP.setBorder(BorderFactory.createTitledBorder(""));
 		// centerEvP.setLayout(new BoxLayout(centerEvP, BoxLayout.Y_AXIS));
-		
+
 		img = new JLabel(new ImageIcon("default.jpg"));
-		//img.setPreferredSize(new Dimension(50, 50));
+		// img.setPreferredSize(new Dimension(50, 50));
 		img.setHorizontalAlignment(SwingConstants.CENTER);
 		centerEvP.add(img);
 
@@ -786,24 +787,28 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				public boolean accept(File f) {
 					if (f.getName().endsWith(".jpg")
 							|| f.getName().endsWith(".jpeg")
-							|| f.getName().endsWith(".gif"))
+							|| f.getName().endsWith(".gif")
+							|| f.getName().endsWith(".png"))
 						return true;
 					return false;
 				}
 
 				public String getDescription() {
-					return "jpg,jpeg,gif";
+					return "jpg,jpeg,gif,png";
 				}
 			};
 			chooser.setFileFilter(filter);
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
 				eLocalImageURL.setText(chooser.getSelectedFile()
 						.getAbsolutePath());
+				// TODO controlla che succede se inserisco stringa vuota al
+				// posto dell'img.
+				String[] extSplit = eLocalImageURL.getText().split(".");
+				String ext = extSplit[extSplit.length - 1];
 				eRemoteImageURL.setText("events/"
 						+ currentClub.getClub().getId() + "/"
-						+ eStartDate.getDate().getTime() + ".jpg");
-				// TODO allow all extensions
-				updateImage(eLocalImageURL.getText());
+						+ eStartDate.getDate().getTime() + "." + ext);
+				refreshImage(eLocalImageURL.getText());
 			}
 		}
 		if (event == saveEvB) {
@@ -1042,7 +1047,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eInfoTel.setText(event.geteInfoTel());
 				eRemoteImageURL.setText(event.geteImageURL());
 				eLocalImageURL.setText("");
-				updateImage(event.geteImageURL());
+				refreshImage(event.geteImageURL());
 				eLongDescription.setText(event.geteLongDescription());
 			} catch (RemoteException e1) {
 				// TODO add error
@@ -1067,7 +1072,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void focusLost(FocusEvent e) {
 		// TODO Auto-generated method stub
-
 	}
 
 	public static void main(String[] args) {
@@ -1087,5 +1091,4 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			e.printStackTrace();
 		}
 	}
-
 }
