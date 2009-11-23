@@ -23,7 +23,9 @@ public class FTPManager {
 	public synchronized boolean uploadFile(String localFile, String remoteFile) {
 		try {
 			URL url = new URL("ftp://" + user + ":" + password + "@" + host
-					+ "/img/" + remoteFile + ";type=i");
+					+ "/www/" + remoteFile + ";type=i");
+			System.out.println("ftp://" + user + ":" + password + "@" + host
+					+ "/www/" + remoteFile + ";type=i");
 			URLConnection m_client = url.openConnection();
 
 			InputStream is = new FileInputStream(localFile);
@@ -47,7 +49,7 @@ public class FTPManager {
 	public synchronized boolean downloadFile(String localFile, String remoteFile) {
 		try {
 			URL url = new URL("ftp://" + user + ":" + password + "@" + host
-					+ "/img/" + remoteFile + ";type=i");
+					+ "/www/" + remoteFile + ";type=i");
 			URLConnection m_client = url.openConnection();
 
 			InputStream is = m_client.getInputStream();
@@ -74,7 +76,7 @@ public class FTPManager {
 	public static void main(String[] args) {
 		FTPManager up = new FTPManager("diana.netsons.org", "diananet",
 				"password1234");
-		//up.uploadFile("ct.jpg", "ct.jpg");
+		// up.uploadFile("ct.jpg", "ct.jpg");
 		up.downloadFile("prova.jpg", "ct.jpg");
 
 	}

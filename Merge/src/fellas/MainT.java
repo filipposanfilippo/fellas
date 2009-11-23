@@ -30,6 +30,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -45,6 +46,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -56,6 +58,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	String TITLE = "DIANA: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
+
+	final String _HOST = "diana.netsons.org";
+	final String _USERNAME = "diananet";
+	final String _PASSWORD = "password1234";
+	final String _URL = "http://diana.netsons.org/";
+
 	final String HELP_ITA = "text/ita.txt"; // TODO creare ita help
 	final String HELP_ENG = "text/eng.txt"; // TODO creare eng help
 
@@ -91,9 +99,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eFinishTime;
 	JTextField eRestriction;
 	JTextField eInfoTel;
-	JTextField eImageURL;
+	JTextField eLocalImageURL;
+	JTextField eRemoteImageURL;
+	JButton selectImgB;
+	JLabel img;
+	JPanel centerEvP;
 
-	JButton createEvB;
+	JButton saveEvB;
 	JButton modifyEvB;
 	JButton deleteEvB;
 
@@ -352,21 +364,51 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eCategory.setText("");
 		eStartDate.setDate(new Date());
 		eFinishDate.setDate(new Date());
+		
+		//eStartDate.setEnabled(false);
+		//eFinishDate.setEnabled(false);
+		
 		eStartTime.setText("00:00");
 		eFinishTime.setText("00:00");
 		eRestriction.setText("");
 		eInfoTel.setText("");
-		eImageURL.setText("");
+		eLocalImageURL.setText("");
+		eRemoteImageURL.setText("");
+		img.setIcon(new ImageIcon("default.jpg"));
 		eLongDescription.setText("");
 	}
 
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
+	private void updateImage(String imgURL) {
+		try {
+			if (imgURL.equals("")) {
+				img.setIcon(new ImageIcon("default.jpg"));
+				img.setHorizontalAlignment(SwingConstants.CENTER);
+			} else {
+				if (imgURL.startsWith("C:")) {
+					img.setIcon(new ImageIcon(imgURL));
+					// img.setPreferredSize(new Dimension(50, 50));
+					img.setHorizontalAlignment(SwingConstants.CENTER);
+				} else {
+					URL url = new URL(_URL + imgURL);
+					ImageIcon ic = new ImageIcon(ImageIO.read(url));
+					img.setIcon(ic);
+					// img.setPreferredSize(new Dimension(50, 50));
+					img.setHorizontalAlignment(SwingConstants.CENTER);
+				}
+			}
+		} catch (IOException e) {
+			img.setIcon(new ImageIcon("default.jpg"));
+			img.setHorizontalAlignment(SwingConstants.CENTER);
+			e.printStackTrace();
+		}
+	}
 
 	private JPanel createEventsPanel() {
 		JPanel eventsP = new JPanel();
-		eventsP.setLayout(new GridLayout(1, 2));
+		eventsP.setLayout(new GridLayout(1, 3));
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftEvP = new JPanel();
@@ -376,14 +418,28 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eventJList2 = createEventList();
 		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
 		leftEvP.add(eventScrollPane);
-		try {
-			URL url = new URL("http://diana.netsons.org/img/ct.jpg");
-			JLabel img = new JLabel(new ImageIcon(ImageIO.read(url)));
-			//img.setPreferredSize(new Dimension(50, 50));
-			leftEvP.add(img);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		// ------------------------ CENTER ------------------------------------
+		centerEvP = new JPanel();
+		centerEvP.setBorder(BorderFactory.createTitledBorder(""));
+		// centerEvP.setLayout(new BoxLayout(centerEvP, BoxLayout.Y_AXIS));
+		img = new JLabel(new ImageIcon("default.jpg"));
+		centerEvP.add(img);
+
+		eLocalImageURL = new JTextField();
+		eLocalImageURL.setPreferredSize(new Dimension(300, 20));
+		eRemoteImageURL.setEditable(false);
+		centerEvP.add(eLocalImageURL);
+
+		eRemoteImageURL = new JTextField();
+		eRemoteImageURL.setPreferredSize(new Dimension(300, 20));
+		eRemoteImageURL.setEditable(false);
+		centerEvP.add(eRemoteImageURL);
+
+		selectImgB = new JButton("Select Event Image");
+		selectImgB.addActionListener(this);
+		centerEvP.add(selectImgB);
+
 		// ------------------------ RIGHT ------------------------------------
 		JPanel rightEvP = new JPanel();
 		rightEvP.setBorder(BorderFactory.createTitledBorder(""));
@@ -391,23 +447,23 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		rightEvP.add(new JLabel("Event Name:"));
 		eName = new JTextField();
-		eName.setPreferredSize(new Dimension(390, 20));
+		eName.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eName);
 
 		rightEvP.add(new JLabel("Location:"));
 		eLocation = new JTextField();
-		eLocation.setPreferredSize(new Dimension(390, 20));
+		eLocation.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eLocation);
 
 		rightEvP.add(new JLabel("Event Category:"));
 		eCategory = new JTextField();
-		eCategory.setPreferredSize(new Dimension(390, 20));
+		eCategory.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eCategory);
 
 		rightEvP.add(new JLabel("Starting Date:"));
 		eStartDate = new JDateChooser(new Date());
 		eStartDate.setDateFormatString("yyyy/MM/dd");
-		eStartDate.setPreferredSize(new Dimension(390, 20));
+		eStartDate.setPreferredSize(new Dimension(300, 20));
 		eStartDate.setMinSelectableDate(new Date());
 		eStartDate.enableInputMethods(false);
 		rightEvP.add(eStartDate);
@@ -415,62 +471,58 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(new JLabel("Finishing Date:"));
 		eFinishDate = new JDateChooser(new Date());
 		eFinishDate.setDateFormatString("yyyy/MM/dd");
-		eFinishDate.setPreferredSize(new Dimension(390, 20));
+		eFinishDate.setPreferredSize(new Dimension(300, 20));
 		eFinishDate.setMinSelectableDate(new Date());
 		rightEvP.add(eFinishDate);
 
 		rightEvP.add(new JLabel("Starting Time: (hh:mm)"));
 		eStartTime = new JTextField("00:00");
-		eStartTime.setPreferredSize(new Dimension(390, 20));
+		eStartTime.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eStartTime);
 
 		rightEvP.add(new JLabel("Finishing Time: (hh:mm)"));
 		eFinishTime = new JTextField("00:00");
-		eFinishTime.setPreferredSize(new Dimension(390, 20));
+		eFinishTime.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eFinishTime);
 
 		rightEvP.add(new JLabel("Restriction:"));
 		eRestriction = new JTextField();
-		eRestriction.setPreferredSize(new Dimension(390, 20));
+		eRestriction.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eRestriction);
 
 		rightEvP.add(new JLabel("Telephon Info.:"));
 		eInfoTel = new JTextField();
-		eInfoTel.setPreferredSize(new Dimension(390, 20));
+		eInfoTel.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eInfoTel);
-
-		rightEvP.add(new JLabel("Event Image:"));
-		eImageURL = new JTextField();
-		eImageURL.setPreferredSize(new Dimension(390, 20));
-		rightEvP.add(eImageURL);
 
 		rightEvP.add(new JLabel("Short Desciption:"));
 		eShortDescription = new JTextField();
-		eShortDescription.setPreferredSize(new Dimension(390, 20));
+		eShortDescription.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eShortDescription);
 
 		rightEvP.add(new JLabel("Long Description:"));
-		eLongDescription = new JTextArea(5, 35);
+		eLongDescription = new JTextArea(5, 30);
 		eLongDescription.setLineWrap(true);
 		JScrollPane descrScrollPane = new JScrollPane(eLongDescription);
 		rightEvP.add(descrScrollPane);
 
-		createEvB = new JButton("Create Event");
-		modifyEvB = new JButton("Modify Event");
+		saveEvB = new JButton("Save New");
+		modifyEvB = new JButton("Save Changes");
 		deleteEvB = new JButton("Delete Event");
 
 		modifyEvB.setEnabled(false);
 		deleteEvB.setEnabled(false);
 
-		createEvB.addActionListener(this);
+		saveEvB.addActionListener(this);
 		modifyEvB.addActionListener(this);
 		deleteEvB.addActionListener(this);
 
-		rightEvP.add(createEvB);
+		rightEvP.add(saveEvB);
 		rightEvP.add(modifyEvB);
 		rightEvP.add(deleteEvB);
 
 		eventsP.add(leftEvP);
+		eventsP.add(centerEvP);
 		eventsP.add(rightEvP);
 		eventsP.setVisible(true);
 		return eventsP;
@@ -615,7 +667,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(800, 750));
+		mainFrame.setPreferredSize(new Dimension(1024, 700));
+		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
 
@@ -648,6 +701,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					criterion += "id=" + s.toString().split("]")[0] + " OR ";
 				}
 				if (criterion != "") {
+					// TODO to check if it works
 					try {
 						currentClub.spamMobile(message.getText(), criterion
 								.substring(0, criterion.length() - 3));
@@ -725,7 +779,21 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				e1.printStackTrace();
 			}
 		}
-		if (event == createEvB) {
+		if (event == selectImgB) {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setCurrentDirectory(new java.io.File("."));
+			chooser.setDialogTitle("Choose Event Image");
+			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
+				eLocalImageURL.setText(chooser.getSelectedFile()
+						.getAbsolutePath());
+				eRemoteImageURL.setText("events/"
+						+ currentClub.getClub().getId() + "/"
+						+ eStartDate.getDate().getTime() + ".jpg");
+				// TODO allow all extensions
+				updateImage(eLocalImageURL.getText());
+			}
+		}
+		if (event == saveEvB) {
 			String newEv = eName.getText();
 			if (newEv.equals("")) {
 				JOptionPane.showMessageDialog(mainFrame,
@@ -742,21 +810,24 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						"Creation Error!", JOptionPane.ERROR_MESSAGE);
 			} else {
 				try {
-					currentClub
-							.createEvent(eName.getText(), eShortDescription
-									.getText(), eLongDescription.getText(),
-									eLocation.getText(), eCategory.getText(),
-									eStartDate.getDate(),
-									eFinishDate.getDate(),
-									eStartTime.getText(),
-									eFinishTime.getText(), eRestriction
-											.getText(), eInfoTel.getText(),
-									eImageURL.getText());
+					currentClub.createEvent(eName.getText(), eShortDescription
+							.getText(), eLongDescription.getText(), eLocation
+							.getText(), eCategory.getText(), eStartDate
+							.getDate(), eFinishDate.getDate(), eStartTime
+							.getText(), eFinishTime.getText(), eRestriction
+							.getText(), eInfoTel.getText(), eRemoteImageURL
+							.getText());
 				} catch (RemoteException e1) {
 					// TODO add error message
 					e1.printStackTrace();
 				}
 
+				if (!eLocalImageURL.getText().equals("")) {
+					FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
+					System.out.println("Save UPLOAD : "
+							+ up.uploadFile(eLocalImageURL.getText(),
+									eRemoteImageURL.getText()));
+				}
 				populateList(eventJList, getEventsArray());
 				populateList(eventJList2, getEventsArray());
 
@@ -778,10 +849,16 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						eCategory.getText(), eStartDate.getDate(), eFinishDate
 								.getDate(), eStartTime.getText(), eFinishTime
 								.getText(), eRestriction.getText(), eInfoTel
-								.getText(), eImageURL.getText()));
+								.getText(), eRemoteImageURL.getText()));
 				populateList(eventJList, getEventsArray());
 				populateList(eventJList2, getEventsArray());
 
+				if (!eLocalImageURL.getText().equals("")) {
+					FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
+					System.out.println("Modify UPLOAD : "
+							+ up.uploadFile(eLocalImageURL.getText(),
+									eRemoteImageURL.getText()));
+				}
 				JOptionPane.showMessageDialog(mainFrame,
 						"Modified succesfully " + selEv[1], "Modified!",
 						JOptionPane.INFORMATION_MESSAGE);
@@ -823,7 +900,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									+ "URZI' Erik - erik.urzi@gmail.com\n"
 									+ "SANFILIPPO Filippo - filippo.sanfilippo@gmail.com\n"
 									+ "SCIBILIA Giorgio - giorgio.scibilia@gmail.com",
-
 							"DIANA: Authors", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (event == newEvent) {
@@ -951,7 +1027,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eFinishTime.setText(event.geteFinishTime());
 				eRestriction.setText(event.geteRestriction());
 				eInfoTel.setText(event.geteInfoTel());
-				eImageURL.setText(event.geteImageURL());
+				eRemoteImageURL.setText(event.geteImageURL());
+				eLocalImageURL.setText("");
+				updateImage(event.geteImageURL());
 				eLongDescription.setText(event.geteLongDescription());
 			} catch (RemoteException e1) {
 				// TODO add error
@@ -980,7 +1058,21 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	}
 
 	public static void main(String[] args) {
-		// new Thread(new MainT("Barone Rosso")).start();
+		ClientClub currentClub;
+		try {
+			currentClub = new ClientClub();
+
+			String userTest = "danilo";
+			String passTest = "danilo";
+
+			boolean isLogged = currentClub.clubAccess(userTest, passTest);
+			// System.out.println("Logged = " + isLogged);
+			if (isLogged) {
+				new Thread(new MainT(currentClub)).start();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
