@@ -77,7 +77,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return false;
 	}
 
-	// TODO MANCA clunUnregistration
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw) throws RemoteException {
@@ -1060,7 +1059,40 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} finally {
 			closeConnection();
 		}
-		return "You have disjoined the event " + eName + " (" + eventCode + ")%";
+		return "You have disjoined the event " + eName + " (" + eventCode
+				+ ")%";
+	}
+
+	public String getDescriptionEvent(String key, String senderPhone,
+			String eventCode) throws RemoteException {
+		String eShortDescription = new String();
+		String eName = new String();
+		if (!keyword.equals(key))
+			return "You are not authorized";
+		try {
+			openConnection();
+			// CHECK IF USER EXISTS
+			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "You are not registered, please register%";
+
+			query = "SELECT eName, eShortDescription FROM events WHERE id='"
+					+ eventCode + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "Any event match with your code%";
+			eShortDescription = rs.getString("eShortDescription");
+			eName = rs.getString("eName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "GETDESCRIPTIONEVENT ERROR%";
+		} finally {
+			closeConnection();
+		}
+		return eName.toUpperCase() + ": " + eShortDescription + "%";
 	}
 
 	public String setLocation(String key, String uTel, String uLocation)
@@ -1284,7 +1316,7 @@ System.out.println("SPAM QUERY: " + query);
 			// ---------
 
 			// Retrieve the ServerName
-			InetAddress serverAddr = InetAddress.getByName("192.168.1.106"); // HTC
+			InetAddress serverAddr = InetAddress.getByName("192.168.1.101"); // HTC
 			// ip
 			// address
 			// where
