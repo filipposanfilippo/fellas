@@ -31,9 +31,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	private Statement statement = null;
 	private String query = "";
 	private ResultSet rs = null;
-	private static String keyword ="perorapassworddiprova";
+	private static String keyword = "perorapassworddiprova";
+	private ResultSet primaryRs = null;
 
 	public Server() throws RemoteException {
+		GrabberThread grabber = new GrabberThread();
+		new Thread(grabber).start();
 		openConnection();
 		closeConnection();
 	}
@@ -61,14 +64,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	//TODO to cancel
+	// TODO to cancel
 	public boolean authenticationClub(String name, String psw)
 			throws RemoteException {
 		// invoke client club method to check user-password
 		return false;
 	}
 
-	//TODO to cancel
+	// TODO to cancel
 	public boolean authenticationMobile() throws RemoteException {
 		// invoke client club method to check user-password
 		return false;
@@ -152,15 +155,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			// e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public boolean updateClubData(String cName, String psw, Club club) throws RemoteException {
+	public boolean updateClubData(String cName, String psw, Club club)
+			throws RemoteException {
 		String[] coordinates = new String[2];
-		if(!clubAccess(cName,psw))
+		if (!clubAccess(cName, psw))
 			return false;
 		try {
 			openConnection();
@@ -186,8 +189,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -207,45 +209,33 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	/*public LinkedList<Club> getClubList() throws RemoteException {
-		LinkedList<Club> clubList = new LinkedList<Club>();
-		try {
-			openConnection();
-			query = "SELECT * FROM clubs";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			while (rs.next()) {
-				clubList.add(new Club(rs.getInt("id"), rs.getString("oName"),
-						rs.getString("oSurname"), rs.getString("cAddress"), rs
-								.getString("cTel"), rs.getString("cEMail"), rs
-								.getString("cType"), rs.getString("cName"), rs
-								.getString("psw")));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-		finally{
-			closeConnection();
-		}
-		return clubList;
-	}*/
+	/*
+	 * public LinkedList<Club> getClubList() throws RemoteException {
+	 * LinkedList<Club> clubList = new LinkedList<Club>(); try {
+	 * openConnection(); query = "SELECT * FROM clubs"; statement =
+	 * connection.createStatement(); rs = statement.executeQuery(query); while
+	 * (rs.next()) { clubList.add(new Club(rs.getInt("id"),
+	 * rs.getString("oName"), rs.getString("oSurname"),
+	 * rs.getString("cAddress"), rs .getString("cTel"), rs.getString("cEMail"),
+	 * rs .getString("cType"), rs.getString("cName"), rs .getString("psw"))); }
+	 * } catch (SQLException e) { e.printStackTrace(); return null; } finally{
+	 * closeConnection(); } return clubList; }
+	 */
 
 	public Club getClubData(String cName, String psw) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty club
-		if(!clubAccess(cName,psw))
-			return new Club();		
+		if (!clubAccess(cName, psw))
+			return new Club();
 		try {
-			openConnection();			
+			openConnection();
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
-			rs = statement.executeQuery(query);			
+			rs = statement.executeQuery(query);
 			if (rs.next())
 				return new Club(rs.getInt("id"), rs.getString("oName"), rs
 						.getString("oSurname"), rs.getString("cAddress"), rs
@@ -254,17 +244,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("psw"));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubData: " + cName);
-			e.printStackTrace();			
+			e.printStackTrace();
 			return new Club();
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 		return new Club();
 	}
 
-	public LinkedList<MyEvent> getClubEventsList(String cName, String psw, int cId) throws RemoteException {
-		if(!clubAccess(cName,psw))
+	public LinkedList<MyEvent> getClubEventsList(String cName, String psw,
+			int cId) throws RemoteException {
+		if (!clubAccess(cName, psw))
 			return null;
 		try {
 			openConnection();
@@ -290,8 +280,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
 			e.printStackTrace();
 			return null;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -323,15 +312,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			System.out.println("ERRORE IN SERVER getEvent: " + id);
 			e.printStackTrace();
 			return null;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
-	
-	public LinkedList<User> getEventUsersList(String cName, String psw, int eventId) throws RemoteException {
+
+	public LinkedList<User> getEventUsersList(String cName, String psw,
+			int eventId) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty list
-		if(!clubAccess(cName,psw))
+		if (!clubAccess(cName, psw))
 			return null;
 		try {
 			openConnection();
@@ -353,8 +342,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace(System.err);
 			return null;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -362,14 +350,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public MobileUser[] getMobileList(String sqlString) throws RemoteException {
 		// TODO IS IT NECESSARY???
-		try{
+		try {
 			openConnection();
 		}
-		//catch(SQLException e){
-		catch(Exception e){	// TODO use the line above
-			
-		}
-		finally{
+		// catch(SQLException e){
+		catch (Exception e) { // TODO use the line above
+
+		} finally {
 			closeConnection();
 		}
 		return null;
@@ -379,34 +366,34 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean isClubExisting(String cName) {
 		boolean res = false;
 		try {
-			//openConnection();
+			// openConnection();
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			res = rs.next();
-			//closeConnection();			
+			// closeConnection();
 			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//closeConnection();		
+			// closeConnection();
 			return true;
 		}
 	}
 
 	// added by Fil
 	public boolean isUserExisting(String uTel) {
-		boolean res=false;
+		boolean res = false;
 		try {
-			//openConnection();
+			// openConnection();
 			query = "SELECT * FROM users WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			res= rs.next();
-			//closeConnection();
+			res = rs.next();
+			// closeConnection();
 			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//closeConnection();
+			// closeConnection();
 			return true;
 		}
 	}
@@ -418,11 +405,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return null;
 	}
 
-	public boolean createEvent(String cName, String psw, int cId, String eName, String eShortDescription,
-			String eLongDescription, String eLocation, String eCategory,
-			Date eStartDate, Date eFinishDate, String eStartTime,
-			String eFinishTime, String eRestriction, String eInfoTel,
-			String eImageURL) throws RemoteException {
+	public boolean createEvent(String cName, String psw, int cId, String eName,
+			String eShortDescription, String eLongDescription,
+			String eLocation, String eCategory, Date eStartDate,
+			Date eFinishDate, String eStartTime, String eFinishTime,
+			String eRestriction, String eInfoTel, String eImageURL)
+			throws RemoteException {
 		String[] coordinates = new String[2];
 		coordinates = address2GEOcoordinates(eLocation);
 		long startDifference;
@@ -430,7 +418,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 		String formattedStartDate = fomatDate(eStartDate);
 		String formattedFinishDate = fomatDate(eFinishDate);
-		if(!clubAccess(cName,psw))
+		if (!clubAccess(cName, psw))
 			return false;
 		try {
 			// TODO prima di inserire controlla che eName non esista già
@@ -554,15 +542,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 
 			// Start terminatorEvent
-			finishDifference = dayOfFinish.getTime() - today.getTime();		
+			finishDifference = dayOfFinish.getTime() - today.getTime();
 			Timer EndTimer = new Timer();
 			EndTimer.schedule(new terminatorTask(eventId), finishDifference);
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -640,8 +627,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				statement.execute(query);
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
-			finally{
+			} finally {
 				closeConnection();
 			}
 		}
@@ -677,8 +663,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				statement.execute(query);
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
-			finally{
+			} finally {
 				closeConnection();
 			}
 		}
@@ -689,8 +674,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new StringBuilder(dateFormat.format(date)).toString();
 	}
 
-	public boolean updateEvent(String cName, String psw, MyEvent event) throws RemoteException {
-		if(!clubAccess(cName,psw))
+	public boolean updateEvent(String cName, String psw, MyEvent event)
+			throws RemoteException {
+		if (!clubAccess(cName, psw))
 			return false;
 		try {
 			openConnection();
@@ -732,14 +718,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public boolean deleteEvent(String cName, String psw, int eventId) throws RemoteException {
-		if(!clubAccess(cName,psw))
+	public boolean deleteEvent(String cName, String psw, int eventId)
+			throws RemoteException {
+		if (!clubAccess(cName, psw))
 			return false;
 		try {
 			openConnection();
@@ -765,18 +751,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public String broadcastMyStatus(String key, String senderPhone, String criterion)
-			throws RemoteException {
+	public String broadcastMyStatus(String key, String senderPhone,
+			String criterion) throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		String answer = "";
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -806,8 +791,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "broadcastMyStatus error%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -815,7 +799,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException {
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		String answer = "";
 		String receiverTel = "";
@@ -869,17 +853,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "CHATUP ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 		return answer;
 	}
 
 	@Override
-	public boolean checkRegistration(String key, String phoneNumber) throws RemoteException {
+	public boolean checkRegistration(String key, String phoneNumber)
+			throws RemoteException {
 		// TODO IS IT NECESSARY?
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return false;
 		return false;
 	}
@@ -888,7 +872,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String eventsList(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -916,16 +900,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "EVENTLIST ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
 	@Override
-	public String inviteFriend(String key, String senderPhone, String friendPhone,
-			int eventId) throws RemoteException {
-		if(keyword.equals(key))
+	public String inviteFriend(String key, String senderPhone,
+			String friendPhone, int eventId) throws RemoteException {
+		if (keyword.equals(key))
 			return "You are not authorized";
 		String answer = new String('@' + friendPhone + '@');
 		try {
@@ -951,8 +934,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "INVITEFRIEND ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 		return answer;
@@ -963,7 +945,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			throws RemoteException {
 		int userid;
 		String eName = new String();
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -991,8 +973,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "JOINEVENT ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 		return "You are attending at event " + eName + " (" + eventCode + ")%";
@@ -1003,7 +984,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1033,16 +1014,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "LOCATIONUPDATE ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public String setStatus(String key, String uTel, String uStatus) throws RemoteException {
+	public String setStatus(String key, String uTel, String uStatus)
+			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1067,16 +1048,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "STATUS UPDATE ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public String mobileRegistration(String key, String uTel, String username, String psw,
-			String uSex, String uAge, String uLocation, String uPrivacy)
-			throws RemoteException {
-		if(keyword.equals(key))
+	public String mobileRegistration(String key, String uTel, String username,
+			String psw, String uSex, String uAge, String uLocation,
+			String uPrivacy) throws RemoteException {
+		if (keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (isUserExisting(uTel))
@@ -1164,8 +1144,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "REGISTRATION ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -1173,7 +1152,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String userList(String key, String senderPhone, String criterion)
 			throws RemoteException {
 		String answer = "";
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -1201,17 +1180,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "USERLIST ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public String spamMobile(String cName, String psw, String message, String criterion)
-			throws RemoteException {
+	public String spamMobile(String cName, String psw, String message,
+			String criterion) throws RemoteException {
 		String answer = "";
 		// TODO be careful: if cName & psw are wrong we return an empty string
-		if(!clubAccess(cName,psw))
+		if (!clubAccess(cName, psw))
 			return "";
 		try {
 			openConnection();
@@ -1262,8 +1240,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "SPAMMOBILE error%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -1278,8 +1255,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String mobileUnregistration(String key, String uTel) throws RemoteException {
-		if(keyword.equals(key))
+	public String mobileUnregistration(String key, String uTel)
+			throws RemoteException {
+		if (keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1319,8 +1297,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "MOBILEUNREGISTRATION ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -1328,7 +1305,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String chatUpAnswer(String key, String senderTel, String id)
 			throws RemoteException {
 		String answer = "";
-		if(keyword.equals(key))
+		if (keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
@@ -1355,8 +1332,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "CHATUPANSWER ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -1445,14 +1421,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
 
-	public String setPrivacy(String key, String uTel, int privacy) throws RemoteException {
-		if(keyword.equals(key))
+	public String setPrivacy(String key, String uTel, int privacy)
+			throws RemoteException {
+		if (keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
 		if (!isUserExisting(uTel))
@@ -1484,9 +1460,149 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "PRIVACY UPDATE ERROR%";
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
+
+	class GrabberThread implements Runnable { // when the server goes down it
+		// will
+		// guarantee database consistency
+		public void run() {
+			System.out.println("Grabber is running");
+			String[] coordinates = new String[2];
+			Date today;
+
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date dayOfStart = null;
+			Date dayOfFinish = null;
+			long startDifference;
+			long finishDifference;
+			try {
+				openConnection();
+				query = "SELECT * FROM events";
+				statement = connection.createStatement();
+				primaryRs = statement.executeQuery(query);
+				while (primaryRs.next()) {
+					try {
+						dayOfStart = df.parse(primaryRs.getDate("eStartDate") + " "
+								+ primaryRs.getTime("eStartTime"));
+						dayOfFinish = df.parse(primaryRs.getDate("eFinishDate") + " "
+								+ primaryRs.getTime("eFinishTime"));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					today = new Date();
+					if (today.after(dayOfFinish)) {
+						query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+								+ primaryRs.getInt("id") + "'";
+						statement = connection.createStatement();
+						rs = statement.executeQuery(query);
+						if (rs.next()) {
+							int poiId = rs.getInt("id");
+							System.out.println("Deleting expired event "
+									+ primaryRs.getInt("id") + " from POI");
+
+							query = "DELETE from POI where idItem='"
+									+ primaryRs.getInt("id") + "' AND type=3";
+							statement = connection.createStatement();
+							statement.execute(query);
+							query = "DELETE from Action where poiId='" + poiId
+									+ "'";
+							statement = connection.createStatement();
+							statement.execute(query);
+						}
+					} else {
+						coordinates = address2GEOcoordinates(primaryRs
+								.getString("eLocation"));
+						startDifference = dayOfStart.getTime()
+								- today.getTime();
+						if (startDifference < 7 * 60 * 60 * 24 * 1000) {
+							query = "SELECT id FROM POI WHERE idItem='"
+									+ primaryRs.getInt("id") + "' AND type=3";
+							statement = connection.createStatement();
+							rs = statement.executeQuery(query);
+							if (!rs.next()) {
+								System.out.println("Immidiatily adding to POI");
+								query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+										+ "VALUES ('"
+										+ primaryRs.getInt("id")
+										+ "','"
+										+ primaryRs.getString("eInfoTel")
+										+ "','"
+										+ primaryRs.getString("eImageURL")
+										+ "','"
+										+ coordinates[0]
+										+ "','"
+										+ coordinates[1]
+										+ "','"
+										+ primaryRs.getString("eCategory")
+										+ "','Starts: "
+										+ primaryRs.getDate("eStartDate")
+										+ " "
+										+ primaryRs.getTime("eStartTime")
+										+ "','Ends: "
+										+ primaryRs.getDate("eFinishDate")
+										+ " "
+										+ primaryRs.getTime("eFinishTime")
+										+ "','"
+										+ primaryRs.getString("eName") + "',3)";
+								statement = connection.createStatement();
+								statement.execute(query);
+								// add actions to POI
+								// retrieve POI id
+								query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+										+ primaryRs.getInt("id") + "'";
+								statement = connection.createStatement();
+								rs = statement.executeQuery(query);
+								rs.next();
+								int poiId = rs.getInt("id");
+
+								query = "INSERT INTO Action (uri,label,poiId)"
+										+ "VALUES ('http://fellas.netsons.org/events/event"
+										+ poiId + ".php','Join event','"
+										+ poiId + "')";
+								statement = connection.createStatement();
+								statement.execute(query);
+							}
+						} else {
+							System.out
+									.println("Starting starterTask for event: "
+											+ primaryRs.getInt("id"));
+							startDifference = startDifference - 7 * 60 * 60
+									* 24 * 1000;
+							Timer StartTimer = new Timer();
+							StartTimer.schedule(new starterTask(
+									primaryRs.getInt("id"), primaryRs.getString("eInfoTel"),
+									primaryRs.getString("eImageURL"), coordinates, primaryRs
+											.getString("eCategory"), primaryRs
+											.getString("eStartDate"), primaryRs
+											.getString("eFinishDate"), primaryRs
+											.getString("eStartTime"), primaryRs
+											.getString("eFinishTime"), primaryRs
+											.getString("eName")),
+									startDifference);
+						}
+
+						// Start terminatorEvent
+						System.out
+								.println("Starting terminatorTask for event: "
+										+ primaryRs.getInt("id"));
+						finishDifference = dayOfFinish.getTime()
+								- today.getTime();
+						Timer EndTimer = new Timer();
+						EndTimer.schedule(new terminatorTask(primaryRs.getInt("id")),
+								finishDifference);
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				closeConnection();
+			}
+			System.out.println("Grabber has ending");
+
+		}
+	}
+
 }
