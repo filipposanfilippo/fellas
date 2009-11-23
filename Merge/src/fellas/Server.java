@@ -434,8 +434,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		long startDifference;
 		long finishDifference;
 
-		String formattedStartDate = fomatDate(eStartDate);
-		String formattedFinishDate = fomatDate(eFinishDate);
+		String formattedStartDate = formatDate(eStartDate);
+		String formattedFinishDate = formatDate(eFinishDate);
 		if (!clubAccess(cName, psw))
 			return false;
 		try {
@@ -478,8 +478,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 
-			//System.out.println(formattedStartDate + " " + eStartTime);
-			//System.out.println(formattedFinishDate + " " + eFinishTime);
+			// System.out.println(formattedStartDate + " " + eStartTime);
+			// System.out.println(formattedFinishDate + " " + eFinishTime);
 			// check start time of event
 			// if dayOfStart.getTime() - today.getTime()<7 than immediately
 			// adding to POI
@@ -554,15 +554,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				startDifference = startDifference - 7 * 60 * 60 * 24 * 1000;
 				Timer StartTimer = new Timer();
 				StartTimer.schedule(new starterTask(eventId, eInfoTel,
-						eImageURL, coordinates, eCategory, formattedStartDate,
-						formattedFinishDate, eStartTime, eFinishTime, eName),
+						eImageURL, eLocation, eCategory, eStartDate,
+						eFinishDate, eStartTime, eFinishTime, eName),
 						startDifference);
 			}
 
 			// Start terminatorEvent
 			finishDifference = dayOfFinish.getTime() - today.getTime();
 			Timer EndTimer = new Timer();
-			EndTimer.schedule(new terminatorTask(eventId), finishDifference);
+			EndTimer.schedule(new terminatorTask(eventId, eFinishDate,
+					eFinishTime), finishDifference);
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -576,22 +577,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		private int eventId;
 		private String eInfoTel;
 		private String eImageURL;
-		private String[] coordinates;
+		private String eLocation;
 		private String eCategory;
-		private String eStartDate;
-		private String eFinishDate;
+		private Date eStartDate;
+		private Date eFinishDate;
 		private String eStartTime;
 		private String eFinishTime;
 		private String eName;
 
 		public starterTask(int eventId, String eInfoTel, String eImageURL,
-				String[] coordinates, String eCategory, String eStartDate,
-				String eFinishDate, String eStartTime, String eFinishTime,
+				String eLocation, String eCategory, Date eStartDate,
+				Date eFinishDate, String eStartTime, String eFinishTime,
 				String eName) {
 			this.eventId = eventId;
 			this.eInfoTel = eInfoTel;
 			this.eImageURL = eImageURL;
-			this.coordinates = coordinates;
+			this.eLocation = eLocation;
 			this.eCategory = eCategory;
 			this.eStartDate = eStartDate;
 			this.eFinishDate = eFinishDate;
@@ -604,81 +605,170 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		public void run() {
 			System.out.println("Adding event " + eventId
 					+ " to POI 7 days before his starting time");
+
+			MyEvent oldEvent;
+
+			String[] coordinates = new String[2];
 			try {
 				openConnection();
-				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
-						+ "VALUES ('"
-						+ eventId
-						+ "','"
-						+ eInfoTel
-						+ "','"
-						+ eImageURL
-						+ "','"
-						+ coordinates[0]
-						+ "','"
-						+ coordinates[1]
-						+ "','"
-						+ eCategory
-						+ "','Starts: "
-						+ eStartDate
-						+ " "
-						+ eStartTime
-						+ "','Ends: "
-						+ eFinishDate
-						+ " "
-						+ eFinishTime + "','" + eName + "',3)";
-				statement = connection.createStatement();
-				statement.execute(query);
-				// add actions to POI
-				// retrieve POI id
-				query = "SELECT id FROM POI WHERE type=3 AND idItem='"
-						+ eventId + "'";
+				// check if event was modified
+				query = "SELECT id, cId, eName, eShortDescription, eLongDescription, eLocation, eCategory, eStartDate, eFinishDate, eStartTime, eFinishTime, eRestriction, eInfoTel, eImageURL FROM events WHERE id="
+						+ eventId + "";
 				statement = connection.createStatement();
 				rs = statement.executeQuery(query);
 				rs.next();
-				int poiId = rs.getInt("id");
+				oldEvent = new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+						.getString("eName"), rs.getString("eShortDescription"),
+						rs.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
+								.getString("eRestriction"), rs
+								.getString("eInfoTel"), rs
+								.getString("eImageURL"));
 
-				query = "INSERT INTO Action (uri,label,poiId)"
-						+ "VALUES ('http://fellas.netsons.org/events/event"
-						+ poiId + ".php','Join event','" + poiId + "')";
-				statement = connection.createStatement();
-				statement.execute(query);
+				// if nothing was changed
+				if (oldEvent.geteStartDate().equals(formatDate(eStartDate)))
+					System.out.println("ciao");
+				System.out.println("stesse date: " + oldEvent.geteStartDate()
+						+ " " + formatDate(eStartDate));
+				// if(oldEvent.geteStartTime().equals(eStartTime))
+				System.out.println("stesse ore: " + oldEvent.geteStartTime()
+						+ " " + eStartTime);
+
+				if (oldEvent.geteName().equals(eName)
+						&& oldEvent.geteInfoTel().equals(eInfoTel)
+						&& oldEvent.geteImageURL().equals(eImageURL)
+						&& oldEvent.geteLocation().equals(eLocation)
+						&& oldEvent.geteCategory().equals(eCategory)
+						&& oldEvent.geteStartDate().equals(
+								formatDate(eStartDate))
+						&& oldEvent.geteFinishDate().equals(
+								formatDate(eFinishDate))
+						&& oldEvent.geteStartTime().equals(eStartTime)
+						&& oldEvent.geteFinishTime().equals(eFinishTime))
+
+				{
+					System.out.println("intra");
+					coordinates = address2GEOcoordinates(rs
+							.getString("eLocation"));
+
+					query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
+							+ "VALUES ('"
+							+ eventId
+							+ "','"
+							+ eInfoTel
+							+ "','"
+							+ eImageURL
+							+ "','"
+							+ coordinates[0]
+							+ "','"
+							+ coordinates[1]
+							+ "','"
+							+ eCategory
+							+ "','Starts: "
+							+ eStartDate
+							+ " "
+							+ eStartTime
+							+ "','Ends: "
+							+ eFinishDate
+							+ " " + eFinishTime + "','" + eName + "',3)";
+					statement = connection.createStatement();
+					statement.execute(query);
+					// add actions to POI
+					// retrieve POI id
+					query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+							+ eventId + "'";
+					statement = connection.createStatement();
+					rs = statement.executeQuery(query);
+					rs.next();
+					int poiId = rs.getInt("id");
+
+					query = "INSERT INTO Action (uri,label,poiId)"
+							+ "VALUES ('http://fellas.netsons.org/events/event"
+							+ poiId + ".php','Join event','" + poiId + "')";
+					statement = connection.createStatement();
+					statement.execute(query);
+				} else
+					System.out.println("StartEvent of " + eventId
+							+ " was modified, another timer is running");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
 				closeConnection();
 			}
+		}
+
+		private String dateFormat(String eStartDate2) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
 	class terminatorTask extends TimerTask {
 		private int eventId;
+		private Date eFinishDate;
+		private String eFinishTime;
 
-		public terminatorTask(int eventId) {
+		public terminatorTask(int eventId, Date eFinishDate, String eFinishTime) {
 			this.eventId = eventId;
-
+			this.eFinishDate = eFinishDate;
+			this.eFinishTime = eFinishTime;
 		}
 
 		public void run() {
 			System.out.println("Deleting event " + eventId + " from POI");
+
+			MyEvent oldEvent;
 			try {
 				// delete item from poi table and from actions too
 				// recupera id POI
 				openConnection();
-				query = "SELECT id FROM POI WHERE type=3 AND idItem='"
-						+ eventId + "'";
+
+				// check if eFinishEvent was modified
+				query = "SELECT id, cId, eName, eShortDescription, eLongDescription, eLocation, eCategory, eStartDate, eFinishDate, eStartTime, eFinishTime, eRestriction, eInfoTel, eImageURL FROM events WHERE id="
+						+ eventId + "";
 				statement = connection.createStatement();
 				rs = statement.executeQuery(query);
 				rs.next();
-				int poiId = rs.getInt("id");
+				oldEvent = new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+						.getString("eName"), rs.getString("eShortDescription"),
+						rs.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
+								.getString("eRestriction"), rs
+								.getString("eInfoTel"), rs
+								.getString("eImageURL"));
 
-				query = "DELETE from POI where idItem='" + eventId
-						+ "' AND type=3";
-				statement = connection.createStatement();
-				statement.execute(query);
-				query = "DELETE from Action where poiId='" + poiId + "'";
-				statement = connection.createStatement();
-				statement.execute(query);
+				// if nothing was changed
+				if (oldEvent.geteFinishDate().equals(eFinishDate)
+
+				&& oldEvent.geteFinishTime().equals(eFinishTime)) {
+
+					query = "SELECT id FROM POI WHERE type=3 AND idItem='"
+							+ eventId + "'";
+					statement = connection.createStatement();
+					rs = statement.executeQuery(query);
+					rs.next();
+					int poiId = rs.getInt("id");
+
+					query = "DELETE from POI where idItem='" + eventId
+							+ "' AND type=3";
+					statement = connection.createStatement();
+					statement.execute(query);
+					query = "DELETE from Action where poiId='" + poiId + "'";
+					statement = connection.createStatement();
+					statement.execute(query);
+				} else
+					System.out.println("FinishEvent of " + eventId
+							+ " was modified, another timer is running");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -687,8 +777,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	private String fomatDate(Date date) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+	private String formatDate(Date date) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		return new StringBuilder(dateFormat.format(date)).toString();
 	}
 
@@ -696,16 +786,40 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			throws RemoteException {
 		if (!clubAccess(cName, psw))
 			return false;
+		Date today;
+
+		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		Date dayOfStart = null;
+		Date dayOfFinish = null;
+		long startDifference;
+		long finishDifference;
+
+		MyEvent oldEvent;
 		try {
 			openConnection();
+			// retrieve start and end event
+			query = "SELECT id, cId, eName, eShortDescription, eLongDescription, eLocation, eCategory, eStartDate, eFinishDate, eStartTime, eFinishTime, eRestriction, eInfoTel, eImageURL FROM events WHERE id="
+					+ event.getId() + "";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			oldEvent = new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+					.getString("eName"), rs.getString("eShortDescription"), rs
+					.getString("eLongDescription"), rs.getString("eLocation"),
+					rs.getString("eCategory"), rs.getDate("eStartDate"), rs
+							.getDate("eFinishDate"),
+					rs.getString("eStartTime"), rs.getString("eFinishTime"), rs
+							.getString("eRestriction"), rs
+							.getString("eInfoTel"), rs.getString("eImageURL"));
+
 			query = "UPDATE events SET " + "cId='" + event.getcId() + "',"
 					+ "eName='" + event.geteName() + "',"
 					+ "eShortDescription='" + event.geteShortDescription()
 					+ "'," + "eLongDescription='" + event.geteLongDescription()
 					+ "'," + "eLocation='" + event.geteLocation() + "',"
 					+ "eCategory='" + event.geteCategory() + "',"
-					+ "eStartDate='" + fomatDate(event.geteStartDate()) + "',"
-					+ "eFinishDate='" + fomatDate(event.geteFinishDate())
+					+ "eStartDate='" + formatDate(event.geteStartDate()) + "',"
+					+ "eFinishDate='" + formatDate(event.geteFinishDate())
 					+ "'," + "eStartTime='" + event.geteStartTime() + "',"
 					+ "eFinishTime='" + event.geteFinishTime() + "',"
 					+ "eRestriction='" + event.geteRestriction()
@@ -719,19 +833,79 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			 * tabella: - eInfoTel: che è il telefono dell'organizzatore
 			 * dell'evento (può essere diverso dal club) - eImageURL
 			 */
-			String[] coordinates = address2GEOcoordinates(event.geteLocation());
-			query = "UPDATE POI SET " + "title='" + event.geteName() + "',"
-					+ "attribution='" + event.geteInfoTel() + "',"
-					+ "imageURL='" + event.geteImageURL() + "'," + "lat='"
-					+ coordinates[0] + "'," + "lon='" + coordinates[1] + "',"
-					+ "line2='" + event.geteCategory() + "',"
-					+ "line3='Starts: " + fomatDate(event.geteStartDate())
-					+ " " + event.geteStartTime() + "'," + "line4='Ends: "
-					+ fomatDate(event.geteFinishDate()) + " "
-					+ event.geteFinishTime() + "'" + " WHERE idItem='"
-					+ event.getId() + "' AND type=3";
-			statement = connection.createStatement();
-			statement.execute(query);
+
+			// if something is changed start starterTask (if it is necessary)
+			if (!event.geteName().equals(oldEvent.geteName())
+					|| !event.geteInfoTel().equals(oldEvent.geteInfoTel())
+					|| !event.geteImageURL().equals(oldEvent.geteImageURL())
+					|| !event.geteLocation().equals(oldEvent.geteLocation())
+					|| !event.geteCategory().equals(oldEvent.geteCategory())
+					|| !event.geteStartDate().equals(oldEvent.geteStartDate())
+					|| !event.geteFinishDate()
+							.equals(oldEvent.geteFinishDate())
+					|| !event.geteStartTime().equals(oldEvent.geteStartTime())
+					|| !event.geteFinishTime()
+							.equals(oldEvent.geteFinishTime())) {
+				System.out.println(event.geteStartDate() + " "
+						+ event.geteStartTime());
+
+				try {
+					dayOfStart = df.parse(formatDate(event.geteStartDate())
+							+ " " + event.geteStartTime());
+					dayOfFinish = df.parse(formatDate(event.geteFinishDate())
+							+ " " + event.geteFinishTime());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				String[] coordinates = address2GEOcoordinates(event
+						.geteLocation());
+				today = new Date();
+				startDifference = dayOfStart.getTime() - today.getTime();
+
+				if (startDifference < 7 * 60 * 60 * 24 * 1000) {
+					System.out.println("Immediatily updating event "
+							+ event.getId() + " to POI");
+
+					query = "UPDATE POI SET " + "title='" + event.geteName()
+							+ "'," + "attribution='" + event.geteInfoTel()
+							+ "'," + "imageURL='" + event.geteImageURL() + "',"
+							+ "lat='" + coordinates[0] + "'," + "lon='"
+							+ coordinates[1] + "'," + "line2='"
+							+ event.geteCategory() + "'," + "line3='Starts: "
+							+ formatDate(event.geteStartDate()) + " "
+							+ event.geteStartTime() + "'," + "line4='Ends: "
+							+ formatDate(event.geteFinishDate()) + " "
+							+ event.geteFinishTime() + "'" + " WHERE idItem='"
+							+ event.getId() + "' AND type=3";
+					statement = connection.createStatement();
+					statement.execute(query);
+				} else {
+					System.out.println("Starting starterTask for event: "
+							+ event.getId());
+					startDifference = startDifference - 7 * 60 * 60 * 24 * 1000;
+					Timer StartTimer = new Timer();
+					StartTimer.schedule(new starterTask(event.getId(), event
+							.geteInfoTel(), event.geteImageURL(), event
+							.geteLocation(), event.geteCategory(), event
+							.geteStartDate(), event.geteFinishDate(), event
+							.geteStartTime(), event.geteFinishTime(), event
+							.geteName()), startDifference);
+				}
+				// Start terminatorEvent (if and only if event end was modified)
+				if (!event.geteFinishDate().equals(oldEvent.geteFinishDate())
+						|| !event.geteFinishTime().equals(
+								oldEvent.geteFinishTime())) {
+					System.out.println("Starting terminatorTask for event: "
+							+ event.getId());
+					finishDifference = dayOfFinish.getTime() - today.getTime();
+					Timer EndTimer = new Timer();
+					EndTimer.schedule(new terminatorTask(event.getId(), event
+							.geteFinishDate(), event.geteFinishTime()),
+							finishDifference);
+				}
+
+			}
+
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1071,7 +1245,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		String eName = new String();
 		String start = new String();
 		String temp2split = new String();
-		String[] splittedString=new String[3];
+		String[] splittedString = new String[3];
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
@@ -1092,9 +1266,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			eShortDescription = rs.getString("eShortDescription");
 			eName = rs.getString("eName");
 			temp2split = rs.getString("eStartTime");
-			splittedString=temp2split.split(":");
-			start = rs.getString("eStartDate") + " "
-					+ splittedString[0]+":"+splittedString[1];
+			splittedString = temp2split.split(":");
+			start = rs.getString("eStartDate") + " " + splittedString[0] + ":"
+					+ splittedString[1];
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "GETDESCRIPTIONEVENT ERROR%";
@@ -1697,14 +1871,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							StartTimer.schedule(new starterTask(primaryRs
 									.getInt("id"), primaryRs
 									.getString("eInfoTel"), primaryRs
-									.getString("eImageURL"), coordinates,
-									primaryRs.getString("eCategory"), primaryRs
-											.getString("eStartDate"), primaryRs
-											.getString("eFinishDate"),
-									primaryRs.getString("eStartTime"),
-									primaryRs.getString("eFinishTime"),
-									primaryRs.getString("eName")),
-									startDifference);
+									.getString("eImageURL"), primaryRs
+									.getString("eLocation"), primaryRs
+									.getString("eCategory"), primaryRs
+									.getDate("eStartDate"), primaryRs
+									.getDate("eFinishDate"), primaryRs
+									.getString("eStartTime"), primaryRs
+									.getString("eFinishTime"), primaryRs
+									.getString("eName")), startDifference);
 						}
 
 						// Start terminatorEvent
@@ -1715,7 +1889,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								- today.getTime();
 						Timer EndTimer = new Timer();
 						EndTimer.schedule(new terminatorTask(primaryRs
-								.getInt("id")), finishDifference);
+								.getInt("id"),
+								primaryRs.getDate("eFinishDate"), primaryRs
+										.getString("eFinishTime")),
+								finishDifference);
 						System.out
 								.println("___________________________________________________________");
 					}
