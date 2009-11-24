@@ -839,6 +839,31 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "' WHERE id=" + event.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
+			
+			// check if there are user subscripted to that event
+			query = "SELECT uId from subscription  where eId='" + event.getId() + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			// rs.next();
+			String criterion = "";
+			while (rs.next()) {
+				criterion += "id='" + rs.getInt("uId") + "' OR ";
+			}
+			// send an update message to all users that have joined the event
+			if (criterion != "") {
+				query = "SELECT cName from clubs  where id='" + event.getcId() + "'";
+				statement = connection.createStatement();
+				rs = statement.executeQuery(query);
+				rs.next();
+				String message = "Update event " + event.geteName()
+					+ "(" + event.getId() + ") "
+					+ "of " + rs.getString("cName")  
+					+ ": " + formatDate(event.geteStartDate())
+					+ " " + event.geteStartTime()
+					+ " " + event.geteShortDescription();		
+				spamMobile(cName, psw, message, criterion.substring(0,
+						criterion.length() - 4));
+			}
 			// Update POI table too
 			/*
 			 * note: in poi table, id has to be the same to event id and action
