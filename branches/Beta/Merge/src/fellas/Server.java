@@ -18,7 +18,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -253,13 +252,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public LinkedList<MyEvent> getClubEventsList(String cName, String psw,
-			int cId) throws RemoteException {
+			int cId, String table) throws RemoteException {
 		if (!clubAccess(cName, psw))
 			return null;
 		try {
 			openConnection();
 			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
-			query = "SELECT * FROM events WHERE cId=" + cId;
+			query = "SELECT * FROM " + table + " WHERE cId=" + cId;
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
@@ -285,10 +284,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public MyEvent getEvent(int id) {
+	public MyEvent getEvent(int id, String table) {
 		try {
 			openConnection();
-			query = "SELECT * FROM events WHERE id=" + id + " LIMIT 1";
+			query = "SELECT * FROM " + table + " WHERE id=" + id
+					+ " ORDER BY eStartDate DESC LIMIT 1";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next()) {
@@ -686,7 +686,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							+ eStartTime
 							+ "','Ends: "
 							+ formatDate(eFinishDate)
-							+ " " + eFinishTime + "','" + eName + "',3)";
+							+ " "
+							+ eFinishTime + "','" + eName + "',3)";
 					statement = connection.createStatement();
 					statement.execute(query);
 					// add actions to POI
@@ -774,7 +775,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					query = "DELETE from Action where poiId='" + poiId + "'";
 					statement = connection.createStatement();
 					statement.execute(query);
-					System.out.println("Event " + eventId + " has been deleted from POI");
+					System.out.println("Event " + eventId
+							+ " has been deleted from POI");
 				} else
 					System.out
 							.println("FinishEvent of "

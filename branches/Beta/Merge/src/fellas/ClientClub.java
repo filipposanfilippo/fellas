@@ -36,7 +36,7 @@ public class ClientClub extends UnicastRemoteObject {
 			String cName, String psw, String imgLocalURL)
 			throws RemoteException {
 
-		String ext = "jpg";//imgLocalURL.split(".")[imgLocalURL.split(".").length];
+		String ext = "jpg";// imgLocalURL.split(".")[imgLocalURL.split(".").length];
 		System.out.println("len " + imgLocalURL.split(".").length);
 		System.out.println("URL " + imgLocalURL);
 		System.out.println("ext " + ext);
@@ -87,11 +87,20 @@ public class ClientClub extends UnicastRemoteObject {
 
 	public LinkedList<MyEvent> getClubEventsList() throws RemoteException {
 		return server.getClubEventsList(clubLogged.getcName(), clubLogged
-				.getPsw(), clubLogged.getId());
+				.getPsw(), clubLogged.getId(), "events");
+	}
+
+	public LinkedList<MyEvent> getOldClubEventsList() throws RemoteException {
+		return server.getClubEventsList(clubLogged.getcName(), clubLogged
+				.getPsw(), clubLogged.getId(), "old_events");
 	}
 
 	public MyEvent getEvent(int id) throws RemoteException {
-		return server.getEvent(id);
+		return server.getEvent(id, "events");
+	}
+
+	public MyEvent getOldEvent(int id) throws RemoteException {
+		return server.getEvent(id, "old_events");
 	}
 
 	public boolean createEvent(String eName, String eShortDescription,

@@ -18,10 +18,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -107,14 +104,27 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eRemoteImageURL;
 	JButton selectEImgB;
 	JLabel eImg;
-	JPanel centerEvP;
 
 	JButton saveEvB;
 	JButton modifyEvB;
 	JButton deleteEvB;
 
 	JList eventJList2;
+	// -------------- Old Events Items ----------------------------
+	JTextField eOName;
+	JTextField eOShortDescription;
+	JTextArea eOLongDescription;
+	JTextField eOLocation;
+	JTextField eOCategory;
+	JDateChooser eOStartDate;
+	JDateChooser eOFinishDate;
+	JTextField eOStartTime;
+	JTextField eOFinishTime;
+	JTextField eORestriction;
+	JTextField eOInfoTel;
+	JLabel eOImg;
 
+	JList eventJList3;
 	// -------------- Profile Items ---------------------------
 	JTextField nameR;
 	JTextField surnameR;
@@ -224,13 +234,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		JPanel leftUpP = new JPanel();
 		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.Y_AXIS));
 
-		leftUpP
-				.add(new JLabel(
-						"Planned Events                                 "
-								+ "                                    Users for Selected Event"));
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
 
-		eventJList = createEventList();
+		eventJList = createEventList(getEventsArray());
 		JScrollPane eventScrollPane = new JScrollPane(eventJList);
 		leftDownP.add(eventScrollPane);
 
@@ -296,6 +302,21 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			// TODO add error alert
 			ex.printStackTrace();
 		}
+		return doArray(eventsList);
+	}
+
+	private String[] getOldEventsArray() {
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		try {
+			eventsList = currentClub.getOldClubEventsList();
+		} catch (Exception ex) {
+			// TODO add error alert
+			ex.printStackTrace();
+		}
+		return doArray(eventsList);
+	}
+
+	private String[] doArray(LinkedList<MyEvent> eventsList) {
 		if (eventsList != null) {
 			String[] events = new String[eventsList.size()];
 			int i = 0;
@@ -327,13 +348,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return new String[0];
 	}
 
-	private JList createEventList() {
+	private JList createEventList(String[] eventArray) {
 		JList eJList = new JList(new DefaultListModel());
 		eJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		eJList.setBackground(new Color(153, 204, 255));
 		eJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
 		eJList.addListSelectionListener(this);
-		populateList(eJList, getEventsArray());
+		populateList(eJList, eventArray);
 		return eJList;
 	}
 
@@ -343,26 +364,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		for (String e : elements) {
 			model.addElement(e);
 		}
-	}
-
-	private boolean isDateValid(String date) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-		Date testDate = null;
-		try {
-			testDate = df.parse(date);
-		} catch (ParseException e) {
-			return false;
-		}
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		if (cal.getTime().after(testDate))
-			return false;
-		if (!df.format(testDate).equals(date))
-			return false;
-		return true;
 	}
 
 	private void cleanBoxes() {
@@ -390,7 +391,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
-	private void refreshImage(String imgURL) {
+	private void refreshImage(JLabel eImg, String imgURL) {
 		try {
 			if (imgURL.equals("")) {
 				eImg.setIcon(new ImageIcon("default.jpg"));
@@ -418,12 +419,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
 		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 
-		eventJList2 = createEventList();
+		eventJList2 = createEventList(getEventsArray());
 		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
 		leftEvP.add(eventScrollPane);
 
 		// ------------------------ CENTER ------------------------------------
-		centerEvP = new JPanel();
+		JPanel centerEvP = new JPanel();
 		centerEvP.setBorder(BorderFactory.createTitledBorder(""));
 		// centerEvP.setLayout(new BoxLayout(centerEvP, BoxLayout.Y_AXIS));
 
@@ -532,6 +533,98 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eventsP.add(rightEvP);
 		eventsP.setVisible(true);
 		return eventsP;
+	}
+
+	// ******************************************************************************
+	// Old Event Panel
+	// ******************************************************************************
+
+	private JPanel createOldEventsPanel() {
+		JPanel oldEventsP = new JPanel();
+		oldEventsP.setLayout(new GridLayout(1, 3));
+
+		// ------------------------ LEFT ------------------------------------
+		JPanel leftOldEvP = new JPanel();
+		leftOldEvP.setBorder(BorderFactory.createTitledBorder(""));
+		leftOldEvP.setLayout(new BoxLayout(leftOldEvP, BoxLayout.Y_AXIS));
+
+		eventJList3 = createEventList(getOldEventsArray());
+		JScrollPane eventScrollPane = new JScrollPane(eventJList3);
+		leftOldEvP.add(eventScrollPane);
+
+		// ------------------------ RIGHT ------------------------------------
+		JPanel rightOldEvP = new JPanel(new SpringLayout());
+		rightOldEvP.setBorder(BorderFactory.createTitledBorder(""));
+		// rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
+
+		rightOldEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
+		eOName = new JTextField();
+		eOName.setEditable(false);
+		rightOldEvP.add(eOName);
+
+		rightOldEvP.add(new JLabel("Location:", JLabel.TRAILING));
+		eOLocation = new JTextField();
+		eOLocation.setEditable(false);
+		rightOldEvP.add(eOLocation);
+
+		rightOldEvP.add(new JLabel("Event Category:", JLabel.TRAILING));
+		eOCategory = new JTextField();
+		eOCategory.setEditable(false);
+		rightOldEvP.add(eOCategory);
+
+		rightOldEvP.add(new JLabel("Starting Date:", JLabel.TRAILING));
+		eOStartDate = new JDateChooser(new Date());
+		eOStartDate.setDateFormatString("yyyy/MM/dd");
+		eOStartDate.setEnabled(false);
+		rightOldEvP.add(eOStartDate);
+
+		rightOldEvP.add(new JLabel("Finishing Date:", JLabel.TRAILING));
+		eOFinishDate = new JDateChooser(new Date());
+		eOFinishDate.setDateFormatString("yyyy/MM/dd");
+		eOFinishDate.setEnabled(false);
+		eOFinishDate.setMinSelectableDate(new Date());
+		rightOldEvP.add(eOFinishDate);
+
+		rightOldEvP
+				.add(new JLabel("Starting Time: (hh:mm:ss)", JLabel.TRAILING));
+		eOStartTime = new JTextField("00:00:00");
+		eOStartTime.setEditable(false);
+		rightOldEvP.add(eOStartTime);
+
+		rightOldEvP.add(new JLabel("Finishing Time: (hh:mm:ss)",
+				JLabel.TRAILING));
+		eOFinishTime = new JTextField("00:00:00");
+		eOFinishTime.setEditable(false);
+		rightOldEvP.add(eOFinishTime);
+
+		rightOldEvP.add(new JLabel("Restriction:", JLabel.TRAILING));
+		eORestriction = new JTextField();
+		eORestriction.setEditable(false);
+		rightOldEvP.add(eORestriction);
+
+		rightOldEvP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
+		eOInfoTel = new JTextField();
+		eOInfoTel.setEditable(false);
+		rightOldEvP.add(eOInfoTel);
+
+		rightOldEvP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
+		eOShortDescription = new JTextField();
+		eOShortDescription.setEditable(false);
+		rightOldEvP.add(eOShortDescription);
+
+		rightOldEvP.add(new JLabel("Long Description:", JLabel.TRAILING));
+		eOLongDescription = new JTextArea(5, 30);
+		eOLongDescription.setLineWrap(true);
+		eOLongDescription.setEditable(false);
+		JScrollPane descrScrollPane = new JScrollPane(eOLongDescription);
+		rightOldEvP.add(descrScrollPane);
+
+		SpringUtilities.makeCompactGrid(rightOldEvP, 11, 2, 6, 6, 6, 6);
+
+		oldEventsP.add(leftOldEvP);
+		oldEventsP.add(rightOldEvP);
+		oldEventsP.setVisible(true);
+		return oldEventsP;
 	}
 
 	// ******************************************************************************
@@ -663,6 +756,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		tabPanel.add("Message", createMessagePanel());
 		tabPanel.add("Events", createEventsPanel());
 		tabPanel.add("Profile", createProfilePanel());
+		tabPanel.add("Old Events", createOldEventsPanel());
 		tabPanel.addFocusListener(this);
 
 		mainFrame.pack();
@@ -791,7 +885,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eRemoteImageURL.setText("events/"
 						+ currentClub.getClub().getId() + "/"
 						+ eStartDate.getDate().getTime() + "." + ext);
-				refreshImage(eLocalImageURL.getText());
+				refreshImage(eImg, eLocalImageURL.getText());
 			}
 		}
 		if (event == saveEvB) {
@@ -831,6 +925,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 				populateList(eventJList, getEventsArray());
 				populateList(eventJList2, getEventsArray());
+				populateList(eventJList3, getOldEventsArray());
 
 				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
 						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
@@ -1030,8 +1125,34 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eInfoTel.setText(event.geteInfoTel());
 				eRemoteImageURL.setText(event.geteImageURL());
 				eLocalImageURL.setText("");
-				refreshImage(event.geteImageURL());
+				refreshImage(eImg, event.geteImageURL());
 				eLongDescription.setText(event.geteLongDescription());
+			} catch (RemoteException e1) {
+				// TODO add error messaggio che dice che l'evento è stato
+				// eliminato da qualcuno
+				e1.printStackTrace();
+			}
+		}
+		if (e.getSource() == eventJList3
+				&& eventJList3.getSelectedValue() != null) {
+			try {
+				int sel = Integer.parseInt(eventJList3.getSelectedValue()
+						.toString().split("]")[0]);
+				MyEvent event = currentClub.getOldEvent(sel);
+
+				eOName.setText(event.geteName());
+				eOShortDescription.setText(event.geteShortDescription());
+				eOLongDescription.setText(event.geteLongDescription());
+				eOLocation.setText(event.geteLocation());
+				eOCategory.setText(event.geteCategory());
+				eOStartDate.setDate(event.geteStartDate());
+				eOFinishDate.setDate(event.geteFinishDate());
+				eOStartTime.setText(event.geteStartTime());
+				eOFinishTime.setText(event.geteFinishTime());
+				eORestriction.setText(event.geteRestriction());
+				eOInfoTel.setText(event.geteInfoTel());
+				refreshImage(eOImg, event.geteImageURL());
+				eOLongDescription.setText(event.geteLongDescription());
 			} catch (RemoteException e1) {
 				// TODO add error
 				e1.printStackTrace();
