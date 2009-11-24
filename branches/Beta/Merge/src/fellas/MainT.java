@@ -391,21 +391,21 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
-	private void refreshImage(JLabel eImg, String imgURL) {
+	private void refreshImage(JLabel imglabel, String imgURL) {
 		try {
 			if (imgURL.equals("")) {
-				eImg.setIcon(new ImageIcon("default.jpg"));
+				imglabel.setIcon(new ImageIcon("default.jpg"));
 			} else {
 				if (imgURL.startsWith("C:")) {
-					eImg.setIcon(new ImageIcon(imgURL));
+					imglabel.setIcon(new ImageIcon(imgURL));
 				} else {
 					URL url = new URL(_URL + imgURL);
 					ImageIcon ic = new ImageIcon(ImageIO.read(url));
-					eImg.setIcon(ic);
+					imglabel.setIcon(ic);
 				}
 			}
 		} catch (IOException e) {
-			eImg.setIcon(new ImageIcon("default.jpg"));
+			imglabel.setIcon(new ImageIcon("default.jpg"));
 			e.printStackTrace();
 		}
 	}
@@ -436,11 +436,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eLocalImageURL = new JTextField();
 		eLocalImageURL.setPreferredSize(new Dimension(300, 20));
 		eLocalImageURL.setEditable(false);
+		eLocalImageURL.setVisible(false);
 		centerEvP.add(eLocalImageURL);
 
 		eRemoteImageURL = new JTextField();
 		eRemoteImageURL.setPreferredSize(new Dimension(300, 20));
 		eRemoteImageURL.setEditable(false);
+		eRemoteImageURL.setVisible(false);
 		centerEvP.add(eRemoteImageURL);
 
 		selectEImgB = new JButton("Select Event Image");
@@ -553,73 +555,81 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftOldEvP.add(eventScrollPane);
 
 		// ------------------------ RIGHT ------------------------------------
-		JPanel rightOldEvP = new JPanel(new SpringLayout());
-		rightOldEvP.setBorder(BorderFactory.createTitledBorder(""));
-		// rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
+		JPanel rightOldEvP = new JPanel();
 
-		rightOldEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
+		JPanel oldEvDataP = new JPanel(new SpringLayout());
+
+		oldEvDataP.add(new JLabel("Event Name:", JLabel.TRAILING));
 		eOName = new JTextField();
 		eOName.setEditable(false);
-		rightOldEvP.add(eOName);
+		oldEvDataP.add(eOName);
 
-		rightOldEvP.add(new JLabel("Location:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Location:", JLabel.TRAILING));
 		eOLocation = new JTextField();
 		eOLocation.setEditable(false);
-		rightOldEvP.add(eOLocation);
+		oldEvDataP.add(eOLocation);
 
-		rightOldEvP.add(new JLabel("Event Category:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Event Category:", JLabel.TRAILING));
 		eOCategory = new JTextField();
 		eOCategory.setEditable(false);
-		rightOldEvP.add(eOCategory);
+		oldEvDataP.add(eOCategory);
 
-		rightOldEvP.add(new JLabel("Starting Date:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Starting Date:", JLabel.TRAILING));
 		eOStartDate = new JDateChooser(new Date());
 		eOStartDate.setDateFormatString("yyyy/MM/dd");
 		eOStartDate.setEnabled(false);
-		rightOldEvP.add(eOStartDate);
+		oldEvDataP.add(eOStartDate);
 
-		rightOldEvP.add(new JLabel("Finishing Date:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Finishing Date:", JLabel.TRAILING));
 		eOFinishDate = new JDateChooser(new Date());
 		eOFinishDate.setDateFormatString("yyyy/MM/dd");
 		eOFinishDate.setEnabled(false);
 		eOFinishDate.setMinSelectableDate(new Date());
-		rightOldEvP.add(eOFinishDate);
+		oldEvDataP.add(eOFinishDate);
 
-		rightOldEvP
+		oldEvDataP
 				.add(new JLabel("Starting Time: (hh:mm:ss)", JLabel.TRAILING));
 		eOStartTime = new JTextField("00:00:00");
 		eOStartTime.setEditable(false);
-		rightOldEvP.add(eOStartTime);
+		oldEvDataP.add(eOStartTime);
 
-		rightOldEvP.add(new JLabel("Finishing Time: (hh:mm:ss)",
-				JLabel.TRAILING));
+		oldEvDataP
+				.add(new JLabel("Finishing Time: (hh:mm:ss)", JLabel.TRAILING));
 		eOFinishTime = new JTextField("00:00:00");
 		eOFinishTime.setEditable(false);
-		rightOldEvP.add(eOFinishTime);
+		oldEvDataP.add(eOFinishTime);
 
-		rightOldEvP.add(new JLabel("Restriction:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Restriction:", JLabel.TRAILING));
 		eORestriction = new JTextField();
 		eORestriction.setEditable(false);
-		rightOldEvP.add(eORestriction);
+		oldEvDataP.add(eORestriction);
 
-		rightOldEvP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
 		eOInfoTel = new JTextField();
 		eOInfoTel.setEditable(false);
-		rightOldEvP.add(eOInfoTel);
+		oldEvDataP.add(eOInfoTel);
 
-		rightOldEvP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
 		eOShortDescription = new JTextField();
 		eOShortDescription.setEditable(false);
-		rightOldEvP.add(eOShortDescription);
+		oldEvDataP.add(eOShortDescription);
 
-		rightOldEvP.add(new JLabel("Long Description:", JLabel.TRAILING));
+		oldEvDataP.add(new JLabel("Long Description:", JLabel.TRAILING));
 		eOLongDescription = new JTextArea(5, 30);
 		eOLongDescription.setLineWrap(true);
 		eOLongDescription.setEditable(false);
 		JScrollPane descrScrollPane = new JScrollPane(eOLongDescription);
-		rightOldEvP.add(descrScrollPane);
+		oldEvDataP.add(descrScrollPane);
 
-		SpringUtilities.makeCompactGrid(rightOldEvP, 11, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(oldEvDataP, 11, 2, 6, 6, 6, 6);
+		rightOldEvP.add(oldEvDataP);
+
+		JPanel oldEvImgP = new JPanel();
+
+		eOImg = new JLabel(new ImageIcon("default.jpg"));
+		eOImg.setHorizontalAlignment(SwingConstants.CENTER);
+		oldEvImgP.add(eOImg);
+		rightOldEvP.add(oldEvImgP);
 
 		oldEventsP.add(leftOldEvP);
 		oldEventsP.add(rightOldEvP);
@@ -632,12 +642,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 
 	private JPanel createProfilePanel() {
+		JPanel profileP = new JPanel();
+		profileP.setLayout(new BoxLayout(profileP, BoxLayout.X_AXIS));
+
 		JPanel leftProfileP = new JPanel();
 		leftProfileP.setLayout(new BoxLayout(leftProfileP, BoxLayout.Y_AXIS));
 		leftProfileP.setBorder(BorderFactory.createTitledBorder("Club Data"));
 
 		JPanel dataP = new JPanel(new SpringLayout());
-		JPanel imgP = new JPanel();
 		JPanel buttonsP = new JPanel();
 		JPanel statusP = new JPanel();
 		Club clubData = new Club();
@@ -672,6 +684,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		modifyProfB.addActionListener(this);
 		unregProfB = new JButton("Unregister Club");
 		unregProfB.addActionListener(this);
+		selectCImgB = new JButton("Select Club Image");
+		selectCImgB.addActionListener(this);
 
 		JLabel lb;
 		lb = new JLabel("Owner Name:", JLabel.TRAILING);
@@ -722,9 +736,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		SpringUtilities.makeCompactGrid(dataP, 9, 2, 6, 6, 6, 6);
 		leftProfileP.add(dataP);
 
-		buttonsP.add(new JLabel("", JLabel.TRAILING));
 		buttonsP.add(modifyProfB);
 		buttonsP.add(unregProfB);
+		buttonsP.add(selectCImgB);
 		leftProfileP.add(buttonsP);
 
 		profileStatus = new JLabel();
@@ -732,8 +746,31 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		statusP.add(profileStatus);
 		leftProfileP.add(statusP);
 
-		leftProfileP.setVisible(true);
-		return leftProfileP;
+		// ------------------ RIGHT PROFILE PANEL --------------------------
+		JPanel rightProfileP = new JPanel();
+
+		rightProfileP.setBorder(BorderFactory.createTitledBorder(""));
+
+		cImg = new JLabel(new ImageIcon("default.jpg"));
+		// img.setPreferredSize(new Dimension(50, 50));
+		cImg.setHorizontalAlignment(SwingConstants.CENTER);
+		rightProfileP.add(cImg);
+
+		cLocalImageURL = new JTextField();
+		cLocalImageURL.setPreferredSize(new Dimension(300, 20));
+		cLocalImageURL.setEditable(false);
+		cLocalImageURL.setVisible(false);
+		rightProfileP.add(cLocalImageURL);
+
+		cRemoteImageURL = new JTextField();
+		cRemoteImageURL.setPreferredSize(new Dimension(300, 20));
+		cRemoteImageURL.setEditable(false);
+		cRemoteImageURL.setVisible(false);
+		rightProfileP.add(cRemoteImageURL);
+
+		profileP.add(leftProfileP);
+		profileP.add(rightProfileP);
+		return profileP;
 	}
 
 	// ******************************************************************************
@@ -886,6 +923,39 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 						+ currentClub.getClub().getId() + "/"
 						+ eStartDate.getDate().getTime() + "." + ext);
 				refreshImage(eImg, eLocalImageURL.getText());
+			}
+		}
+		if (event == selectCImgB) {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setCurrentDirectory(new java.io.File("."));
+			chooser.setDialogTitle("Choose Event Image");
+			FileFilter filter = new FileFilter() {
+				public boolean accept(File f) {
+					if (f.getName().endsWith(".jpg")
+							|| f.getName().endsWith(".jpeg")
+							|| f.getName().endsWith(".gif")
+							|| f.getName().endsWith(".png"))
+						return true;
+					return false;
+				}
+
+				public String getDescription() {
+					return "jpg,jpeg,gif,png";
+				}
+			};
+			chooser.setFileFilter(filter);
+			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
+				cLocalImageURL.setText(chooser.getSelectedFile()
+						.getAbsolutePath());
+				// TODO controlla che succede se inserisco stringa vuota al
+				// posto dell'img.
+				// String[] extSplit = eLocalImageURL.getText().split(".");
+				String ext = "jpg";// = extSplit[extSplit.length - 1];
+				// TODO rivedi percorso...lasci non fatto per ritardo cronico!
+				cRemoteImageURL.setText("clubs/"
+						+ currentClub.getClub().getId() + "/"
+						+ eStartDate.getDate().getTime() + "." + ext);
+				refreshImage(cImg, cLocalImageURL.getText());
 			}
 		}
 		if (event == saveEvB) {
