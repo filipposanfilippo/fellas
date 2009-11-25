@@ -80,10 +80,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String psw, String cImageURL) throws RemoteException {
-		openConnection();
-		if (isClubExisting(oName))
-			return false;
 		try {
+			openConnection();
+			if (isClubExisting(oName))
+				return false;
 			// check if there isn't another club with the same name and address
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND cAddress='" + cAddress + "'";
@@ -162,10 +162,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean updateClubData(String cName, String psw, Club club)
 			throws RemoteException {
 		String[] coordinates = new String[2];
-		if (!clubAccess(cName, psw))
-			return false;
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return false;
 			query = "UPDATE clubs SET oName='" + club.getoName()
 					+ "', oSurname='" + club.getoSurname() + "', cAddress='"
 					+ club.getcAddress() + "', cTel='" + club.getcTel()
@@ -195,10 +195,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	@Override
 	public boolean clubAccess(String cName, String psw) throws RemoteException {
+		//BE CAREFUL: before calling this method, you need to open the connection
 		boolean res = false;
 		System.out.println(cName + " : " + psw);
 		try {
-			openConnection();
 			query = "SELECT psw FROM clubs WHERE cName='" + cName
 					+ "' AND psw = '" + psw + "'";
 			statement = connection.createStatement();
@@ -208,8 +208,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		} finally {
-			closeConnection();
 		}
 	}
 
@@ -228,10 +226,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public Club getClubData(String cName, String psw) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty club
-		if (!clubAccess(cName, psw))
-			return new Club();
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return new Club();
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -253,10 +251,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public LinkedList<MyEvent> getClubEventsList(String cName, String psw,
 			int cId, String table) throws RemoteException {
-		if (!clubAccess(cName, psw))
-			return null;
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return null;
 			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
 			query = "SELECT * FROM " + table + " WHERE cId=" + cId;
 			statement = connection.createStatement();
@@ -320,10 +318,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public LinkedList<User> getEventUsersList(String cName, String psw,
 			int eventId) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty list
-		if (!clubAccess(cName, psw))
-			return null;
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return null;
 			LinkedList<User> usersList = new LinkedList<User>();
 			query = "SELECT * FROM users RIGHT OUTER JOIN subscription "
 					+ "ON users.id = subscription.uId "
@@ -416,6 +414,26 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return -1;
 		}
 	}
+	
+	// BE CAREFUL: before calling this method, you need to open connection
+	//TODO IMPLEMENT THIS METHOD AND CORRECT IN ALL CLUB METHODS
+	public int getClubId(String cUsername) {
+		int userId;
+		try {
+			// openConnection();
+			query = "SELECT id FROM clubs WHERE cUserName='" + cUsername + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			userId = rs.getInt("id");
+			// closeConnection();
+			return userId;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// closeConnection();
+			return -1;
+		}
+	}
 
 	// BE CAREFUL: before calling this method, you need to open connection
 	public boolean isUserExisting(String uTel) {
@@ -455,8 +473,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 		String formattedStartDate = formatDate(eStartDate);
 		String formattedFinishDate = formatDate(eFinishDate);
-		if (!clubAccess(cName, psw))
-			return false;
 		try {
 			// TODO prima di inserire controlla che eName non esista già
 			/*
@@ -465,6 +481,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			 * statement.executeQuery(query); if (rs.next()) return false;
 			 */
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return false;
 			query = "INSERT INTO events (cId,eName,eShortDescription,eLongDescription,"
 					+ "eLocation,eCategory,eStartDate,eFinishDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
 					+ "VALUES ('"
@@ -837,19 +855,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public boolean updateEvent(String cName, String psw, MyEvent event)
 			throws RemoteException {
-		if (!clubAccess(cName, psw))
-			return false;
 		Date today;
-
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date dayOfStart = null;
 		Date dayOfFinish = null;
 		long startDifference;
 		long finishDifference;
-
 		MyEvent oldEvent;
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return false;
 			// retrieve start and end event
 			query = "SELECT id, cId, eName, eShortDescription, eLongDescription, eLocation, eCategory, eStartDate, eFinishDate, eStartTime, eFinishTime, eRestriction, eInfoTel, eImageURL FROM events WHERE id="
 					+ event.getId() + "";
@@ -1059,10 +1075,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public boolean deleteEvent(String cName, String psw, int eventId)
 			throws RemoteException {
-		if (!clubAccess(cName, psw))
-			return false;
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return false;
 			// check if there are user subscripted to that event
 			query = "SELECT uId from subscription  where eId='" + eventId + "'";
 			statement = connection.createStatement();
@@ -1636,10 +1652,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String criterion) throws RemoteException {
 		String answer = "";
 		// TODO be careful: if cName & psw are wrong we return an empty string
-		if (!clubAccess(cName, psw))
-			return "";
 		try {
 			openConnection();
+			if (!clubAccess(cName, psw))
+				return "";
 			query = "SELECT uTel FROM users WHERE " + criterion + "";
 			System.out.println("SPAM QUERY: " + query);
 			statement = connection.createStatement();
@@ -1844,6 +1860,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			// select id club
 			openConnection();
+			//TODO USARE GETCLUBID QUANDO SARA' IMPLEMENTATA
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND psw='" + psw + "'";
 			statement = connection.createStatement();
