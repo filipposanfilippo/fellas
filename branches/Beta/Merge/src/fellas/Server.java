@@ -777,6 +777,46 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					statement.execute(query);
 					System.out.println("Event " + eventId
 							+ " has been deleted from POI");
+
+					// move event to old_event table
+					query = "INSERT INTO old_events (cId,eName,eShortDescription,eLongDescription,"
+							+ "eLocation,eCategory,eStartDate,eFinishDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
+							+ "VALUES ('"
+							+ oldEvent.getcId()
+							+ "','"
+							+ oldEvent.geteName()
+							+ "','"
+							+ oldEvent.geteShortDescription()
+							+ "','"
+							+ oldEvent.geteLongDescription()
+							+ "','"
+							+ oldEvent.geteLocation()
+							+ "','"
+							+ oldEvent.geteCategory()
+							+ "','"
+							+ formatDate(oldEvent.geteStartDate())
+							+ "','"
+							+ formatDate(oldEvent.geteFinishDate())
+							+ "','"
+							+ oldEvent.geteStartTime()
+							+ "','"
+							+ oldEvent.geteFinishTime()
+							+ "','"
+							+ oldEvent.geteRestriction()
+							+ "','"
+							+ oldEvent.geteInfoTel()
+							+ "','"
+							+ oldEvent.geteImageURL() + "')";
+					statement = connection.createStatement();
+					statement.execute(query);
+
+					query = "DELETE from events where id='" + eventId + "'";
+					statement = connection.createStatement();
+					statement.execute(query);
+
+					System.out.println("Event " + eventId
+							+ " has been moved to old_event table");
+
 				} else
 					System.out
 							.println("FinishEvent of "
@@ -839,9 +879,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "' WHERE id=" + event.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
-			
+
 			// check if there are user subscripted to that event
-			query = "SELECT uId from subscription  where eId='" + event.getId() + "'";
+			query = "SELECT uId from subscription  where eId='" + event.getId()
+					+ "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			// rs.next();
@@ -851,16 +892,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 			// send an update message to all users that have joined the event
 			if (criterion != "") {
-				query = "SELECT cName from clubs  where id='" + event.getcId() + "'";
+				query = "SELECT cName from clubs  where id='" + event.getcId()
+						+ "'";
 				statement = connection.createStatement();
 				rs = statement.executeQuery(query);
 				rs.next();
-				String message = "Update event " + event.geteName()
-					+ "(" + event.getId() + ") "
-					+ "of " + rs.getString("cName")  
-					+ ": " + formatDate(event.geteStartDate())
-					+ " " + event.geteStartTime()
-					+ " " + event.geteShortDescription();		
+				String message = "Update event " + event.geteName() + "("
+						+ event.getId() + ") " + "of " + rs.getString("cName")
+						+ ": " + formatDate(event.geteStartDate()) + " "
+						+ event.geteStartTime() + " "
+						+ event.geteShortDescription();
 				spamMobile(cName, psw, message, criterion.substring(0,
 						criterion.length() - 4));
 			}
@@ -1857,6 +1898,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			Date dayOfFinish = null;
 			long startDifference;
 			long finishDifference;
+			int eventId;
 			try {
 				openConnection();
 				query = "SELECT * FROM events";
@@ -1871,6 +1913,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
+					eventId = primaryRs.getInt("id");
 					today = new Date();
 					if (today.after(dayOfFinish)) {
 						System.out.println("Event " + primaryRs.getInt("id")
@@ -1892,15 +1935,51 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 									+ "'";
 							statement = connection.createStatement();
 							statement.execute(query);
-							System.out
-									.println("___________________________________________________________");
 						} else {
 							System.out.println("Expired event "
 									+ primaryRs.getInt("id")
 									+ " was already deleted from POI");
-							System.out
-									.println("___________________________________________________________");
 						}
+						// move event to old_event table
+						query = "INSERT INTO old_events (cId,eName,eShortDescription,eLongDescription,"
+								+ "eLocation,eCategory,eStartDate,eFinishDate,eStartTime,eFinishTime,eRestriction,eInfoTel,eImageURL)"
+								+ "VALUES ('"
+								+ primaryRs.getInt("cId")
+								+ "','"
+								+ primaryRs.getString("eName")
+								+ "','"
+								+ primaryRs.getString("eShortDescription")
+								+ "','"
+								+ primaryRs.getString("eLongDescription")
+								+ "','"
+								+ primaryRs.getString("eLocation")
+								+ "','"
+								+ primaryRs.getString("eCategory")
+								+ "','"
+								+ primaryRs.getDate("eStartDate")
+								+ "','"
+								+ primaryRs.getDate("eFinishDate")
+								+ "','"
+								+ primaryRs.getTime("eStartTime")
+								+ "','"
+								+ primaryRs.getTime("eFinishTime")
+								+ "','"
+								+ primaryRs.getString("eRestriction")
+								+ "','"
+								+ primaryRs.getString("eInfoTel")
+								+ "','"
+								+ primaryRs.getString("eImageURL")
+								+ "')";
+						statement = connection.createStatement();
+						statement.execute(query);
+
+						query = "DELETE from events where id='" + eventId + "'";
+						statement = connection.createStatement();
+						statement.execute(query);
+						System.out.println("Event " + eventId
+								+ " has been moved to old_event table");
+						System.out
+								.println("___________________________________________________________");
 
 					} else {
 						System.out.println("Event " + primaryRs.getInt("id")
