@@ -291,104 +291,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	}
 
 	// ******************************************************************************
-	// Utility
-	// ******************************************************************************
-
-	private String[] getEventsArray() {
-		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		try {
-			eventsList = currentClub.getClubEventsList();
-		} catch (Exception ex) {
-			// TODO add error alert
-			ex.printStackTrace();
-		}
-		return doArray(eventsList);
-	}
-
-	private String[] getOldEventsArray() {
-		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		try {
-			eventsList = currentClub.getOldClubEventsList();
-		} catch (Exception ex) {
-			// TODO add error alert
-			ex.printStackTrace();
-		}
-		return doArray(eventsList);
-	}
-
-	private String[] doArray(LinkedList<MyEvent> eventsList) {
-		if (eventsList != null) {
-			String[] events = new String[eventsList.size()];
-			int i = 0;
-			for (MyEvent e : eventsList) {
-				events[i++] = e.getId() + "]" + e.geteName();
-			}
-			return events;
-		}
-		return new String[0];
-	}
-
-	private String[] getUsersArray(int eventId) {
-		LinkedList<User> userssList = new LinkedList<User>();
-		try {
-			userssList = currentClub.getEventUsersList(eventId);
-		} catch (Exception ex) {
-			// TODO add error alert
-			ex.printStackTrace();
-		}
-		if (userssList != null) {
-			String[] users = new String[userssList.size()];
-			int i = 0;
-			for (User u : userssList) {
-				users[i++] = u.getId() + "]" + u.getuName() + " "
-						+ u.getuSurname() + "( " + u.getusername() + " )";
-			}
-			return users;
-		}
-		return new String[0];
-	}
-
-	private JList createEventList(String[] eventArray) {
-		JList eJList = new JList(new DefaultListModel());
-		eJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		eJList.setBackground(new Color(153, 204, 255));
-		eJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		eJList.addListSelectionListener(this);
-		populateList(eJList, eventArray);
-		return eJList;
-	}
-
-	private void populateList(JList list, String[] elements) {
-		DefaultListModel model = (DefaultListModel) list.getModel();
-		model.clear();
-		for (String e : elements) {
-			model.addElement(e);
-		}
-	}
-
-	private void cleanBoxes() {
-		eName.setText("");
-		eShortDescription.setText("");
-		eLongDescription.setText("");
-		eLocation.setText("");
-		eCategory.setText("");
-		eStartDate.setDate(new Date());
-		eFinishDate.setDate(new Date());
-
-		// eStartDate.setEnabled(false);
-		// eFinishDate.setEnabled(false);
-
-		eStartTime.setText("00:00:00");
-		eFinishTime.setText("00:00:00");
-		eRestriction.setText("");
-		eInfoTel.setText("");
-		eLocalImageURL.setText("");
-		eRemoteImageURL.setText("");
-		eImg.setIcon(new ImageIcon("default.jpg"));
-		eLongDescription.setText("");
-	}
-
-	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
 	private void refreshImage(JLabel imglabel, String imgURL) {
@@ -406,7 +308,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			}
 		} catch (IOException e) {
 			imglabel.setIcon(new ImageIcon("default.jpg"));
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
@@ -510,7 +412,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(eShortDescription);
 
 		rightEvP.add(new JLabel("Long Description:"));
-		eLongDescription = new JTextArea(5, 30);
+		eLongDescription = new JTextArea(5, 27);
 		eLongDescription.setLineWrap(true);
 		JScrollPane descrScrollPane = new JScrollPane(eLongDescription);
 		rightEvP.add(descrScrollPane);
@@ -547,7 +449,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftOldEvP = new JPanel();
-		leftOldEvP.setBorder(BorderFactory.createTitledBorder(""));
 		leftOldEvP.setLayout(new BoxLayout(leftOldEvP, BoxLayout.Y_AXIS));
 
 		eventJList3 = createEventList(getOldEventsArray());
@@ -749,7 +650,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// ------------------ RIGHT PROFILE PANEL --------------------------
 		JPanel rightProfileP = new JPanel();
 
-		rightProfileP.setBorder(BorderFactory.createTitledBorder(""));
+		rightProfileP.setBorder(BorderFactory.createTitledBorder("Club Image"));
 
 		cImg = new JLabel(new ImageIcon("default.jpg"));
 		// img.setPreferredSize(new Dimension(50, 50));
@@ -773,6 +674,145 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		profileP.add(leftProfileP);
 		profileP.add(rightProfileP);
 		return profileP;
+	}
+
+	// ******************************************************************************
+	// Utility
+	// ******************************************************************************
+
+	private String[] getEventsArray() {
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		try {
+			eventsList = currentClub.getClubEventsList();
+		} catch (Exception ex) {
+			// TODO add error alert
+			ex.printStackTrace();
+		}
+		return doArray(eventsList);
+	}
+
+	private String[] getOldEventsArray() {
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		try {
+			eventsList = currentClub.getOldClubEventsList();
+		} catch (Exception ex) {
+			// TODO add error alert
+			ex.printStackTrace();
+		}
+		return doArray(eventsList);
+	}
+
+	private String[] doArray(LinkedList<MyEvent> eventsList) {
+		if (eventsList != null) {
+			String[] events = new String[eventsList.size()];
+			int i = 0;
+			for (MyEvent e : eventsList) {
+				events[i++] = e.getId() + "]" + e.geteName();
+			}
+			return events;
+		}
+		return new String[0];
+	}
+
+	private String[] getUsersArray(int eventId) {
+		LinkedList<User> userssList = new LinkedList<User>();
+		try {
+			userssList = currentClub.getEventUsersList(eventId);
+		} catch (Exception ex) {
+			// TODO add error alert
+			ex.printStackTrace();
+		}
+		if (userssList != null) {
+			String[] users = new String[userssList.size()];
+			int i = 0;
+			for (User u : userssList) {
+				users[i++] = u.getId() + "]" + u.getuName() + " "
+						+ u.getuSurname() + "( " + u.getusername() + " )";
+			}
+			return users;
+		}
+		return new String[0];
+	}
+
+	private JList createEventList(String[] eventArray) {
+		JList eJList = new JList(new DefaultListModel());
+		eJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		eJList.setBackground(new Color(153, 204, 255));
+		eJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		eJList.addListSelectionListener(this);
+		populateList(eJList, eventArray);
+		return eJList;
+	}
+
+	private void populateList(JList list, String[] elements) {
+		DefaultListModel model = (DefaultListModel) list.getModel();
+		model.clear();
+		for (String e : elements) {
+			model.addElement(e);
+		}
+	}
+
+	private void cleanBoxes() {
+		eName.setText("");
+		eShortDescription.setText("");
+		eLongDescription.setText("");
+		eLocation.setText("");
+		eCategory.setText("");
+		eStartDate.setDate(new Date());
+		eFinishDate.setDate(new Date());
+		eStartTime.setText("00:00:00");
+		eFinishTime.setText("00:00:00");
+		eRestriction.setText("");
+		eInfoTel.setText("");
+		eLocalImageURL.setText("");
+		eRemoteImageURL.setText("");
+		eImg.setIcon(new ImageIcon("default.jpg"));
+		eLongDescription.setText("");
+	}
+
+	private boolean eventErrorControlls(String newEv) {
+		String errMsg = "";
+		boolean flag = true;
+		if (newEv.equals("")) {
+			errMsg = "Type a correct event name to preceed.";
+			flag = false;
+		} else if (eStartDate.getDate().before(new Date())) {
+			errMsg = "StartDate must be later than today!";
+			flag = false;
+		} else if (eStartDate.getDate() == null
+				|| eFinishDate.getDate() == null) {
+			errMsg = "Date are not well formatted!";
+			flag = false;
+		} else if (eStartDate.getDate().after(eFinishDate.getDate())) {
+			errMsg = "FinishDate must be greater than StartDate!";
+			flag = false;
+		} else if (eStartTime.getText().equals("")
+				|| eFinishTime.getText().equals("")) {
+			errMsg = "Insert correct time for selected event!";
+			flag = false;
+		}
+		if (!flag) {
+			JOptionPane.showMessageDialog(mainFrame, errMsg, "Creation Error!",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		return flag;
+	}
+
+	private void setEventEditable(boolean flag) {
+		eFinishDate.setEnabled(flag);
+		eName.setEditable(flag);
+		eLocation.setEditable(flag);
+		eCategory.setEditable(flag);
+		eStartDate.setEnabled(flag);
+		eStartTime.setEditable(flag);
+		eFinishTime.setEditable(flag);
+		eRestriction.setEditable(flag);
+		eInfoTel.setEditable(flag);
+		eShortDescription.setEditable(flag);
+		eLongDescription.setEditable(flag);
+		modifyEvB.setEnabled(flag);
+		deleteEvB.setEnabled(flag);
+		selectEImgB.setEnabled(flag);
 	}
 
 	// ******************************************************************************
@@ -960,20 +1000,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == saveEvB) {
 			String newEv = eName.getText();
-			if (newEv.equals("")) {
-				JOptionPane.showMessageDialog(mainFrame,
-						"Type a correct event name to preceed.",
-						"Creation Error!", JOptionPane.ERROR_MESSAGE);
-			} else if (eStartDate.getDate() == null
-					|| eFinishDate.getDate() == null) {
-				JOptionPane.showMessageDialog(mainFrame,
-						"Date are not well formatted!", "Creation Error!",
-						JOptionPane.ERROR_MESSAGE);
-			} else if (eStartDate.getDate().after(eFinishDate.getDate())) {
-				JOptionPane.showMessageDialog(mainFrame,
-						"FinishDate must be greater than StartDate!",
-						"Creation Error!", JOptionPane.ERROR_MESSAGE);
-			} else {
+			if (eventErrorControlls(newEv)) {
 				try {
 					currentClub.createEvent(eName.getText(), eShortDescription
 							.getText(), eLongDescription.getText(), eLocation
@@ -1197,6 +1224,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eLocalImageURL.setText("");
 				refreshImage(eImg, event.geteImageURL());
 				eLongDescription.setText(event.geteLongDescription());
+
+				// TODO l'evento viene considerato iniziato se è oggi...vedere
+				// se è il caso di inserire i controlli anche sull'orario
+				if (eStartDate.getDate().before(new Date()))
+					setEventEditable(false);
+				else
+					setEventEditable(true);
+
 			} catch (RemoteException e1) {
 				// TODO add error messaggio che dice che l'evento è stato
 				// eliminato da qualcuno
