@@ -119,7 +119,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String[] geo = new String[2];
 			geo = address2GEOcoordinates(cAddress);
 			// adding info in POI table
-			query = "INSERT INTO POI (idItem,attribution,imageURL,lat,lon,line2,line4,title,type) VALUES "
+			query = "INSERT INTO POI (idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type) VALUES "
 					+ "('"
 					+ clubId
 					+ "','"
@@ -134,7 +134,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ geo[1]
 					+ "','"
 					+ cType
-					+ "','" + cEMail + "','" + cName + "','2')";
+					+ "','Owner: "+oName+" "+oSurname+"','" + cEMail + "','" + cName + "','2')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
