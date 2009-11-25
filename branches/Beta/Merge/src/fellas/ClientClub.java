@@ -1,5 +1,6 @@
 package fellas;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -40,10 +41,17 @@ public class ClientClub extends UnicastRemoteObject {
 		// TODO
 		String imgRemoteURL = "clubs/" + cName + "." + ext;
 
-		FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
-		System.out.println("Save UPLOAD : "
-				+ up.uploadFile(imgLocalURL, imgRemoteURL));
-
+		FTPConnection connection = new FTPConnection();
+		try {
+			if (connection.connect(_HOST)) {
+				if (connection.login(_USERNAME, _PASSWORD)) {
+					connection.uploadFile(imgRemoteURL, imgLocalURL);
+				}
+				connection.disconnect();
+			}
+		} catch (IOException e) {
+			// TODO handle I/O exception
+		}
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
 				cType, cName, psw, imgRemoteURL);
 	}
@@ -69,9 +77,17 @@ public class ClientClub extends UnicastRemoteObject {
 				tempClub)) {
 			clubLogged = tempClub;
 
-			FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
-			System.out.println("Modify Prof. UPLOAD : "
-					+ up.uploadFile(imgLocalURL, imgRemoteURL));
+			FTPConnection connection = new FTPConnection();
+			try {
+				if (connection.connect(_HOST)) {
+					if (connection.login(_USERNAME, _PASSWORD)) {
+						connection.uploadFile(imgRemoteURL, imgLocalURL);
+					}
+					connection.disconnect();
+				}
+			} catch (IOException e) {
+				// TODO handle I/O exception
+			}
 			return true;
 		} else
 			return false;
