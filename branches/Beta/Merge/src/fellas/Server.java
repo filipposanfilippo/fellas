@@ -134,7 +134,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ geo[1]
 					+ "','"
 					+ cType
-					+ "','Owner: "+oName+" "+oSurname+"','" + cEMail + "','" + cName + "','2')";
+					+ "','Owner: "
+					+ oName
+					+ " "
+					+ oSurname
+					+ "','"
+					+ cEMail
+					+ "','" + cName + "','2')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -194,7 +200,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public boolean clubAccess(String cName, String psw) throws RemoteException {
-		//BE CAREFUL: before calling this method, you need to open the connection
+		// BE CAREFUL: before calling this method, you need to open the
+		// connection
 		boolean res = false;
 		try {
 			query = "SELECT psw FROM clubs WHERE cName='" + cName
@@ -208,19 +215,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
+
 	@Override
-	public boolean clubAuthentication(String cName, String psw) throws RemoteException {
-		//BE CAREFUL: before calling this method, you need to open the connection
+	public boolean clubAuthentication(String cName, String psw)
+			throws RemoteException {
+		// BE CAREFUL: before calling this method, you need to open the
+		// connection
 		System.out.println(cName + " : " + psw);
 		try {
 			openConnection();
-			return clubAccess(cName,psw);
+			return clubAccess(cName, psw);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally{
+		} finally {
 			closeConnection();
 		}
 	}
@@ -241,7 +249,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public Club getClubData(String cName, String psw) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty club
 		try {
-			openConnection();			
+			openConnection();
 			if (!clubAccess(cName, psw))
 				return new Club();
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
@@ -428,9 +436,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return -1;
 		}
 	}
-	
+
 	// BE CAREFUL: before calling this method, you need to open connection
-	//TODO IMPLEMENT THIS METHOD AND CORRECT IN ALL CLUB METHODS
+	// TODO IMPLEMENT THIS METHOD AND CORRECT IN ALL CLUB METHODS
 	public int getClubId(String cUsername) {
 		int userId;
 		try {
@@ -1312,12 +1320,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			else
 				return "You are not registered, please register%";
 
-			query = "SELECT eShortDescription FROM events WHERE id='" + eventId
-					+ "'";
+			query = "SELECT eName, eLocation, eShortDescription FROM events WHERE id='"
+					+ eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				answer += rs.getString("eShortDescription") + '%';
+				answer += rs.getString("eName") + rs.getString("eLocation")
+						+ rs.getString("eShortDescription") + '%';
 			else
 				return "Any events match with id%";
 
@@ -1874,7 +1883,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			// select id club
 			openConnection();
-			//TODO USARE GETCLUBID QUANDO SARA' IMPLEMENTATA
+			// TODO USARE GETCLUBID QUANDO SARA' IMPLEMENTATA
 			query = "SELECT id FROM clubs WHERE cName='" + cName
 					+ "' AND psw='" + psw + "'";
 			statement = connection.createStatement();
