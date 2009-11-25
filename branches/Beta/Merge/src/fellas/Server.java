@@ -241,15 +241,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public Club getClubData(String cName, String psw) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty club
 		try {
-			openConnection();
-System.out.println("connessione aperta");			
+			openConnection();			
 			if (!clubAccess(cName, psw))
 				return new Club();
-System.out.println("passato autenticazione");
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-System.out.println("eseguita query");
 			if (rs.next())
 				return new Club(rs.getInt("id"), rs.getString("oName"), rs
 						.getString("oSurname"), rs.getString("cAddress"), rs
