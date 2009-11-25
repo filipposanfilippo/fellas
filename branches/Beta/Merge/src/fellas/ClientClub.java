@@ -37,9 +37,7 @@ public class ClientClub extends UnicastRemoteObject {
 			throws RemoteException {
 
 		String ext = "jpg";// imgLocalURL.split(".")[imgLocalURL.split(".").length];
-		System.out.println("len " + imgLocalURL.split(".").length);
-		System.out.println("URL " + imgLocalURL);
-		System.out.println("ext " + ext);
+		// TODO
 		String imgRemoteURL = "clubs/" + cName + "." + ext;
 
 		FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
@@ -61,13 +59,19 @@ public class ClientClub extends UnicastRemoteObject {
 
 	public boolean updateClubData(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
-			String cName, String psw, String imgRemoteURL)
+			String cName, String psw, String imgLocalURL)
 			throws RemoteException {
+		String ext = "jpg";// = extSplit[extSplit.length - 1]; TODO
+		String imgRemoteURL = "clubs/" + clubLogged.getcName() + "." + ext;
 		final Club tempClub = new Club(clubLogged.getId(), oName, oSurname,
 				cAddress, cTel, cEMail, cType, cName, psw, imgRemoteURL);
 		if (server.updateClubData(clubLogged.getcName(), clubLogged.getPsw(),
 				tempClub)) {
 			clubLogged = tempClub;
+
+			FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
+			System.out.println("Modify Prof. UPLOAD : "
+					+ up.uploadFile(imgLocalURL, imgRemoteURL));
 			return true;
 		} else
 			return false;

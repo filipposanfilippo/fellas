@@ -762,11 +762,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		cLocalImageURL.setVisible(false);
 		rightProfileP.add(cLocalImageURL);
 
-		cRemoteImageURL = new JTextField();
+		cRemoteImageURL = new JTextField(clubData.getcImageURL());
 		cRemoteImageURL.setPreferredSize(new Dimension(300, 20));
 		cRemoteImageURL.setEditable(false);
 		cRemoteImageURL.setVisible(false);
 		rightProfileP.add(cRemoteImageURL);
+
+		refreshImage(cImg, cRemoteImageURL.getText());
 
 		profileP.add(leftProfileP);
 		profileP.add(rightProfileP);
@@ -853,7 +855,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 							surnameR.getText(), addressR.getText(), telR
 									.getText(), emailR.getText(), typeR
 									.getText(), userR.getText(), new String(
-									pwdR.getPassword()), cRemoteImageURL
+									pwdR.getPassword()), cLocalImageURL
 									.getText());
 					if (res) {
 						profileStatus.setForeground(Color.green);
@@ -951,10 +953,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				// posto dell'img.
 				// String[] extSplit = eLocalImageURL.getText().split(".");
 				String ext = "jpg";// = extSplit[extSplit.length - 1];
-				// TODO rivedi percorso...lasci non fatto per ritardo cronico!
 				cRemoteImageURL.setText("clubs/"
-						+ currentClub.getClub().getId() + "/"
-						+ eStartDate.getDate().getTime() + "." + ext);
+						+ currentClub.getClub().getcName() + "." + ext);
 				refreshImage(cImg, cLocalImageURL.getText());
 			}
 		}
