@@ -1110,7 +1110,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String broadcastMyStatus(String key, String senderPhone,
+	public String broadcastMyStatus(String key, String senderTel,
 			String criterion) throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
@@ -1131,7 +1131,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			System.out.println(answer);
 
 			query = "SELECT username, uStatus FROM users WHERE uTel='"
-					+ senderPhone + "'";
+					+ senderTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 
@@ -1139,6 +1139,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				answer += rs.getString("username") + '+'
 						+ rs.getString("uStatus") + "%";
 				System.out.println(answer);
+				insertUserLog(senderTel,"broadcastMyStatus",rs.getString("uStatus"));
 				return answer;
 			} else
 				return "You are not registered, please register%";
@@ -1150,7 +1151,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
+	//TODO ritorniamo cmq answer. se si verifica un errore, sarà vuota. correggere???
+	// anche perchè così faccio il log anche se si è verificato un errore!!!
 	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException {
 		if (!keyword.equals(key))
@@ -1204,6 +1206,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs.next();
 			answer += " asks to chatup with you. If you agree, respond 'y&"
 					+ rs.getString("id") + "$'%";
+			insertUserLog(senderTel,"chatUp",receiverTel);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "CHATUP ERROR%";
@@ -1222,15 +1225,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return false;
 	}
 
-	@Override
-	public String eventsList(String key, String senderPhone, String criterion)
+	//TODO sul campo value metto il criterion scelto dall'utente. serve???
+	public String eventsList(String key, String senderTel, String criterion)
 			throws RemoteException {
 		String answer = "";
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
-			query = "SELECT username FROM users WHERE uTel='" + senderPhone
+			query = "SELECT username FROM users WHERE uTel='" + senderTel
 					+ "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -1250,6 +1253,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
+			insertUserLog(senderTel,"eventsList",answer);
 			return answer;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1259,15 +1263,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
-	public String inviteFriend(String key, String senderPhone,
+	//TODO stesso problema della chatUp. torno cmq answer anche se succede un errore
+	public String inviteFriend(String key, String senderTel,
 			String friendPhone, int eventId) throws RemoteException {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		String answer = new String('@' + friendPhone + '@');
 		try {
 			openConnection();
-			query = "SELECT username FROM users WHERE uTel='" + senderPhone
+			query = "SELECT username FROM users WHERE uTel='" + senderTel
 					+ "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -1285,6 +1289,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				answer += rs.getString("eShortDescription") + '%';
 			else
 				return "Any events match with id%";
+			insertUserLog(senderTel,"inviteFriend",String.valueOf(eventId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "INVITEFRIEND ERROR%";
@@ -1294,7 +1299,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return answer;
 	}
 
-	public String joinEvent(String key, String senderPhone, String eventCode)
+	//TODO stesso problema della chatUp e inviteFriend. torno cmq answer anche se con errore
+	public String joinEvent(String key, String senderTel, String eventId)
 			throws RemoteException {
 		int userid;
 		String eName = new String();
@@ -1303,7 +1309,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			openConnection();
 			// CHECK IF USER EXISTS
-			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
+			query = "SELECT id FROM users WHERE uTel='" + senderTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (!rs.next())
@@ -1312,32 +1318,34 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			// CHECK IF USER IS ALREADY ATTENDING
 			query = "SELECT uId FROM subscription WHERE uId='" + userid
-					+ "' AND eId='" + eventCode + "'";
+					+ "' AND eId='" + eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
 				return "You are already attendig at this event%";
 			// INSERT USER IN EVENT TABLE
 			query = "INSERT INTO subscription (eId, uId)" + "VALUES ('"
-					+ eventCode + "', '" + userid + "')";
+					+ eventId + "', '" + userid + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
-			query = "SELECT eName FROM events WHERE id='" + eventCode + "'";
+			query = "SELECT eName FROM events WHERE id='" + eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			eName = rs.getString("eName");
+			insertUserLog(senderTel,"joisEvent",eventId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "JOINEVENT ERROR%";
 		} finally {
 			closeConnection();
 		}
-		return "You are attending at event " + eName + " (" + eventCode + ")%";
+		return "You are attending at event " + eName + " (" + eventId + ")%";
 	}
 
-	public String disJoinEvent(String key, String senderPhone, String eventCode)
+	//TODO stesso problema di chatUp etc
+	public String disJoinEvent(String key, String senderTel, String eventId)
 			throws RemoteException {
 		int userid;
 		String eName = new String();
@@ -1346,7 +1354,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			openConnection();
 			// CHECK IF USER EXISTS
-			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
+			query = "SELECT id FROM users WHERE uTel='" + senderTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (!rs.next())
@@ -1355,34 +1363,36 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			// CHECK IF USER IS ALREADY ATTENDING
 			query = "SELECT uId FROM subscription WHERE uId='" + userid
-					+ "' AND eId='" + eventCode + "'";
+					+ "' AND eId='" + eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next()) {
-				query = "DELETE from subscription where eId='" + eventCode
+				query = "DELETE from subscription where eId='" + eventId
 						+ "' AND uId='" + userid + "'";
 				statement = connection.createStatement();
 				statement.execute(query);
 			} else
 				return "You are not attendig at this event%";
 
-			query = "SELECT eName FROM events WHERE id='" + eventCode + "'";
+			query = "SELECT eName FROM events WHERE id='" + eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
 			eName = rs.getString("eName");
+			insertUserLog(senderTel,"disJoinEvent",eventId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "DISJOINEVENT ERROR%";
 		} finally {
 			closeConnection();
 		}
-		return "You have disjoined the event " + eName + " (" + eventCode
+		return "You have disjoined the event " + eName + " (" + eventId
 				+ ")%";
 	}
 
-	public String getDescriptionEvent(String key, String senderPhone,
-			String eventCode) throws RemoteException {
+	//TODO stesso problema di chatUp etc
+	public String getDescriptionEvent(String key, String senderTel,
+			String eventId) throws RemoteException {
 		String eShortDescription = new String();
 		String eName = new String();
 		String start = new String();
@@ -1393,14 +1403,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			openConnection();
 			// CHECK IF USER EXISTS
-			query = "SELECT id FROM users WHERE uTel='" + senderPhone + "'";
+			query = "SELECT id FROM users WHERE uTel='" + senderTel + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (!rs.next())
 				return "You are not registered, please register%";
 
 			query = "SELECT eName, eShortDescription, eStartDate, eStartTime FROM events WHERE id='"
-					+ eventCode + "'";
+					+ eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (!rs.next())
@@ -1411,6 +1421,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			splittedString = temp2split.split(":");
 			start = rs.getString("eStartDate") + " " + splittedString[0] + ":"
 					+ splittedString[1];
+			insertUserLog(senderTel,"getDescriptionEvent",eventId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "GETDESCRIPTIONEVENT ERROR%";
@@ -1421,31 +1432,30 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				+ "%";
 	}
 
-	public String setLocation(String key, String uTel, String uLocation)
+	public String setLocation(String key, String senderTel, String uLocation)
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		int id = getUserId(uTel);
+		int id = getUserId(senderTel);
 		if (id < 0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET uLocation = '" + uLocation
-					+ "' WHERE uTel = '" + uTel + "'";
+					+ "' WHERE uTel = '" + senderTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-
 			// update location in poi
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-
 			query = "UPDATE POI SET lat = '" + coordinates[0] + "',lon='"
 					+ coordinates[1] + "' WHERE idItem = '" + id
 					+ "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
+			insertUserLog(senderTel,"setLocation",uLocation);
 			return "Location updated%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1455,19 +1465,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String setStatus(String key, String uTel, String uStatus)
+	public String setStatus(String key, String senderTel, String uStatus)
 			throws RemoteException {
 		// if(!checkRegistration())
 		// return "You are not registered, please register";
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		int id = getUserId(uTel);
+		int id = getUserId(senderTel);
 		if (id < 0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET uStatus = '" + uStatus
-					+ "' WHERE uTel = '" + uTel + "'";
+					+ "' WHERE uTel = '" + senderTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update status in poi
@@ -1475,6 +1485,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ id + "' AND type=1";
 			statement = connection.createStatement();
 			statement.execute(query);
+			insertUserLog(senderTel,"setStatus",uStatus);
 			return "Status updated%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1571,6 +1582,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ ".php','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
+			insertUserLog(uTel,"mobileRegistration",username);
 			return "Welcome to Diana, you can now use our services%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1580,14 +1592,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String userList(String key, String senderPhone, String criterion)
+	public String userList(String key, String senderTel, String criterion)
 			throws RemoteException {
 		String answer = "";
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
-			query = "SELECT username FROM users WHERE uTel='" + senderPhone
+			query = "SELECT username FROM users WHERE uTel='" + senderTel
 					+ "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -1607,6 +1619,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
+			insertUserLog(senderTel,"userList",criterion);
 			return answer;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1676,6 +1689,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			closeConnection();
 		}
 	}
+	
+	//TODO add information for an aborted operation?
+	//TODO check if the method done an error?
+	public void insertUserLog(String uTel, String operation, String value){
+		//BE CAREFUL: the connection must be opened before calling this method
+		try{
+			query = "INSERT INTO log_user (uId,operation,value)"
+				+ "VALUES ('" + uTel + "','" + operation + "','" + value +"')";
+			statement = connection.createStatement();
+			statement.execute(query);
+System.out.println(query);			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
 
 	public static void main(String[] args) throws RemoteException,
 			MalformedURLException, NotBoundException {
@@ -1687,17 +1715,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String mobileUnregistration(String key, String uTel)
+	public String mobileUnregistration(String key, String senderTel)
 			throws RemoteException {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		int id = getUserId(uTel);
+		int id = getUserId(senderTel);
 		if (id < 0)
 			return "You are not registered%";
 		try {
 			// delete user from users
-			query = "DELETE from users WHERE uTel='" + uTel + "'";
+			query = "DELETE from users WHERE uTel='" + senderTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -1718,6 +1746,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from Action WHERE poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
+			insertUserLog(senderTel,"mobileUnregistration","");
 			return "You have been unregistered%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1730,30 +1759,30 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public String chatUpAnswer(String key, String senderTel, String id)
 			throws RemoteException {
 		String answer = "";
+		String destinationTel="";
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
 			openConnection();
-			query = "SELECT senderTel, authorization FROM chatup WHERE id='"
+			query = "SELECT senderTel authorization FROM chatup WHERE id='"
 					+ id + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next()) {
 				if (rs.getInt("authorization") == 1)
 					return "You have already accepted this chatup request%";
-				answer += '@' + rs.getString("senderTel") + '@';
+				destinationTel = rs.getString("senderTel");
+				answer += '@' + destinationTel + '@';
 			} else
 				return "Any chatup requests are pending for you%";
-
 			query = "UPDATE chatup SET authorization='1' WHERE id='" + id + "'";
 			// System.out.println(query);
 			statement = connection.createStatement();
 			statement.execute(query);
-
 			answer += "User has accepted to chatup with you. Here the phone number "
 					+ senderTel + "%";
+			insertUserLog(senderTel,"chatUpAnswer",destinationTel);
 			return answer;
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "CHATUPANSWER ERROR%";
@@ -1851,22 +1880,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String setPrivacy(String key, String uTel, int privacy)
+	public String setPrivacy(String key, String senderTel, int privacy)
 			throws RemoteException {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		openConnection();
-		int id = getUserId(uTel);
+		int id = getUserId(senderTel);
 		if (id < 0)
 			return "You are not registered, please register%";
 		try {
 			query = "UPDATE users SET privacy  = '" + privacy
-					+ "' WHERE uTel = '" + uTel + "'";
+					+ "' WHERE uTel = '" + senderTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update status in poi
 			if (privacy == 1) {
-				query = "UPDATE POI SET attribution = '" + uTel
+				query = "UPDATE POI SET attribution = '" + senderTel
 						+ "' WHERE idItem = '" + id + "' AND type=1";
 				statement = connection.createStatement();
 				statement.execute(query);
@@ -1876,6 +1905,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
+			insertUserLog(senderTel,"setPrivacy",String.valueOf(privacy));
 			return "Privacy updated%";
 		} catch (SQLException e) {
 			e.printStackTrace();
