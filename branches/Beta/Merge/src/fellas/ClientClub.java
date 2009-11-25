@@ -24,7 +24,7 @@ public class ClientClub extends UnicastRemoteObject {
 	}
 
 	public boolean clubAccess(String cName, String psw) throws RemoteException {
-		boolean res = server.clubAccess(cName, psw);
+		boolean res = server.clubAuthentication(cName, psw);
 		if (res) {
 			clubLogged = getClubData(cName, psw);
 		}
