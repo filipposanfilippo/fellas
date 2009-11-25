@@ -523,6 +523,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightOldEvP.add(descrScrollPane);
 
 		eOImg = new JLabel(new ImageIcon("default.jpg"));
+		eOImg.setPreferredSize(new Dimension(200, 200));
 		eOImg.setHorizontalAlignment(SwingConstants.CENTER);
 		rightOldEvP.add(new JLabel("Event Image:", JLabel.TRAILING));
 		rightOldEvP.add(eOImg);
@@ -767,25 +768,29 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eLongDescription.setText("");
 	}
 
-	private boolean eventErrorControls(String newEv) {
+	private boolean checkEvErrors() {
 		String errMsg = "";
 		Date dayOfStart = null;
 		Date dayOfFinish = null;
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
 		boolean flag = true;
-
 		try {
-			dayOfStart = df.parse(eStartDate.getDate() + " " + eStartTime);
-			dayOfFinish = df.parse(eFinishDate.getDate() + " " + eFinishTime);
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			dayOfStart = df.parse(new StringBuilder(dateFormat
+					.format(eStartDate.getDate())).toString()
+					+ " " + eStartTime.getText());
+			dayOfFinish = df.parse(new StringBuilder(dateFormat
+					.format(eFinishDate.getDate())).toString()
+					+ " " + eFinishTime.getText());
 		} catch (ParseException e) {
-			errMsg = "Date are not well formatted!";
+			errMsg = "Date are not well formatted! C:1";
 			JOptionPane.showMessageDialog(mainFrame, errMsg, "Creation Error!",
 					JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 			return false;
 		}
 
-		if (newEv.equals("")) {
+		if (eName.getText().equals("")) {
 			errMsg = "Type a correct event name to preceed.";
 			flag = false;
 		} else if (dayOfStart.before(new Date())) {
@@ -1011,8 +1016,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			}
 		}
 		if (event == saveEvB) {
-			String newEv = eName.getText();
-			if (eventErrorControls(newEv)) {
+			if (checkEvErrors()) {
 				try {
 					currentClub.createEvent(eName.getText(), eShortDescription
 							.getText(), eLongDescription.getText(), eLocation
@@ -1037,7 +1041,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				populateList(eventJList3, getOldEventsArray());
 
 				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
-						+ newEv, "Created!", JOptionPane.INFORMATION_MESSAGE);
+						+ eName.getText(), "Created!",
+						JOptionPane.INFORMATION_MESSAGE);
 				cleanBoxes();
 				modifyEvB.setEnabled(false);
 				deleteEvB.setEnabled(false);
@@ -1046,32 +1051,35 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		if (event == modifyEvB && eventJList2.getSelectedValue() != null) {
 			String selEv[] = eventJList2.getSelectedValue().toString().split(
 					"]");
-			try {
-				currentClub.updateEvent(new MyEvent(Integer.parseInt(selEv[0]),
-						currentClub.getClub().getId(), eName.getText(),
-						eShortDescription.getText(),
-						eLongDescription.getText(), eLocation.getText(),
-						eCategory.getText(), eStartDate.getDate(), eFinishDate
-								.getDate(), eStartTime.getText(), eFinishTime
-								.getText(), eRestriction.getText(), eInfoTel
-								.getText(), eRemoteImageURL.getText()));
-				populateList(eventJList, getEventsArray());
-				populateList(eventJList2, getEventsArray());
+			if (checkEvErrors()) {
+				try {
+					currentClub.updateEvent(new MyEvent(Integer
+							.parseInt(selEv[0]), currentClub.getClub().getId(),
+							eName.getText(), eShortDescription.getText(),
+							eLongDescription.getText(), eLocation.getText(),
+							eCategory.getText(), eStartDate.getDate(),
+							eFinishDate.getDate(), eStartTime.getText(),
+							eFinishTime.getText(), eRestriction.getText(),
+							eInfoTel.getText(), eRemoteImageURL.getText()));
+					populateList(eventJList, getEventsArray());
+					populateList(eventJList2, getEventsArray());
 
-				if (!eLocalImageURL.getText().equals("")) {
-					FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
-					System.out.println("Modify UPLOAD : "
-							+ up.uploadFile(eLocalImageURL.getText(),
-									eRemoteImageURL.getText()));
+					if (!eLocalImageURL.getText().equals("")) {
+						FTPManager up = new FTPManager(_HOST, _USERNAME,
+								_PASSWORD);
+						System.out.println("Modify UPLOAD : "
+								+ up.uploadFile(eLocalImageURL.getText(),
+										eRemoteImageURL.getText()));
+					}
+					JOptionPane.showMessageDialog(mainFrame,
+							"Modified succesfully " + selEv[1], "Modified!",
+							JOptionPane.INFORMATION_MESSAGE);
+					cleanBoxes();
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
+							"Error", JOptionPane.ERROR_MESSAGE);
+					ex.printStackTrace();
 				}
-				JOptionPane.showMessageDialog(mainFrame,
-						"Modified succesfully " + selEv[1], "Modified!",
-						JOptionPane.INFORMATION_MESSAGE);
-				cleanBoxes();
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(mainFrame, "Not Modified!",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				ex.printStackTrace();
 			}
 		}
 		if (event == deleteEvB && eventJList2.getSelectedValue() != null) {
