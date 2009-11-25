@@ -1325,7 +1325,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				answer += rs.getString("eName") + rs.getString("eLocation")
+				answer += rs.getString("eName") + eventId
+						+ rs.getString("eLocation")
 						+ rs.getString("eShortDescription") + '%';
 			else
 				return "Any events match with id%";
