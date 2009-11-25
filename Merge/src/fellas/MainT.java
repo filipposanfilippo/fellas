@@ -1126,6 +1126,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			deleteEvB.setEnabled(false);
 			populateList(eventJList, getEventsArray());
 			populateList(eventJList2, getEventsArray());
+			populateList(eventJList3, getOldEventsArray());
+			
 		}
 		if (event == exit) {
 			int answer = JOptionPane.showConfirmDialog(mainFrame,
