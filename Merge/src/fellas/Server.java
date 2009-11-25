@@ -193,11 +193,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	@Override
 	public boolean clubAccess(String cName, String psw) throws RemoteException {
 		//BE CAREFUL: before calling this method, you need to open the connection
 		boolean res = false;
-		System.out.println(cName + " : " + psw);
 		try {
 			query = "SELECT psw FROM clubs WHERE cName='" + cName
 					+ "' AND psw = '" + psw + "'";
@@ -208,6 +206,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+	
+	@Override
+	public boolean clubAuthentication(String cName, String psw) throws RemoteException {
+		//BE CAREFUL: before calling this method, you need to open the connection
+		System.out.println(cName + " : " + psw);
+		try {
+			openConnection();
+			return clubAccess(cName,psw);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		finally{
+			closeConnection();
 		}
 	}
 
@@ -228,11 +242,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		// TODO be careful: if cName & psw are wrong, we return an empty club
 		try {
 			openConnection();
+System.out.println("connessione aperta");			
 			if (!clubAccess(cName, psw))
 				return new Club();
+System.out.println("passato autenticazione");
 			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
+System.out.println("eseguita query");
 			if (rs.next())
 				return new Club(rs.getInt("id"), rs.getString("oName"), rs
 						.getString("oSurname"), rs.getString("cAddress"), rs
