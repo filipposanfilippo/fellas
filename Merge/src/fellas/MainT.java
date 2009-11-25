@@ -18,6 +18,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -308,115 +311,81 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			}
 		} catch (IOException e) {
 			imglabel.setIcon(new ImageIcon("default.jpg"));
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 
 	private JPanel createEventsPanel() {
 		JPanel eventsP = new JPanel();
-		eventsP.setLayout(new GridLayout(1, 3));
+		eventsP.setLayout(new GridLayout(1, 2));
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftEvP = new JPanel();
-		leftEvP.setBorder(BorderFactory.createTitledBorder(""));
 		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 
 		eventJList2 = createEventList(getEventsArray());
 		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
 		leftEvP.add(eventScrollPane);
 
-		// ------------------------ CENTER ------------------------------------
-		JPanel centerEvP = new JPanel();
-		centerEvP.setBorder(BorderFactory.createTitledBorder(""));
-		// centerEvP.setLayout(new BoxLayout(centerEvP, BoxLayout.Y_AXIS));
-
-		eImg = new JLabel(new ImageIcon("default.jpg"));
-		// img.setPreferredSize(new Dimension(50, 50));
-		eImg.setHorizontalAlignment(SwingConstants.CENTER);
-		centerEvP.add(eImg);
-
-		eLocalImageURL = new JTextField();
-		eLocalImageURL.setPreferredSize(new Dimension(300, 20));
-		eLocalImageURL.setEditable(false);
-		eLocalImageURL.setVisible(false);
-		centerEvP.add(eLocalImageURL);
-
-		eRemoteImageURL = new JTextField();
-		eRemoteImageURL.setPreferredSize(new Dimension(300, 20));
-		eRemoteImageURL.setEditable(false);
-		eRemoteImageURL.setVisible(false);
-		centerEvP.add(eRemoteImageURL);
-
-		selectEImgB = new JButton("Select Event Image");
-		selectEImgB.addActionListener(this);
-		centerEvP.add(selectEImgB);
-
 		// ------------------------ RIGHT ------------------------------------
-		JPanel rightEvP = new JPanel();
-		rightEvP.setBorder(BorderFactory.createTitledBorder(""));
-		// rightEvP.setLayout(new BoxLayout(rightEvP, BoxLayout.Y_AXIS));
 
-		rightEvP.add(new JLabel("Event Name:"));
+		JPanel rightEvP = new JPanel(new SpringLayout());
+
+		rightEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
 		eName = new JTextField();
-		eName.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eName);
 
-		rightEvP.add(new JLabel("Location:"));
+		rightEvP.add(new JLabel("Location:", JLabel.TRAILING));
 		eLocation = new JTextField();
-		eLocation.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eLocation);
 
-		rightEvP.add(new JLabel("Event Category:"));
+		rightEvP.add(new JLabel("Event Category:", JLabel.TRAILING));
 		eCategory = new JTextField();
-		eCategory.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eCategory);
 
-		rightEvP.add(new JLabel("Starting Date:"));
+		rightEvP.add(new JLabel("Starting Date:", JLabel.TRAILING));
 		eStartDate = new JDateChooser(new Date());
 		eStartDate.setDateFormatString("yyyy/MM/dd");
-		eStartDate.setPreferredSize(new Dimension(300, 20));
 		eStartDate.setMinSelectableDate(new Date());
 		eStartDate.enableInputMethods(false);
 		rightEvP.add(eStartDate);
 
-		rightEvP.add(new JLabel("Finishing Date:"));
+		rightEvP.add(new JLabel("Finishing Date:", JLabel.TRAILING));
 		eFinishDate = new JDateChooser(new Date());
 		eFinishDate.setDateFormatString("yyyy/MM/dd");
-		eFinishDate.setPreferredSize(new Dimension(300, 20));
 		eFinishDate.setMinSelectableDate(new Date());
 		rightEvP.add(eFinishDate);
 
-		rightEvP.add(new JLabel("Starting Time: (hh:mm)"));
+		rightEvP.add(new JLabel("Starting Time: (hh:mm:ss)", JLabel.TRAILING));
 		eStartTime = new JTextField("00:00:00");
-		eStartTime.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eStartTime);
 
-		rightEvP.add(new JLabel("Finishing Time: (hh:mm)"));
+		rightEvP.add(new JLabel("Finishing Time: (hh:mm:ss)", JLabel.TRAILING));
 		eFinishTime = new JTextField("00:00:00");
-		eFinishTime.setPreferredSize(new Dimension(300, 20));
 		rightEvP.add(eFinishTime);
 
-		rightEvP.add(new JLabel("Restriction:"));
+		rightEvP.add(new JLabel("Restriction:", JLabel.TRAILING));
 		eRestriction = new JTextField();
-		eRestriction.setPreferredSize(new Dimension(300, 20));
+
 		rightEvP.add(eRestriction);
 
-		rightEvP.add(new JLabel("Telephon Info.:"));
+		rightEvP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
 		eInfoTel = new JTextField();
-		eInfoTel.setPreferredSize(new Dimension(300, 20));
+
 		rightEvP.add(eInfoTel);
 
-		rightEvP.add(new JLabel("Short Desciption:"));
+		rightEvP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
 		eShortDescription = new JTextField();
-		eShortDescription.setPreferredSize(new Dimension(300, 20));
+
 		rightEvP.add(eShortDescription);
 
-		rightEvP.add(new JLabel("Long Description:"));
+		rightEvP.add(new JLabel("Long Description:", JLabel.TRAILING));
 		eLongDescription = new JTextArea(5, 27);
 		eLongDescription.setLineWrap(true);
 		JScrollPane descrScrollPane = new JScrollPane(eLongDescription);
 		rightEvP.add(descrScrollPane);
 
+		JPanel evButtonsP = new JPanel();
 		saveEvB = new JButton("Save New");
 		modifyEvB = new JButton("Save Changes");
 		deleteEvB = new JButton("Delete Event");
@@ -428,12 +397,44 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		modifyEvB.addActionListener(this);
 		deleteEvB.addActionListener(this);
 
-		rightEvP.add(saveEvB);
-		rightEvP.add(modifyEvB);
-		rightEvP.add(deleteEvB);
+		evButtonsP.add(saveEvB);
+		evButtonsP.add(modifyEvB);
+		evButtonsP.add(deleteEvB);
+
+		rightEvP.add(new JLabel(""));
+		rightEvP.add(evButtonsP);
+
+		// ------------------- Img Ev Panel ---------------------------
+		JPanel evImgP = new JPanel();
+
+		eImg = new JLabel(new ImageIcon("default.jpg"));
+		eImg.setPreferredSize(new Dimension(200, 200));
+		eImg.setHorizontalAlignment(SwingConstants.CENTER);
+		evImgP.add(eImg);
+
+		eLocalImageURL = new JTextField();
+		eLocalImageURL.setPreferredSize(new Dimension(300, 20));
+		eLocalImageURL.setEditable(false);
+		eLocalImageURL.setVisible(false);
+		evImgP.add(eLocalImageURL);
+
+		eRemoteImageURL = new JTextField();
+		eRemoteImageURL.setPreferredSize(new Dimension(300, 20));
+		eRemoteImageURL.setEditable(false);
+		eRemoteImageURL.setVisible(false);
+		evImgP.add(eRemoteImageURL);
+
+		selectEImgB = new JButton("Select Event Image");
+		selectEImgB.addActionListener(this);
+
+		rightEvP.add(new JLabel("Event Image:", JLabel.TRAILING));
+		rightEvP.add(evImgP);
+		rightEvP.add(new JLabel(""));
+		rightEvP.add(selectEImgB);
+
+		SpringUtilities.makeCompactGrid(rightEvP, 14, 2, 6, 6, 6, 6);
 
 		eventsP.add(leftEvP);
-		eventsP.add(centerEvP);
 		eventsP.add(rightEvP);
 		eventsP.setVisible(true);
 		return eventsP;
@@ -445,7 +446,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	private JPanel createOldEventsPanel() {
 		JPanel oldEventsP = new JPanel();
-		oldEventsP.setLayout(new GridLayout(1, 3));
+		oldEventsP.setLayout(new GridLayout(1, 2));
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftOldEvP = new JPanel();
@@ -456,81 +457,77 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftOldEvP.add(eventScrollPane);
 
 		// ------------------------ RIGHT ------------------------------------
-		JPanel rightOldEvP = new JPanel();
 
-		JPanel oldEvDataP = new JPanel(new SpringLayout());
+		JPanel rightOldEvP = new JPanel(new SpringLayout());
 
-		oldEvDataP.add(new JLabel("Event Name:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
 		eOName = new JTextField();
 		eOName.setEditable(false);
-		oldEvDataP.add(eOName);
+		rightOldEvP.add(eOName);
 
-		oldEvDataP.add(new JLabel("Location:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Location:", JLabel.TRAILING));
 		eOLocation = new JTextField();
 		eOLocation.setEditable(false);
-		oldEvDataP.add(eOLocation);
+		rightOldEvP.add(eOLocation);
 
-		oldEvDataP.add(new JLabel("Event Category:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Event Category:", JLabel.TRAILING));
 		eOCategory = new JTextField();
 		eOCategory.setEditable(false);
-		oldEvDataP.add(eOCategory);
+		rightOldEvP.add(eOCategory);
 
-		oldEvDataP.add(new JLabel("Starting Date:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Starting Date:", JLabel.TRAILING));
 		eOStartDate = new JDateChooser(new Date());
 		eOStartDate.setDateFormatString("yyyy/MM/dd");
 		eOStartDate.setEnabled(false);
-		oldEvDataP.add(eOStartDate);
+		rightOldEvP.add(eOStartDate);
 
-		oldEvDataP.add(new JLabel("Finishing Date:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Finishing Date:", JLabel.TRAILING));
 		eOFinishDate = new JDateChooser(new Date());
 		eOFinishDate.setDateFormatString("yyyy/MM/dd");
 		eOFinishDate.setEnabled(false);
 		eOFinishDate.setMinSelectableDate(new Date());
-		oldEvDataP.add(eOFinishDate);
+		rightOldEvP.add(eOFinishDate);
 
-		oldEvDataP
+		rightOldEvP
 				.add(new JLabel("Starting Time: (hh:mm:ss)", JLabel.TRAILING));
 		eOStartTime = new JTextField("00:00:00");
 		eOStartTime.setEditable(false);
-		oldEvDataP.add(eOStartTime);
+		rightOldEvP.add(eOStartTime);
 
-		oldEvDataP
-				.add(new JLabel("Finishing Time: (hh:mm:ss)", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Finishing Time: (hh:mm:ss)",
+				JLabel.TRAILING));
 		eOFinishTime = new JTextField("00:00:00");
 		eOFinishTime.setEditable(false);
-		oldEvDataP.add(eOFinishTime);
+		rightOldEvP.add(eOFinishTime);
 
-		oldEvDataP.add(new JLabel("Restriction:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Restriction:", JLabel.TRAILING));
 		eORestriction = new JTextField();
 		eORestriction.setEditable(false);
-		oldEvDataP.add(eORestriction);
+		rightOldEvP.add(eORestriction);
 
-		oldEvDataP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
 		eOInfoTel = new JTextField();
 		eOInfoTel.setEditable(false);
-		oldEvDataP.add(eOInfoTel);
+		rightOldEvP.add(eOInfoTel);
 
-		oldEvDataP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
 		eOShortDescription = new JTextField();
 		eOShortDescription.setEditable(false);
-		oldEvDataP.add(eOShortDescription);
+		rightOldEvP.add(eOShortDescription);
 
-		oldEvDataP.add(new JLabel("Long Description:", JLabel.TRAILING));
+		rightOldEvP.add(new JLabel("Long Description:", JLabel.TRAILING));
 		eOLongDescription = new JTextArea(5, 30);
 		eOLongDescription.setLineWrap(true);
 		eOLongDescription.setEditable(false);
 		JScrollPane descrScrollPane = new JScrollPane(eOLongDescription);
-		oldEvDataP.add(descrScrollPane);
-
-		SpringUtilities.makeCompactGrid(oldEvDataP, 11, 2, 6, 6, 6, 6);
-		rightOldEvP.add(oldEvDataP);
-
-		JPanel oldEvImgP = new JPanel();
+		rightOldEvP.add(descrScrollPane);
 
 		eOImg = new JLabel(new ImageIcon("default.jpg"));
 		eOImg.setHorizontalAlignment(SwingConstants.CENTER);
-		oldEvImgP.add(eOImg);
-		rightOldEvP.add(oldEvImgP);
+		rightOldEvP.add(new JLabel("Event Image:", JLabel.TRAILING));
+		rightOldEvP.add(eOImg);
+
+		SpringUtilities.makeCompactGrid(rightOldEvP, 12, 2, 6, 6, 6, 6);
 
 		oldEventsP.add(leftOldEvP);
 		oldEventsP.add(rightOldEvP);
@@ -770,21 +767,36 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eLongDescription.setText("");
 	}
 
-	private boolean eventErrorControlls(String newEv) {
+	private boolean eventErrorControls(String newEv) {
 		String errMsg = "";
+		Date dayOfStart = null;
+		Date dayOfFinish = null;
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 		boolean flag = true;
+
+		try {
+			dayOfStart = df.parse(eStartDate.getDate() + " " + eStartTime);
+			dayOfFinish = df.parse(eFinishDate.getDate() + " " + eFinishTime);
+		} catch (ParseException e) {
+			errMsg = "Date are not well formatted!";
+			JOptionPane.showMessageDialog(mainFrame, errMsg, "Creation Error!",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
 		if (newEv.equals("")) {
 			errMsg = "Type a correct event name to preceed.";
 			flag = false;
-		} else if (eStartDate.getDate().before(new Date())) {
+		} else if (dayOfStart.before(new Date())) {
 			errMsg = "StartDate must be later than today!";
 			flag = false;
 		} else if (eStartDate.getDate() == null
 				|| eFinishDate.getDate() == null) {
 			errMsg = "Date are not well formatted!";
 			flag = false;
-		} else if (eStartDate.getDate().after(eFinishDate.getDate())) {
-			errMsg = "FinishDate must be greater than StartDate!";
+		} else if (dayOfStart.after(dayOfFinish)) {
+			errMsg = "Finish Date-Time must be greater than Start Date-Time!";
 			flag = false;
 		} else if (eStartTime.getText().equals("")
 				|| eFinishTime.getText().equals("")) {
@@ -821,7 +833,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(1024, 700));
+		mainFrame.setPreferredSize(new Dimension(1024, 730));
 		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
@@ -832,10 +844,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		mainFrame.add(tabPanel, BorderLayout.CENTER);
 
-		tabPanel.add("Message", createMessagePanel());
 		tabPanel.add("Events", createEventsPanel());
-		tabPanel.add("Profile", createProfilePanel());
 		tabPanel.add("Old Events", createOldEventsPanel());
+		tabPanel.add("Message", createMessagePanel());
+		tabPanel.add("Profile", createProfilePanel());
 		tabPanel.addFocusListener(this);
 
 		mainFrame.pack();
@@ -1000,7 +1012,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == saveEvB) {
 			String newEv = eName.getText();
-			if (eventErrorControlls(newEv)) {
+			if (eventErrorControls(newEv)) {
 				try {
 					currentClub.createEvent(eName.getText(), eShortDescription
 							.getText(), eLongDescription.getText(), eLocation
