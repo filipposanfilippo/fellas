@@ -873,12 +873,16 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					criterion += "id=" + s.toString().split("]")[0] + " OR ";
 				}
 				if (criterion != "") {
-					// TODO to check if it works
 					try {
 						currentClub.spamMobile(message.getText(), criterion
 								.substring(0, criterion.length() - 3));
+						JOptionPane.showMessageDialog(mainFrame,
+								"Message sended correctly!", "Sended",
+								JOptionPane.INFORMATION_MESSAGE);
 					} catch (RemoteException e1) {
-						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(mainFrame,
+								"Message not sended try again!", "Error",
+								JOptionPane.ERROR_MESSAGE);
 						e1.printStackTrace();
 					}
 				}
@@ -1025,27 +1029,35 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 							.getText(), eFinishTime.getText(), eRestriction
 							.getText(), eInfoTel.getText(), eRemoteImageURL
 							.getText());
-				} catch (RemoteException e1) {
+
+					if (!eLocalImageURL.getText().equals("")) {
+						if (!eLocalImageURL.getText().equals("")) {
+							FTPConnection connection = new FTPConnection();
+							if (connection.connect(_HOST)) {
+								if (connection.login(_USERNAME, _PASSWORD)) {
+									connection.uploadFile(eRemoteImageURL
+											.getText(), eLocalImageURL
+											.getText());
+								}
+								connection.disconnect();
+							}
+						}
+					}
+					populateList(eventJList, getEventsArray());
+					populateList(eventJList2, getEventsArray());
+					populateList(eventJList3, getOldEventsArray());
+
+					JOptionPane.showMessageDialog(mainFrame,
+							"Created succesfully " + eName.getText(),
+							"Created!", JOptionPane.INFORMATION_MESSAGE);
+					cleanBoxes();
+					modifyEvB.setEnabled(false);
+					deleteEvB.setEnabled(false);
+				} catch (Exception e1) {
 					// TODO add error message
 					e1.printStackTrace();
 				}
 
-				if (!eLocalImageURL.getText().equals("")) {
-					FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
-					System.out.println("Save UPLOAD : "
-							+ up.uploadFile(eLocalImageURL.getText(),
-									eRemoteImageURL.getText()));
-				}
-				populateList(eventJList, getEventsArray());
-				populateList(eventJList2, getEventsArray());
-				populateList(eventJList3, getOldEventsArray());
-
-				JOptionPane.showMessageDialog(mainFrame, "Created succesfully "
-						+ eName.getText(), "Created!",
-						JOptionPane.INFORMATION_MESSAGE);
-				cleanBoxes();
-				modifyEvB.setEnabled(false);
-				deleteEvB.setEnabled(false);
 			}
 		}
 		if (event == modifyEvB && eventJList2.getSelectedValue() != null) {
@@ -1065,11 +1077,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					populateList(eventJList2, getEventsArray());
 
 					if (!eLocalImageURL.getText().equals("")) {
-						FTPManager up = new FTPManager(_HOST, _USERNAME,
-								_PASSWORD);
-						System.out.println("Modify UPLOAD : "
-								+ up.uploadFile(eLocalImageURL.getText(),
-										eRemoteImageURL.getText()));
+						FTPConnection connection = new FTPConnection();
+						if (connection.connect(_HOST)) {
+							if (connection.login(_USERNAME, _PASSWORD)) {
+								connection.uploadFile(
+										eRemoteImageURL.getText(),
+										eLocalImageURL.getText());
+							}
+							connection.disconnect();
+						}
 					}
 					JOptionPane.showMessageDialog(mainFrame,
 							"Modified succesfully " + selEv[1], "Modified!",
@@ -1127,7 +1143,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			populateList(eventJList, getEventsArray());
 			populateList(eventJList2, getEventsArray());
 			populateList(eventJList3, getOldEventsArray());
-			
+
 		}
 		if (event == exit) {
 			int answer = JOptionPane.showConfirmDialog(mainFrame,
