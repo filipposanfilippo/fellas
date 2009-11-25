@@ -10,7 +10,7 @@ import java.util.LinkedList;
 
 public class ClientClub extends UnicastRemoteObject {
 	private ServerInterface server;
-	private String host = "localhost";
+	private String host = "192.168.1.105"; //localhost
 	private Club clubLogged;
 
 	final String _HOST = "diana.netsons.org";
