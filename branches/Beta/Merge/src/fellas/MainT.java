@@ -874,7 +874,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 				if (criterion != "") {
 					try {
-						currentClub.spamMobile(message.getText(), criterion
+						currentClub.spamMobile(currentClub.getClubName()+ "-" + message.getText(), criterion
 								.substring(0, criterion.length() - 3));
 						JOptionPane.showMessageDialog(mainFrame,
 								"Message sended correctly!", "Sended",

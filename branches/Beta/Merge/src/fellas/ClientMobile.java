@@ -143,7 +143,8 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCodeG);
 					// invoke remote method
-					serverAnswer = server.getDescriptionEvent(keyword, uTel, eventCodeG);
+					serverAnswer = server.getDescriptionEvent(keyword, uTel,
+							eventCodeG);
 					served = true;
 					break;
 				case 'd' | 'D':
