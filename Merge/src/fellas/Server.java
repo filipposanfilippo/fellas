@@ -1310,16 +1310,40 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			if (!rs.next())
 				return "You are not registered, please register%";
+			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
+			Random rn = new Random();
+			int lucky;
+			while (rs.next())
+				eventList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+						.getString("eName"), rs.getString("eShortDescription"),
+						rs.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
+								.getString("eRestriction"), rs
+								.getString("eInfoTel"), rs
+								.getString("eImageURL")));
 
-			query = "SELECT eName, id FROM events WHERE eLocation LIKE '%"
-					+ criterion + "%'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			while (rs.next() && answer.length() < 120)
-				answer += rs.getString("eName") + ' ' + rs.getString("id")
-						+ ',';
+			// devi estrarre a sorte 7 elementi
+			if (eventList.size() < 7) {
+				while (!eventList.isEmpty() && answer.length() < 130) {
+					answer += eventList.getFirst().geteName() + " "
+							+ eventList.getFirst().getId() + ',';
+					eventList.removeFirst();
+				}
+			} else
+				while (!eventList.isEmpty() && answer.length() < 130) {
+					lucky = rn.nextInt() % eventList.size();
+					answer += eventList.getFirst().geteName() + " "
+							+ eventList.getFirst().getId() + ',';
+					eventList.remove(lucky);
+				}
 			if (answer.equals(""))
-				return "Any events match with criterion%";
+				return "Any users match with criterion%";
+
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
