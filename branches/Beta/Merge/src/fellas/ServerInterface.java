@@ -9,7 +9,8 @@ public interface ServerInterface extends Remote {
 	public boolean authenticationClub(String name, String psw)
 			throws RemoteException;
 
-	public boolean clubAuthentication(String name, String cs) throws RemoteException;
+	public boolean clubAuthentication(String name, String cs)
+			throws RemoteException;
 
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
@@ -72,8 +73,14 @@ public interface ServerInterface extends Remote {
 	public String joinEvent(String key, String senderPhone, String eventCode)
 			throws RemoteException;
 
-	public String getDescriptionEvent(String key, String senderPhone,
+	public String getEventDescription(String key, String senderPhone,
 			String eventCode) throws RemoteException;
+
+	public String getUserDescription(String key, String senderPhone,
+			String username) throws RemoteException;
+
+	public String getClubDescription(String key, String senderPhone,
+			String cName) throws RemoteException;
 
 	public String inviteFriend(String key, String senderPhone,
 			String friendPhone, int eventId) throws RemoteException;

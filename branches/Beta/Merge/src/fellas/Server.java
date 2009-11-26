@@ -1457,7 +1457,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	// TODO stesso problema di chatUp etc
-	public String getDescriptionEvent(String key, String senderTel,
+	public String getEventDescription(String key, String senderTel,
 			String eventId) throws RemoteException {
 		String eShortDescription = new String();
 		String eName = new String();
@@ -1493,6 +1493,78 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "GETDESCRIPTIONEVENT ERROR%";
+		} finally {
+			closeConnection();
+		}
+	}
+
+	public String getUserDescription(String key, String senderTel,
+			String username) throws RemoteException {
+		User u;
+		if (!keyword.equals(key))
+			return "You are not authorized";
+		try {
+			openConnection();
+			// CHECK IF USER EXISTS
+			query = "SELECT id FROM users WHERE uTel='" + senderTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "You are not registered, please register%";
+
+			query = "SELECT * FROM users WHERE username='" + username + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "Any user match with your code%";
+			u = new User(rs.getInt("id"), rs.getString("uTel"), rs
+					.getString("uName"), rs.getString("uAge"), rs
+					.getString("uSex"), rs.getString("uStatus"), rs
+					.getString("username"), rs.getString("psw"), rs
+					.getString("uSurname"), rs.getString("uLocation"), rs
+					.getString("imageURL"), rs.getInt("privacy"));
+			insertUserLog(senderTel, "getUserDescription", username);
+			return username.toUpperCase() + ": " + u.getuAge() + " "
+					+ u.getuSex() + " " + u.getuStatus() + "%";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "GETUSERDESCRIPTION ERROR%";
+		} finally {
+			closeConnection();
+		}
+	}
+
+	public String getClubDescription(String key, String senderTel, String cName)
+			throws RemoteException {
+		Club c;
+		if (!keyword.equals(key))
+			return "You are not authorized";
+		try {
+			openConnection();
+			// CHECK IF USER EXISTS
+			query = "SELECT id FROM users WHERE uTel='" + senderTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "You are not registered, please register%";
+
+			query = "SELECT * FROM clubs WHERE cName='" + cName + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "Any club match with your code%";
+			c = new Club(rs.getInt("id"), rs.getString("oName"), rs
+					.getString("oSurname"), rs.getString("cAddress"), rs
+					.getString("cTel"), rs.getString("cEMail"), rs
+					.getString("cType"), rs.getString("cName"), rs
+					.getString("psw"), rs.getString("cImageURL"));
+
+			insertUserLog(senderTel, "getDescriptionClub", cName);
+			return cName.toUpperCase() + ": " + c.getcType() + " "
+					+ c.getcAddress() + " " + c.getcTel() + "%";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "GETDESCRIPTIONCLUB ERROR%";
 		} finally {
 			closeConnection();
 		}
@@ -1692,12 +1764,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			// devi estrarre a sorte 7 elementi
 			if (userList.size() < 7) {
-				while (!userList.isEmpty() && answer.length() < 150) {
+				while (!userList.isEmpty() && answer.length() < 130) {
 					answer += userList.getFirst().getusername() + ',';
 					userList.removeFirst();
 				}
 			} else
-				while (!userList.isEmpty() && answer.length() < 150) {
+				while (!userList.isEmpty() && answer.length() < 130) {
 					lucky = rn.nextInt() % userList.size();
 					answer += userList.get(lucky).getusername() + ',';
 					userList.remove(lucky);
