@@ -1,6 +1,7 @@
 package fellas;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
@@ -35,6 +36,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	private static String keyword = "perorapassworddiprova";
 	private ResultSet primaryRs = null;
 
+	final String _HOST = "diana.netsons.org";
+	final String _USERNAME = "diananet";
+	final String _PASSWORD = "password1234";
+	final String _URL = "http://diana.netsons.org/";
+	
 	public Server() throws RemoteException {
 		GrabberThread grabber = new GrabberThread();
 		new Thread(grabber).start();
@@ -117,6 +123,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int clubId = rs.getInt("id");
+
+			// create id table on events folder
+			FTPConnection ftpConn = new FTPConnection();
+			try {
+				if (ftpConn.connect(_HOST)) {
+					if (ftpConn.login(_USERNAME, _PASSWORD)) {
+						ftpConn.changeDirectory("www/events");
+						ftpConn.makeDirectory("" + clubId);
+					}
+					ftpConn.disconnect();
+				}
+			} catch (IOException e) {
+				// TODO handle I/O exception
+			}
+
 			String[] geo = new String[2];
 			geo = address2GEOcoordinates(cAddress);
 			// adding info in POI table

@@ -1326,8 +1326,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		try {
 			currentClub = new ClientClub();
 
-			String userTest = "danilo";
-			String passTest = "danilo";
+			String userTest = "rosy";
+			String passTest = "rosy";
 
 			boolean isLogged = currentClub.clubAccess(userTest, passTest);
 			// System.out.println("Logged = " + isLogged);
