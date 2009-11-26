@@ -40,7 +40,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	final String _USERNAME = "diananet";
 	final String _PASSWORD = "password1234";
 	final String _URL = "http://diana.netsons.org/";
-	
+
 	public Server() throws RemoteException {
 		GrabberThread grabber = new GrabberThread();
 		new Thread(grabber).start();
@@ -86,7 +86,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
-			String cName, String psw, String cImageURL) throws RemoteException {
+			String cName, String username, String psw, String cImageURL)
+			throws RemoteException {
 		try {
 			openConnection();
 			if (isClubExisting(oName))
@@ -99,7 +100,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (rs.next())
 				return false;
 			// adding club in the club's table
-			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,psw,cImageURL)"
+			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,username,psw,cImageURL)"
 					+ "VALUES ('"
 					+ oName
 					+ "','"
@@ -113,7 +114,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ cType
 					+ "','"
-					+ cName + "','" + psw + "','" + cImageURL + "')";
+					+ cName
+					+ "','"
+					+ username
+					+ "','"
+					+ psw
+					+ "','"
+					+ cImageURL + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// get id-club
@@ -199,8 +206,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ club.getcAddress() + "', cTel='" + club.getcTel()
 					+ "', cEMail='" + club.getcEMail() + "', cType='"
 					+ club.getcType() + "', cName='" + club.getcName()
-					+ "', psw='" + club.getPsw() + "', cImageURL='"
-					+ club.getcImageURL() + "' WHERE id=" + club.getId();
+					+ "', username='" + club.getUsername() + "', psw='"
+					+ club.getPsw() + "', cImageURL='" + club.getcImageURL()
+					+ "' WHERE id=" + club.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update POI table
@@ -282,7 +290,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("oSurname"), rs.getString("cAddress"), rs
 						.getString("cTel"), rs.getString("cEMail"), rs
 						.getString("cType"), rs.getString("cName"), rs
-						.getString("psw"), rs.getString("cImageURL"));
+						.getString("username"), rs.getString("psw"), rs
+						.getString("cImageURL"));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubData: " + cName);
 			e.printStackTrace();

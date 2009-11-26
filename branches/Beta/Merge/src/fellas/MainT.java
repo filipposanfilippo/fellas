@@ -135,7 +135,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField telR;
 	JTextField emailR;
 	JTextField typeR;
-	JTextField userR;
+	JTextField clubNameR;
+	JTextField usernameR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
 	JLabel profileStatus;
@@ -573,8 +574,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		emailR.setBackground(color);
 		typeR = new JTextField(clubData.getcType(), 20);
 		typeR.setBackground(color);
-		userR = new JTextField(clubData.getcName(), 20);
-		userR.setBackground(colorEnf);
+		clubNameR = new JTextField(clubData.getcName(), 20);
+		clubNameR.setBackground(colorEnf);
+		usernameR = new JTextField(clubData.getUsername(), 20);
+		usernameR.setBackground(colorEnf);
+		usernameR.setEditable(false);
 		pwdR = new JPasswordField(clubData.getPsw(), 20);
 		pwdR.setBackground(colorEnf);
 		confPwdR = new JPasswordField(clubData.getPsw(), 20);
@@ -620,7 +624,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		lb = new JLabel("Club Name:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
 		dataP.add(lb);
-		dataP.add(userR);
+		dataP.add(clubNameR);
+
+		lb = new JLabel("Username:", JLabel.TRAILING);
+		lb.setPreferredSize(new Dimension(100, 20));
+		dataP.add(lb);
+		dataP.add(usernameR);
 
 		lb = new JLabel("Password:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
@@ -874,8 +883,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 				if (criterion != "") {
 					try {
-						currentClub.spamMobile(currentClub.getClubName()+ "-" + message.getText(), criterion
-								.substring(0, criterion.length() - 3));
+						currentClub.spamMobile(currentClub.getClubName() + "-"
+								+ message.getText(), criterion.substring(0,
+								criterion.length() - 3));
 						JOptionPane.showMessageDialog(mainFrame,
 								"Message sended correctly!", "Sended",
 								JOptionPane.INFORMATION_MESSAGE);
@@ -915,9 +925,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					boolean res = currentClub.updateClubData(nameR.getText(),
 							surnameR.getText(), addressR.getText(), telR
 									.getText(), emailR.getText(), typeR
-									.getText(), userR.getText(), new String(
-									pwdR.getPassword()), cLocalImageURL
-									.getText());
+									.getText(), clubNameR.getText(), usernameR
+									.getText(), new String(pwdR.getPassword()),
+							cLocalImageURL.getText());
 					if (res) {
 						profileStatus.setForeground(Color.green);
 						profileStatus.setText("Data updated succesfully!");

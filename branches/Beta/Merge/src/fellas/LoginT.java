@@ -50,6 +50,7 @@ public class LoginT implements Runnable, ActionListener {
 	JTextField telR;
 	JTextField emailR;
 	JTextField typeR;
+	JTextField clubNameR;
 	JTextField userR;
 	JPasswordField pwdR;
 	JPasswordField confPwdR;
@@ -88,7 +89,7 @@ public class LoginT implements Runnable, ActionListener {
 		loginB.setMnemonic(KeyEvent.VK_L);
 		loginB.setActionCommand("enable");
 
-		loginP.add(new JLabel("Club Name:", JLabel.TRAILING));
+		loginP.add(new JLabel("Username:", JLabel.TRAILING));
 		loginP.add(userL);
 		loginP.add(new JLabel("Password:", JLabel.TRAILING));
 		loginP.add(pwdL);
@@ -101,7 +102,7 @@ public class LoginT implements Runnable, ActionListener {
 		JPanel statusP = new JPanel();
 		statusP.setBorder(BorderFactory.createTitledBorder(""));
 
-		registrationStatus = new JLabel("", JLabel.LEFT);
+		registrationStatus = new JLabel(" ", JLabel.LEFT);
 		statusP.add(registrationStatus);
 
 		// -------------- BOTTOM PANEL (Club Image) ------------------------
@@ -111,7 +112,7 @@ public class LoginT implements Runnable, ActionListener {
 		imgP.setBorder(BorderFactory.createTitledBorder("Club Image"));
 
 		img = new JLabel(new ImageIcon("default.jpg"));
-		img.setPreferredSize(new Dimension(100, 100));
+		img.setPreferredSize(new Dimension(130, 130));
 		imgP.add(img);
 
 		cImageURL = new JTextField("default.jpg");
@@ -133,7 +134,7 @@ public class LoginT implements Runnable, ActionListener {
 
 	private JPanel createLeftPanel() {
 		JPanel leftP = new JPanel();
-		leftP.setLayout(new GridLayout(10, 2));
+		leftP.setLayout(new GridLayout(11, 2));
 		leftP.setBorder(BorderFactory.createTitledBorder("Registration"));
 
 		nameR = new JTextField(10);
@@ -142,6 +143,7 @@ public class LoginT implements Runnable, ActionListener {
 		telR = new JTextField(10);
 		emailR = new JTextField(10);
 		typeR = new JTextField(10);
+		clubNameR = new JTextField(10);
 		userR = new JTextField(10);
 		pwdR = new JPasswordField(10);
 		confPwdR = new JPasswordField(10);
@@ -161,6 +163,8 @@ public class LoginT implements Runnable, ActionListener {
 		leftP.add(new JLabel("Club Type:"));
 		leftP.add(typeR);
 		leftP.add(new JLabel("Club Name:"));
+		leftP.add(clubNameR);
+		leftP.add(new JLabel("Username:"));
 		leftP.add(userR);
 		leftP.add(new JLabel("Password:"));
 		leftP.add(pwdR);
@@ -198,21 +202,35 @@ public class LoginT implements Runnable, ActionListener {
 		Object event = e.getSource();
 
 		if (event == registerB) {
-			// Checks whether confirm psw is the same of psw or not
 			if (!Arrays.equals(pwdR.getPassword(), confPwdR.getPassword())) {
 				registrationStatus.setForeground(Color.red);
 				registrationStatus
 						.setText("Different Passwords, correct and retry!");
+				pwdR.setBackground(Color.cyan);
+				confPwdR.setBackground(Color.cyan);
+			} else if (userR.getText().equals("")) {
+				registrationStatus.setForeground(Color.red);
+				registrationStatus.setText("Insert a correct username!");
+				userR.setBackground(Color.cyan);
+			} else if (pwdR.getPassword().length == 0) {
+				registrationStatus.setForeground(Color.red);
+				registrationStatus.setText("Insert a correct password!");
+				pwdR.setBackground(Color.cyan);
+			} else if (clubNameR.getText().equals("")) {
+				registrationStatus.setForeground(Color.red);
+				registrationStatus.setText("Insert a correct Club Name!");
+				clubNameR.setBackground(Color.cyan);
 			} else {
 				boolean isRegistrationCorrect = false;
 				try {
 					isRegistrationCorrect = currentClub.clubRegistration(nameR
 							.getText(), surnameR.getText(), addressR.getText(),
 							telR.getText(), emailR.getText(), typeR.getText(),
-							userR.getText(), new String(pwdR.getPassword()),cImageURL.getText());
+							clubNameR.getText(), userR.getText(), new String(
+									pwdR.getPassword()), cImageURL.getText());
 					if (isRegistrationCorrect) {
 						registrationStatus.setForeground(Color.green);
-						registrationStatus.setText(userR.getText()
+						registrationStatus.setText(clubNameR.getText()
 								+ " Registred!");
 					} else {
 						registrationStatus.setForeground(Color.red);
