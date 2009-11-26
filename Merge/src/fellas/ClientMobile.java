@@ -111,7 +111,6 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\ncriterion: " + criterionE);
 					// invoke remote method
 					serverAnswer = server.eventsList(keyword, uTel, criterionE);
-					System.out.println("\nfinito");
 					served = true;
 					break;
 				case 'j' | 'J':
@@ -131,7 +130,7 @@ class ClientMobile extends UnicastRemoteObject {
 					served = true;
 					break;
 				case 'g' | 'G':
-					System.out.println("\nGET DESCRIPTION EVENT: ");
+					System.out.println("\nGET EVENT DESCRIPTION: ");
 					// check registration by phone
 					if (splittedString.length < 2) {
 						serverAnswer = "SMS IS MALFORMED%";
@@ -143,8 +142,42 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\neventCode: " + eventCodeG);
 					// invoke remote method
-					serverAnswer = server.getDescriptionEvent(keyword, uTel,
+					serverAnswer = server.getEventDescription(keyword, uTel,
 							eventCodeG);
+					served = true;
+					break;
+				case 'f' | 'F':
+					System.out.println("\nGET USER DESCRIPTION: ");
+					// check registration by phone
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
+					String usernameF = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\nusername: " + usernameF);
+					// invoke remote method
+					serverAnswer = server.getUserDescription(keyword, uTel,
+							usernameF);
+					served = true;
+					break;
+				case 'h' | 'H':
+					System.out.println("\nGET CLUB DESCRIPTION: ");
+					// check registration by phone
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
+					String cName = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\ncName: " + cName);
+					// invoke remote method
+					serverAnswer = server.getClubDescription(keyword, uTel,
+							cName);
 					served = true;
 					break;
 				case 'd' | 'D':
