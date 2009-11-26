@@ -283,7 +283,23 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncriterion: " + criterionU);
 					// invoke remote method
-					serverAnswer = server.userList(keyword, uTel, criterionU);
+					serverAnswer = server.usersList(keyword, uTel, criterionU);
+					served = true;
+					break;
+				case 'n' | 'N':
+					System.out.println("\nCLUBS LIST: ");
+					// check registration by phone
+					if (splittedString.length < 2) {
+						serverAnswer = "SMS IS MALFORMED%";
+						served = true;
+						break;
+					}
+
+					String criterionN = new String(splittedString[1]);
+					System.out.println("\nphone: " + uTel);
+					System.out.println("\ncriterion: " + criterionN);
+					// invoke remote method
+					serverAnswer = server.clubsList(keyword, uTel, criterionN);
 					served = true;
 					break;
 				case 'b' | 'B':
