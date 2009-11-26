@@ -1312,6 +1312,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
 			Random rn = new Random();
 			int lucky;
+			query = "SELECT * FROM events WHERE eLocation LIKE '%"
+					+ criterion + "%'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
 			while (rs.next())
 				eventList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
 						.getString("eName"), rs.getString("eShortDescription"),
@@ -1341,7 +1345,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					eventList.remove(lucky);
 				}
 			if (answer.equals(""))
-				return "Any events match with criterion%";
+				return "Any event match with criterion%";
+
 			answer = answer.substring(0, answer.lastIndexOf(','));
 			answer += '%';
 			System.out.println(answer);
@@ -1378,8 +1383,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				answer += rs.getString("eName") + " " + eventId + " "
-						+ rs.getString("eLocation") + " "
+				answer += rs.getString("eName") + eventId
+						+ rs.getString("eLocation")
 						+ rs.getString("eShortDescription") + '%';
 			else
 				return "Any events match with id%";
@@ -1411,6 +1416,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 			userid = rs.getInt("id");
+			
+			// CHECK IF EVENT EXISTS
+			query = "SELECT id FROM events WHERE id='" + eventId + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (!rs.next())
+				return "Any event match with your code%";
 
 			// CHECK IF USER IS ALREADY ATTENDING
 			query = "SELECT uId FROM subscription WHERE uId='" + userid
@@ -1495,8 +1507,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		String start = new String();
 		String temp2split = new String();
 		String[] splittedString = new String[3];
-		int cId;
-		String cName;
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		try {
@@ -1508,26 +1518,20 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (!rs.next())
 				return "You are not registered, please register%";
 
-			query = "SELECT cId,eName, eShortDescription, eStartDate, eStartTime FROM events WHERE id='"
+			query = "SELECT eName, eShortDescription, eStartDate, eStartTime FROM events WHERE id='"
 					+ eventId + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (!rs.next())
 				return "Any event match with your code%";
-			cId = rs.getInt("cId");
 			eShortDescription = rs.getString("eShortDescription");
 			eName = rs.getString("eName");
 			temp2split = rs.getString("eStartTime");
 			splittedString = temp2split.split(":");
 			start = rs.getString("eStartDate") + " " + splittedString[0] + ":"
 					+ splittedString[1];
-			query = "SELECT cName FROM clubs WHERE id='" + cId + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			cName = rs.getString("cName");
-			insertUserLog(senderTel, "getEventDescription", eventId);
-			return cName + "-" + eName.toUpperCase() + " " + start + ": " + eShortDescription
+			insertUserLog(senderTel, "getDescriptionEvent", eventId);
+			return eName.toUpperCase() + " " + start + ": " + eShortDescription
 					+ "%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1537,7 +1541,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-public String getUserDescription(String key, String senderTel,
+	public String getUserDescription(String key, String senderTel,
 			String username) throws RemoteException {
 		User u;
 		if (!keyword.equals(key))
@@ -1609,7 +1613,7 @@ public String getUserDescription(String key, String senderTel,
 			closeConnection();
 		}
 	}
-	
+
 	public String setLocation(String key, String senderTel, String uLocation)
 			throws RemoteException {
 		// if(!checkRegistration())
@@ -1770,7 +1774,7 @@ public String getUserDescription(String key, String senderTel,
 		}
 	}
 
-	public String userList(String key, String senderTel, String criterion)
+	public String usersList(String key, String senderTel, String criterion)
 			throws RemoteException {
 		String answer = "";
 		if (!keyword.equals(key))
@@ -1790,7 +1794,7 @@ public String getUserDescription(String key, String senderTel,
 			Random rn = new Random();
 			int lucky;
 
-			query = "SELECT username FROM users WHERE uLocation LIKE '%"
+			query = "SELECT * FROM users WHERE uLocation LIKE '%"
 					+ criterion + "%'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -1815,7 +1819,7 @@ public String getUserDescription(String key, String senderTel,
 					userList.remove(lucky);
 				}
 			if (answer.equals(""))
-				return "Any users match with criterion%";
+				return "Any user match with criterion%";
 
 			//
 			answer = answer.substring(0, answer.lastIndexOf(','));
@@ -1826,6 +1830,67 @@ public String getUserDescription(String key, String senderTel,
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return "USERLIST ERROR%";
+		} finally {
+			closeConnection();
+		}
+	}
+
+	public String clubsList(String key, String senderTel, String criterion)
+			throws RemoteException {
+		String answer = "";
+		if (!keyword.equals(key))
+			return "You are not authorized";
+		try {
+			openConnection();
+			query = "SELECT username FROM users WHERE uTel='" + senderTel + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+
+			if (!rs.next())
+				return "You are not registered, please register%";
+
+			//
+
+			LinkedList<Club> clubList = new LinkedList<Club>();
+			Random rn = new Random();
+			int lucky;
+
+			query = "SELECT * FROM clubs WHERE cAddress LIKE '%"
+					+ criterion + "%'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			while (rs.next())
+				clubList.add(new Club(rs.getInt("id"), rs.getString("oName"), rs
+						.getString("oSurname"), rs.getString("cAddress"), rs
+						.getString("cTel"), rs.getString("cEMail"), rs
+						.getString("cType"), rs.getString("cName"), rs
+						.getString("username"), rs.getString("psw"), rs
+						.getString("cImageURL")));
+
+			// devi estrarre a sorte 7 elementi
+			if (clubList.size() < 7) {
+				while (!clubList.isEmpty() && answer.length() < 130) {
+					answer += clubList.getFirst().getcName() + ',';
+					clubList.removeFirst();
+				}
+			} else
+				while (!clubList.isEmpty() && answer.length() < 130) {
+					lucky = rn.nextInt() % clubList.size();
+					answer += clubList.get(lucky).getcName() + ',';
+					clubList.remove(lucky);
+				}
+			if (answer.equals(""))
+				return "Any club match with criterion%";
+
+			//
+			answer = answer.substring(0, answer.lastIndexOf(','));
+			answer += '%';
+			System.out.println(answer);
+			insertUserLog(senderTel, "clubList", criterion);
+			return answer;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "CLUBLIST ERROR%";
 		} finally {
 			closeConnection();
 		}
@@ -1897,7 +1962,7 @@ public String getUserDescription(String key, String senderTel,
 	public void insertUserLog(String uTel, String operation, String value) {
 		// BE CAREFUL: the connection must be opened before calling this method
 		try {
-			query = "INSERT INTO log_users (uTel,operation,value)" + "VALUES ('"
+			query = "INSERT INTO log_user (uId,operation,value)" + "VALUES ('"
 					+ uTel + "','" + operation + "','" + value + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -1966,7 +2031,7 @@ public String getUserDescription(String key, String senderTel,
 			return "You are not authorized";
 		try {
 			openConnection();
-			query = "SELECT senderTel,authorization FROM chatup WHERE id='"
+			query = "SELECT senderTel authorization FROM chatup WHERE id='"
 					+ id + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -1980,7 +2045,7 @@ public String getUserDescription(String key, String senderTel,
 			query = "UPDATE chatup SET authorization='1' WHERE id='" + id + "'";
 			// System.out.println(query);
 			statement = connection.createStatement();
-			statement.execute(query);			
+			statement.execute(query);
 			answer += "User has accepted to chatup with you. Here the phone number "
 					+ senderTel + "%";
 			insertUserLog(senderTel, "chatUpAnswer", destinationTel);

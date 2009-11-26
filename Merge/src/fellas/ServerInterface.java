@@ -96,7 +96,10 @@ public interface ServerInterface extends Remote {
 	public String setPrivacy(String key, String uTel, int privacy)
 			throws RemoteException;
 
-	public String userList(String key, String senderPhone, String criterion)
+	public String usersList(String key, String senderPhone, String criterion)
+			throws RemoteException;
+
+	public String clubsList(String key, String senderPhone, String criterion)
 			throws RemoteException;
 
 	public String broadcastMyStatus(String key, String senderPhone,
