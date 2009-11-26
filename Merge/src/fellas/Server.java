@@ -1566,7 +1566,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					.getString("oSurname"), rs.getString("cAddress"), rs
 					.getString("cTel"), rs.getString("cEMail"), rs
 					.getString("cType"), rs.getString("cName"), rs
-					.getString("psw"), rs.getString("cImageURL"));
+					.getString("username"), rs.getString("psw"), rs
+					.getString("cImageURL"));
 
 			insertUserLog(senderTel, "getDescriptionClub", cName);
 			return cName.toUpperCase() + ": " + c.getcType() + " "
