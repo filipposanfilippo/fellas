@@ -11,7 +11,7 @@ import java.util.LinkedList;
 
 public class ClientClub extends UnicastRemoteObject {
 	private ServerInterface server;
-	private String host = "192.168.1.105"; //localhost
+	private String host = "localhost"; //Server address
 	private Club clubLogged;
 
 	final String _HOST = "diana.netsons.org";
@@ -41,17 +41,10 @@ public class ClientClub extends UnicastRemoteObject {
 		// TODO
 		String imgRemoteURL = "clubs/" + cName + "." + ext;
 
-		FTPConnection connection = new FTPConnection();
-		try {
-			if (connection.connect(_HOST)) {
-				if (connection.login(_USERNAME, _PASSWORD)) {
-					connection.uploadFile(imgRemoteURL, imgLocalURL);
-				}
-				connection.disconnect();
-			}
-		} catch (IOException e) {
-			// TODO handle I/O exception
-		}
+		FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
+		System.out.println("Save UPLOAD : "
+				+ up.uploadFile(imgLocalURL, imgRemoteURL));
+
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
 				cType, cName, psw, imgRemoteURL);
 	}
@@ -77,17 +70,9 @@ public class ClientClub extends UnicastRemoteObject {
 				tempClub)) {
 			clubLogged = tempClub;
 
-			FTPConnection connection = new FTPConnection();
-			try {
-				if (connection.connect(_HOST)) {
-					if (connection.login(_USERNAME, _PASSWORD)) {
-						connection.uploadFile(imgRemoteURL, imgLocalURL);
-					}
-					connection.disconnect();
-				}
-			} catch (IOException e) {
-				// TODO handle I/O exception
-			}
+			FTPManager up = new FTPManager(_HOST, _USERNAME, _PASSWORD);
+			System.out.println("Modify Prof. UPLOAD : "
+					+ up.uploadFile(imgLocalURL, imgRemoteURL));
 			return true;
 		} else
 			return false;
