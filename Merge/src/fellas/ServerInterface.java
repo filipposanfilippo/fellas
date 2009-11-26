@@ -30,10 +30,6 @@ public interface ServerInterface extends Remote {
 
 	public MyEvent getEvent(int id, String table) throws RemoteException;
 
-	public boolean authenticationMobile() throws RemoteException;
-
-	public MobileUser[] getMobileList(String sqlString) throws RemoteException;
-
 	public boolean createEvent(String cName, String psw, int cId, String eName,
 			String eShortDescription, String eLongDescription,
 			String eLocation, String eCategory, Date eStartDate,
@@ -53,6 +49,9 @@ public interface ServerInterface extends Remote {
 	public String spamMobile(String cName, String psw, String message,
 			String criterion) throws RemoteException;
 
+	// public MobileUser[] getMobileList(String sqlString) throws
+	// RemoteException;
+
 	// public LinkedList<Club> getClubList(String key) throws RemoteException;
 
 	// public boolean registerMobile() throws RemoteException;
@@ -61,6 +60,8 @@ public interface ServerInterface extends Remote {
 	public String mobileRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
 			String uPrivacy) throws RemoteException;
+
+	public boolean authenticationMobile() throws RemoteException;
 
 	public String mobileUnregistration(String key, String uTel)
 			throws RemoteException;
