@@ -34,7 +34,7 @@ public class ClientClub extends UnicastRemoteObject {
 
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
-			String cName, String psw, String imgLocalURL)
+			String cName, String username, String psw, String imgLocalURL)
 			throws RemoteException {
 
 		String ext = "jpg";// imgLocalURL.split(".")[imgLocalURL.split(".").length];
@@ -53,7 +53,7 @@ public class ClientClub extends UnicastRemoteObject {
 			// TODO handle I/O exception
 		}
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
-				cType, cName, psw, imgRemoteURL);
+				cType, cName, username, psw, imgRemoteURL);
 	}
 
 	/*
@@ -67,12 +67,13 @@ public class ClientClub extends UnicastRemoteObject {
 
 	public boolean updateClubData(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,
-			String cName, String psw, String imgLocalURL)
+			String cName, String username, String psw, String imgLocalURL)
 			throws RemoteException {
 		String ext = "jpg";// = extSplit[extSplit.length - 1]; TODO
 		String imgRemoteURL = "clubs/" + clubLogged.getcName() + "." + ext;
 		final Club tempClub = new Club(clubLogged.getId(), oName, oSurname,
-				cAddress, cTel, cEMail, cType, cName, psw, imgRemoteURL);
+				cAddress, cTel, cEMail, cType, cName, username, psw,
+				imgRemoteURL);
 		if (server.updateClubData(clubLogged.getcName(), clubLogged.getPsw(),
 				tempClub)) {
 			clubLogged = tempClub;
