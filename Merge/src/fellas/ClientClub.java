@@ -37,20 +37,22 @@ public class ClientClub extends UnicastRemoteObject {
 			String cName, String username, String psw, String imgLocalURL)
 			throws RemoteException {
 
-		String ext = "jpg";// imgLocalURL.split(".")[imgLocalURL.split(".").length];
-		// TODO
-		String imgRemoteURL = "clubs/" + cName + "." + ext;
-
-		FTPConnection connection = new FTPConnection();
-		try {
-			if (connection.connect(_HOST)) {
-				if (connection.login(_USERNAME, _PASSWORD)) {
-					connection.uploadFile(imgRemoteURL, imgLocalURL);
+		String imgRemoteURL = "";
+		if (!imgLocalURL.equals("")) {
+			String ext = imgLocalURL.substring(imgLocalURL.length() - 3);
+			// TODO imgLocalURL.split(".")[imgLocalURL.split(".").length];
+			imgRemoteURL = _URL + "clubs/" + username + "." + ext;
+			FTPConnection connection = new FTPConnection();
+			try {
+				if (connection.connect(_HOST)) {
+					if (connection.login(_USERNAME, _PASSWORD)) {
+						connection.uploadFile(imgRemoteURL, imgLocalURL);
+					}
+					connection.disconnect();
 				}
-				connection.disconnect();
+			} catch (IOException e) {
+				// TODO handle I/O exception
 			}
-		} catch (IOException e) {
-			// TODO handle I/O exception
 		}
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
 				cType, cName, username, psw, imgRemoteURL);
@@ -69,25 +71,34 @@ public class ClientClub extends UnicastRemoteObject {
 			String cAddress, String cTel, String cEMail, String cType,
 			String cName, String username, String psw, String imgLocalURL)
 			throws RemoteException {
-		String ext = "jpg";// = extSplit[extSplit.length - 1]; TODO
-		String imgRemoteURL = "clubs/" + clubLogged.getcName() + "." + ext;
+
+		String imgRemoteURL = clubLogged.getcImageURL();
+
+		if (!imgLocalURL.equals("")) {
+			String ext = imgLocalURL.substring(imgLocalURL.length() - 3);
+			imgRemoteURL = _URL + "www/clubs/" + clubLogged.getUsername() + "."
+					+ ext;
+			System.out.println("URL: " + imgLocalURL + " " + imgRemoteURL);
+		}
 		final Club tempClub = new Club(clubLogged.getId(), oName, oSurname,
 				cAddress, cTel, cEMail, cType, cName, username, psw,
 				imgRemoteURL);
+
 		if (server.updateClubData(clubLogged.getcName(), clubLogged.getPsw(),
 				tempClub)) {
 			clubLogged = tempClub;
-
-			FTPConnection connection = new FTPConnection();
-			try {
-				if (connection.connect(_HOST)) {
-					if (connection.login(_USERNAME, _PASSWORD)) {
-						connection.uploadFile(imgRemoteURL, imgLocalURL);
+			if (!imgLocalURL.equals("")) {
+				FTPConnection connection = new FTPConnection();
+				try {
+					if (connection.connect(_HOST)) {
+						if (connection.login(_USERNAME, _PASSWORD)) {
+							connection.uploadFile(imgRemoteURL, imgLocalURL);
+						}
+						connection.disconnect();
 					}
-					connection.disconnect();
+				} catch (IOException e) {
+					// TODO handle I/O exception
 				}
-			} catch (IOException e) {
-				// TODO handle I/O exception
 			}
 			return true;
 		} else
