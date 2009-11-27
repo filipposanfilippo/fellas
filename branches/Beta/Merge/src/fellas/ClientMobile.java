@@ -172,12 +172,12 @@ class ClientMobile extends UnicastRemoteObject {
 						break;
 					}
 //TODO METTERE id del club al posto di cName
-					String cName = new String(splittedString[1]);
+					String clubId = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
-					System.out.println("\ncName: " + cName);
+					System.out.println("\ncName: " + clubId);
 					// invoke remote method
 					serverAnswer = server.getClubDescription(keyword, uTel,
-							cName);
+							Integer.parseInt(clubId));
 					served = true;
 					break;
 				case 'd' | 'D':

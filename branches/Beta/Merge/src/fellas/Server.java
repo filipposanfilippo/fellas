@@ -52,7 +52,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			// TODO add connection controls whether the connection falls down
 			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-			connection = DriverManager.getConnection("jdbc:odbc:diana4free");
+			connection = DriverManager.getConnection("jdbc:odbc:diana");// diana4free
 			return true;
 		} catch (Exception ex) {
 			// handle any errors
@@ -1326,18 +1326,24 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			// devi estrarre a sorte 7 elementi
 			if (eventList.size() < 7) {
+				System.out.println("meno di 7");
 				while (!eventList.isEmpty() && answer.length() < 130) {
 					answer += eventList.getFirst().geteName() + " "
 							+ eventList.getFirst().getId() + ',';
 					eventList.removeFirst();
 				}
-			} else
+			} else {
+				System.out.println("più di 7");
 				while (!eventList.isEmpty() && answer.length() < 130) {
+					System.out.println("while");
 					lucky = rn.nextInt() % eventList.size();
+					System.out.println("estrazione");
 					answer += eventList.getFirst().geteName() + " "
 							+ eventList.getFirst().getId() + ',';
 					eventList.remove(lucky);
+					System.out.println("rimozione");
 				}
+			}
 			if (answer.equals(""))
 				return "Any event match with criterion%";
 
@@ -1916,7 +1922,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// ---------
 
 			// Retrieve the ServerName
-			InetAddress serverAddr = InetAddress.getByName("192.168.1.101"); // HTC
+			InetAddress serverAddr = InetAddress.getByName("192.168.1.100"); // HTC
 			// ip
 			// address
 			// where
