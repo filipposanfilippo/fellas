@@ -77,7 +77,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	// -------------- Menu Items -------------------
 	JMenuItem logout;
-	JMenuItem newEvent;
 	JMenuItem reloadEvents;
 	JMenuItem exit;
 	JMenuItem help;
@@ -108,6 +107,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JButton selectEImgB;
 	JLabel eImg;
 
+	JButton newEvB;
 	JButton saveEvB;
 	JButton modifyEvB;
 	JButton deleteEvB;
@@ -174,13 +174,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		file.add(logout);
 
 		file.addSeparator();
-
-		// Create a menu item
-		newEvent = new JMenuItem("New Event");
-		newEvent.addActionListener(this);
-		newEvent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-				Event.CTRL_MASK));
-		file.add(newEvent);
 
 		// Create a menu item
 		reloadEvents = new JMenuItem("Reload Events");
@@ -305,7 +298,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				if (imgURL.startsWith("C:")) {
 					imglabel.setIcon(new ImageIcon(imgURL));
 				} else {
-					URL url = new URL(_URL + imgURL);
+					URL url = new URL(imgURL);// TODO check url
 					ImageIcon ic = new ImageIcon(ImageIO.read(url));
 					imglabel.setIcon(ic);
 				}
@@ -387,17 +380,20 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(descrScrollPane);
 
 		JPanel evButtonsP = new JPanel();
-		saveEvB = new JButton("Save New");
-		modifyEvB = new JButton("Save Changes");
-		deleteEvB = new JButton("Delete Event");
+		newEvB = new JButton("New");
+		saveEvB = new JButton("Save As");
+		modifyEvB = new JButton("Modify");
+		deleteEvB = new JButton("Delete");
 
 		modifyEvB.setEnabled(false);
 		deleteEvB.setEnabled(false);
 
+		newEvB.addActionListener(this);
 		saveEvB.addActionListener(this);
 		modifyEvB.addActionListener(this);
 		deleteEvB.addActionListener(this);
 
+		evButtonsP.add(newEvB);
 		evButtonsP.add(saveEvB);
 		evButtonsP.add(modifyEvB);
 		evButtonsP.add(deleteEvB);
@@ -641,7 +637,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		dataP.add(lb);
 		dataP.add(confPwdR);
 
-		SpringUtilities.makeCompactGrid(dataP, 9, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(dataP, 10, 2, 6, 6, 6, 6);
 		leftProfileP.add(dataP);
 
 		buttonsP.add(modifyProfB);
@@ -649,7 +645,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		buttonsP.add(selectCImgB);
 		leftProfileP.add(buttonsP);
 
-		profileStatus = new JLabel();
+		profileStatus = new JLabel(" ");
 		statusP.add(new JLabel(""));
 		statusP.add(profileStatus);
 		leftProfileP.add(statusP);
@@ -774,7 +770,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eLocalImageURL.setText("");
 		eRemoteImageURL.setText("");
 		eImg.setIcon(new ImageIcon("default.jpg"));
-		eLongDescription.setText("");
+		setEventEditable(true);
 	}
 
 	private boolean checkEvErrors() {
@@ -973,7 +969,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			FileFilter filter = new FileFilter() {
 				public boolean accept(File f) {
 					if (f.getName().endsWith(".jpg")
-							|| f.getName().endsWith(".jpeg")
 							|| f.getName().endsWith(".gif")
 							|| f.getName().endsWith(".png"))
 						return true;
@@ -981,7 +976,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 
 				public String getDescription() {
-					return "jpg,jpeg,gif,png";
+					return "jpg,gif,png";
 				}
 			};
 			chooser.setFileFilter(filter);
@@ -1005,7 +1000,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			FileFilter filter = new FileFilter() {
 				public boolean accept(File f) {
 					if (f.getName().endsWith(".jpg")
-							|| f.getName().endsWith(".jpeg")
 							|| f.getName().endsWith(".gif")
 							|| f.getName().endsWith(".png"))
 						return true;
@@ -1013,7 +1007,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 
 				public String getDescription() {
-					return "jpg,jpeg,gif,png";
+					return "jpg,gif,png";
 				}
 			};
 			chooser.setFileFilter(filter);
@@ -1141,7 +1135,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									+ "SCIBILIA Giorgio - giorgio.scibilia@gmail.com",
 							"FELLAS: Authors", JOptionPane.INFORMATION_MESSAGE);
 		}
-		if (event == newEvent) {
+		if (event == newEvB) {
 			cleanBoxes();
 			modifyEvB.setEnabled(false);
 			deleteEvB.setEnabled(false);
@@ -1273,14 +1267,17 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				refreshImage(eImg, event.geteImageURL());
 				eLongDescription.setText(event.geteLongDescription());
 
-				// TODO l'evento viene considerato iniziato se è oggi...vedere
-				// se è il caso di inserire i controlli anche sull'orario
-				if (eStartDate.getDate().before(new Date()))
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Date dayOfStart = df.parse(new StringBuilder(dateFormat
+						.format(eStartDate.getDate())).toString()
+						+ " " + eStartTime.getText());
+				if (dayOfStart.before(new Date()))
 					setEventEditable(false);
 				else
 					setEventEditable(true);
 
-			} catch (RemoteException e1) {
+			} catch (Exception e1) {
 				// TODO add error messaggio che dice che l'evento è stato
 				// eliminato da qualcuno
 				e1.printStackTrace();
