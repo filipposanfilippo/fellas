@@ -955,7 +955,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 							"Club Unsubscription",
 							JOptionPane.INFORMATION_MESSAGE);
 					System.exit(0);
-					new LoginT();
+					new Thread(new LoginT()).start();
 				}
 			} catch (RemoteException e1) {
 				// TODO add error message
@@ -1158,12 +1158,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == logout) {
 			int answer = JOptionPane.showConfirmDialog(mainFrame,
-					"Do you really want to close?", "Close",
+					"Do you really want to logout?", "Logout",
 					JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
-				System.exit(0);
 				try {
-					new LoginT();
+					mainFrame.setVisible(false); // TODO review
+					new Thread(new LoginT()).start();
 				} catch (RemoteException e1) {
 					System.exit(0);
 				}
