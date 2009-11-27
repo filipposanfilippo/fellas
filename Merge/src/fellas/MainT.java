@@ -1156,6 +1156,19 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			if (answer == JOptionPane.YES_OPTION)
 				System.exit(0);
 		}
+		if (event == logout) {
+			int answer = JOptionPane.showConfirmDialog(mainFrame,
+					"Do you really want to close?", "Close",
+					JOptionPane.YES_NO_OPTION);
+			if (answer == JOptionPane.YES_OPTION) {
+				System.exit(0);
+				try {
+					new LoginT();
+				} catch (RemoteException e1) {
+					System.exit(0);
+				}
+			}
+		}
 		if (event == help) {
 			try {
 				BufferedReader ita = new BufferedReader(
