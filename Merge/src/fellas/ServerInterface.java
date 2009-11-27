@@ -82,7 +82,7 @@ public interface ServerInterface extends Remote {
 			String username) throws RemoteException;
 
 	public String getClubDescription(String key, String senderPhone,
-			String cName) throws RemoteException;
+			int id) throws RemoteException;
 
 	public String inviteFriend(String key, String senderPhone,
 			String friendPhone, int eventId) throws RemoteException;
