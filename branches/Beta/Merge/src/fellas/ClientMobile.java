@@ -171,7 +171,7 @@ class ClientMobile extends UnicastRemoteObject {
 						served = true;
 						break;
 					}
-
+//TODO METTERE id del club al posto di cName
 					String cName = new String(splittedString[1]);
 					System.out.println("\nphone: " + uTel);
 					System.out.println("\ncName: " + cName);
