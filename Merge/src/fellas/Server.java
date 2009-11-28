@@ -234,7 +234,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			res = rs.next();
-			insertClubLog(username, "clubAccess", rs.getInt("id"));
+			//insertClubLog(username, "clubAccess", rs.getInt("id"));
 			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
