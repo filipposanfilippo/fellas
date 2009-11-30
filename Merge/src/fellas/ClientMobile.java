@@ -63,6 +63,9 @@ class ClientMobile extends UnicastRemoteObject {
 			if (sentence.endsWith("$") && sentence.contains("&")) {
 				temp2split = sentence.substring(sentence.indexOf(':') + 1,
 						sentence.lastIndexOf('$'));
+				//escape for '
+				temp2split = temp2split.replace("'", "\\'");
+				System.out.println(temp2split);
 				splittedString = temp2split.split("&");
 				// _____________
 
