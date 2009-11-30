@@ -44,24 +44,16 @@ public class ClientClub extends UnicastRemoteObject {
 			imgRemoteURL = _URL + "clubs/" + username + "." + ext;
 			FTPConnection connection = new FTPConnection();
 			try {
-				if (connection.connect(_HOST)) {
-					if (connection.login(_USERNAME, _PASSWORD)) {
-						connection.uploadFile(imgRemoteURL, imgLocalURL);
-					}
-					connection.disconnect();
-				}
+				connection.uploadFile("www/clubs/" + username + "." + ext,
+						imgLocalURL);
 			} catch (IOException e) {
-				// TODO handle I/O exception
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		return server.clubRegistration(oName, oSurname, cAddress, cTel, cEMail,
 				cType, cName, username, psw, imgRemoteURL);
 	}
-
-	/*
-	 * public LinkedList<Club> getClubList() throws RemoteException { return
-	 * server.getClubList(keyword); }
-	 */
 
 	private Club getClubData(String cName, String psw) throws RemoteException {
 		return server.getClubData(cName, psw);
@@ -73,13 +65,12 @@ public class ClientClub extends UnicastRemoteObject {
 			throws RemoteException {
 
 		String imgRemoteURL = clubLogged.getcImageURL();
-
+		String ext = "";
 		if (!imgLocalURL.equals("")) {
-			String ext = imgLocalURL.substring(imgLocalURL.length() - 3);
-			imgRemoteURL = _URL + "www/clubs/" + clubLogged.getUsername() + "."
-					+ ext;
-			System.out.println("URL: " + imgLocalURL + " " + imgRemoteURL);
+			ext = imgLocalURL.substring(imgLocalURL.length() - 3);
+			imgRemoteURL = _URL + "clubs/" + username + "." + ext;
 		}
+
 		final Club tempClub = new Club(clubLogged.getId(), oName, oSurname,
 				cAddress, cTel, cEMail, cType, cName, username, psw,
 				imgRemoteURL);
@@ -90,13 +81,9 @@ public class ClientClub extends UnicastRemoteObject {
 			if (!imgLocalURL.equals("")) {
 				FTPConnection connection = new FTPConnection();
 				try {
-					if (connection.connect(_HOST)) {
-						if (connection.login(_USERNAME, _PASSWORD)) {
-							connection.uploadFile(imgRemoteURL, imgLocalURL);
-						}
-						connection.disconnect();
-					}
-				} catch (IOException e) {
+					connection.uploadFile("www/clubs/" + username + "." + ext,
+							imgLocalURL);
+				} catch (Exception e) {
 					// TODO handle I/O exception
 				}
 			}

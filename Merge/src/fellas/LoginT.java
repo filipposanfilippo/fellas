@@ -224,10 +224,15 @@ public class LoginT implements Runnable, ActionListener {
 				boolean isRegistrationCorrect = false;
 				try {
 					isRegistrationCorrect = currentClub.clubRegistration(nameR
-							.getText(), surnameR.getText(), addressR.getText(),
-							telR.getText(), emailR.getText(), typeR.getText(),
-							clubNameR.getText(), userR.getText(), new String(
-									pwdR.getPassword()), cImageURL.getText());
+							.getText().replace("'", "\\'"), surnameR.getText()
+							.replace("'", "\\'"), addressR.getText().replace(
+							"'", "\\'"), telR.getText().replace("'", "\\'"),
+							emailR.getText().replace("'", "\\'"), typeR
+									.getText().replace("'", "\\'"), clubNameR
+									.getText().replace("'", "\\'"), userR
+									.getText().replace("'", "\\'"), new String(
+									pwdR.getPassword()), cImageURL.getText()
+									.replace("'", "\\'"));
 					if (isRegistrationCorrect) {
 						registrationStatus.setForeground(Color.green);
 						registrationStatus.setText(clubNameR.getText()

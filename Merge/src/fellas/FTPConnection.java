@@ -1,6 +1,7 @@
 package fellas;
 
-
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,6 +14,8 @@ import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
@@ -52,6 +55,11 @@ import java.util.StringTokenizer;
  * @version 1.01
  */
 public class FTPConnection extends Object {
+
+	final String _HOST = "diana.netsons.org";
+	final String _USERNAME = "diananet";
+	final String _PASSWORD = "password1234";
+	final String _URL = "http://diana.netsons.org/";
 
 	/**
 	 * If this flag is on, we print out debugging information to stdout during
@@ -322,19 +330,36 @@ public class FTPConnection extends Object {
 	}
 
 	/**
-	 * Wrapper for the command <code>stor [fileName]</code>.
-	 */
-	public boolean uploadFile(String fileName) throws IOException {
-		return writeDataFromFile("stor " + fileName, fileName);
-	}
-
-	/**
-	 * Wrapper for the command <code>stor [localPath]</code>. The server file
-	 * path to which we will write is given by <code>serverPath</code>.
+	 * Upload the file
+	 * 
+	 * @param serverPath
+	 * @param localPath
+	 * @return
+	 * @throws IOException
 	 */
 	public boolean uploadFile(String serverPath, String localPath)
 			throws IOException {
-		return writeDataFromFile("stor " + serverPath, localPath);
+		try {
+			URL url = new URL("ftp://" + _USERNAME + ":" + _PASSWORD + "@"
+					+ _HOST + "/" + serverPath + ";type=i");
+			URLConnection m_client = url.openConnection();
+
+			InputStream is = new FileInputStream(localPath);
+			BufferedInputStream bis = new BufferedInputStream(is);
+			OutputStream os = m_client.getOutputStream();
+			BufferedOutputStream bos = new BufferedOutputStream(os);
+			byte[] buffer = new byte[1024];
+			int readCount;
+
+			while ((readCount = bis.read(buffer)) > 0) {
+				bos.write(buffer, 0, readCount);
+			}
+			bos.close();
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
@@ -566,31 +591,6 @@ public class FTPConnection extends Object {
 		boolean success = executeDataCommand(command, fileStream);
 
 		outfile.close();
-
-		return success;
-	}
-
-	/**
-	 * Executes the given ftpd command on the server and writes the contents of
-	 * the given file to the server on an opened data port, returning true if
-	 * the server indicates that the operation was successful.
-	 */
-	public boolean writeDataFromFile(String command, String fileName)
-			throws IOException {
-		// Open the local file
-		RandomAccessFile infile = new RandomAccessFile(fileName, "r");
-
-		// Do restart if desired
-		if (restartPoint != 0) {
-			debugPrint("Seeking to " + restartPoint);
-			infile.seek(restartPoint);
-		}
-
-		// Convert the RandomAccessFile to an InputStream
-		FileInputStream fileStream = new FileInputStream(infile.getFD());
-		boolean success = executeDataCommand(command, fileStream);
-
-		infile.close();
 
 		return success;
 	}

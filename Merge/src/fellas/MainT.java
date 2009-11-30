@@ -102,8 +102,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eFinishTime;
 	JTextField eRestriction;
 	JTextField eInfoTel;
-	JTextField eLocalImageURL;
-	JTextField eRemoteImageURL;
+
+	private String eSelectedImage;
+	private String ePreviousImage;
+	private String eRemoteImage;
+
 	JButton selectEImgB;
 	JLabel eImg;
 
@@ -408,18 +411,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eImg.setPreferredSize(new Dimension(200, 200));
 		eImg.setHorizontalAlignment(SwingConstants.CENTER);
 		evImgP.add(eImg);
-
-		eLocalImageURL = new JTextField();
-		eLocalImageURL.setPreferredSize(new Dimension(300, 20));
-		eLocalImageURL.setEditable(false);
-		eLocalImageURL.setVisible(false);
-		evImgP.add(eLocalImageURL);
-
-		eRemoteImageURL = new JTextField();
-		eRemoteImageURL.setPreferredSize(new Dimension(300, 20));
-		eRemoteImageURL.setEditable(false);
-		eRemoteImageURL.setVisible(false);
-		evImgP.add(eRemoteImageURL);
 
 		selectEImgB = new JButton("Select Event Image");
 		selectEImgB.addActionListener(this);
@@ -767,8 +758,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eFinishTime.setText("00:00:00");
 		eRestriction.setText("");
 		eInfoTel.setText("");
-		eLocalImageURL.setText("");
-		eRemoteImageURL.setText("");
+		eSelectedImage = "";
+		ePreviousImage = "";
+		eRemoteImage = "";
 		eImg.setIcon(new ImageIcon("default.jpg"));
 		setEventEditable(true);
 	}
@@ -918,10 +910,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				profileStatus.setText("Error: Password are different!");
 			} else {
 				try {
-					boolean res = currentClub.updateClubData(nameR.getText(),
-							surnameR.getText(), addressR.getText(), telR
-									.getText(), emailR.getText(), typeR
-									.getText(), clubNameR.getText(), usernameR
+					boolean res = currentClub.updateClubData(nameR.getText()
+							.replace("'", "\\'"), surnameR.getText().replace(
+							"'", "\\'"),
+							addressR.getText().replace("'", "\\'"), telR
+									.getText().replace("'", "\\'"), emailR
+									.getText().replace("'", "\\'"), typeR
+									.getText().replace("'", "\\'"), clubNameR
+									.getText().replace("'", "\\'"), usernameR
 									.getText(), new String(pwdR.getPassword()),
 							cLocalImageURL.getText());
 					if (res) {
@@ -981,16 +977,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			};
 			chooser.setFileFilter(filter);
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
-				eLocalImageURL.setText(chooser.getSelectedFile()
-						.getAbsolutePath());
-				// TODO controlla che succede se inserisco stringa vuota al
-				// posto dell'img.
-				// String[] extSplit = eLocalImageURL.getText().split(".");
-				String ext = "jpg";// = extSplit[extSplit.length - 1];
-				eRemoteImageURL.setText("events/"
-						+ currentClub.getClub().getId() + "/"
-						+ eStartDate.getDate().getTime() + "." + ext);
-				refreshImage(eImg, eLocalImageURL.getText());
+				eSelectedImage = chooser.getSelectedFile().getAbsolutePath();
+				refreshImage(eImg, eSelectedImage);
 			}
 		}
 		if (event == selectCImgB) {
@@ -1014,10 +1002,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
 				cLocalImageURL.setText(chooser.getSelectedFile()
 						.getAbsolutePath());
-				// TODO controlla che succede se inserisco stringa vuota al
-				// posto dell'img.
-				// String[] extSplit = eLocalImageURL.getText().split(".");
-				String ext = "jpg";// = extSplit[extSplit.length - 1];
+				String ext = cLocalImageURL.getText().substring(
+						cLocalImageURL.getText().length() - 3);
 				cRemoteImageURL.setText("clubs/"
 						+ currentClub.getClub().getcName() + "." + ext);
 				refreshImage(cImg, cLocalImageURL.getText());
@@ -1026,26 +1012,34 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		if (event == saveEvB) {
 			if (checkEvErrors()) {
 				try {
-					currentClub.createEvent(eName.getText(), eShortDescription
-							.getText(), eLongDescription.getText(), eLocation
-							.getText(), eCategory.getText(), eStartDate
-							.getDate(), eFinishDate.getDate(), eStartTime
-							.getText(), eFinishTime.getText(), eRestriction
-							.getText(), eInfoTel.getText(), eRemoteImageURL
-							.getText());
+					if (!eSelectedImage.equals("")) {
+						String eventName = eName.getText().replace(" ", "_")
+								.replace("'", "_");
+						String ext = eSelectedImage.substring(eSelectedImage
+								.length() - 3);
+						eRemoteImage = "events/"
+								+ currentClub.getClub().getId() + "/"
+								+ eventName + eStartDate.getDate().getTime()
+								+ "." + ext;
+					} else {
+						eRemoteImage = "";
+					}
+					currentClub.createEvent(
+							eName.getText().replace("'", "\\'"),
+							eShortDescription.getText().replace("'", "\\'"),
+							eLongDescription.getText().replace("'", "\\'"),
+							eLocation.getText().replace("'", "\\'"), eCategory
+									.getText().replace("'", "\\'"), eStartDate
+									.getDate(), eFinishDate.getDate(),
+							eStartTime.getText(), eFinishTime.getText(),
+							eRestriction.getText().replace("'", "\\'"),
+							eInfoTel.getText().replace("'", "\\'"), _URL
+									+ eRemoteImage);
 
-					if (!eLocalImageURL.getText().equals("")) {
-						if (!eLocalImageURL.getText().equals("")) {
-							FTPConnection connection = new FTPConnection();
-							if (connection.connect(_HOST)) {
-								if (connection.login(_USERNAME, _PASSWORD)) {
-									connection.uploadFile(eRemoteImageURL
-											.getText(), eLocalImageURL
-											.getText());
-								}
-								connection.disconnect();
-							}
-						}
+					if (!eSelectedImage.equals("")) {
+						FTPConnection connection = new FTPConnection();
+						connection.uploadFile("www/" + eRemoteImage,
+								eSelectedImage);
 					}
 					populateList(eventJList, getEventsArray());
 					populateList(eventJList2, getEventsArray());
@@ -1058,10 +1052,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					modifyEvB.setEnabled(false);
 					deleteEvB.setEnabled(false);
 				} catch (Exception e1) {
-					// TODO add error message
-					e1.printStackTrace();
+					JOptionPane.showMessageDialog(mainFrame,
+							"An error occured during creation of "
+									+ eName.getText(), "Error!",
+							JOptionPane.ERROR_MESSAGE);
 				}
-
 			}
 		}
 		if (event == modifyEvB && eventJList2.getSelectedValue() != null) {
@@ -1069,27 +1064,37 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					"]");
 			if (checkEvErrors()) {
 				try {
+					if (!eSelectedImage.equals("")) {
+						String ext = eSelectedImage.substring(eSelectedImage
+								.length() - 3);
+						String eventName = eName.getText().replace(" ", "_")
+								.replace("'", "_");
+						eRemoteImage = "events/"
+								+ currentClub.getClub().getId() + "/"
+								+ eventName + eStartDate.getDate().getTime()
+								+ "." + ext;
+					} else {
+						eRemoteImage = ePreviousImage;
+					}
 					currentClub.updateEvent(new MyEvent(Integer
 							.parseInt(selEv[0]), currentClub.getClub().getId(),
-							eName.getText(), eShortDescription.getText(),
-							eLongDescription.getText(), eLocation.getText(),
-							eCategory.getText(), eStartDate.getDate(),
-							eFinishDate.getDate(), eStartTime.getText(),
-							eFinishTime.getText(), eRestriction.getText(),
-							eInfoTel.getText(), eRemoteImageURL.getText()));
+							eName.getText().replace("'", "\\'"),
+							eShortDescription.getText().replace("'", "\\'"),
+							eLongDescription.getText().replace("'", "\\'"),
+							eLocation.getText().replace("'", "\\'"), eCategory
+									.getText().replace("'", "\\'"), eStartDate
+									.getDate(), eFinishDate.getDate(),
+							eStartTime.getText(), eFinishTime.getText(),
+							eRestriction.getText().replace("'", "\\'"),
+							eInfoTel.getText().replace("'", "\\'"), _URL
+									+ eRemoteImage));
 					populateList(eventJList, getEventsArray());
 					populateList(eventJList2, getEventsArray());
 
-					if (!eLocalImageURL.getText().equals("")) {
+					if (!eSelectedImage.equals("")) {
 						FTPConnection connection = new FTPConnection();
-						if (connection.connect(_HOST)) {
-							if (connection.login(_USERNAME, _PASSWORD)) {
-								connection.uploadFile(
-										eRemoteImageURL.getText(),
-										eLocalImageURL.getText());
-							}
-							connection.disconnect();
-						}
+						connection.uploadFile("www/" + eRemoteImage,
+								eSelectedImage);
 					}
 					JOptionPane.showMessageDialog(mainFrame,
 							"Modified succesfully " + selEv[1], "Modified!",
@@ -1275,8 +1280,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				eFinishTime.setText(event.geteFinishTime());
 				eRestriction.setText(event.geteRestriction());
 				eInfoTel.setText(event.geteInfoTel());
-				eRemoteImageURL.setText(event.geteImageURL());
-				eLocalImageURL.setText("");
+				eSelectedImage = "";
+				eRemoteImage = "";
+				ePreviousImage = event.geteImageURL();
 				refreshImage(eImg, event.geteImageURL());
 				eLongDescription.setText(event.geteLongDescription());
 
@@ -1346,8 +1352,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		try {
 			currentClub = new ClientClub();
 
-			String userTest = "rosy";
-			String passTest = "rosy";
+			String userTest = "k";
+			String passTest = "k";
 
 			boolean isLogged = currentClub.clubAccess(userTest, passTest);
 			// System.out.println("Logged = " + isLogged);
