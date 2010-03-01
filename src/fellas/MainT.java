@@ -384,7 +384,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		JPanel evButtonsP = new JPanel();
 		newEvB = new JButton("New");
-		saveEvB = new JButton("Save As");
+		saveEvB = new JButton("Save");
 		modifyEvB = new JButton("Modify");
 		deleteEvB = new JButton("Delete");
 
@@ -838,7 +838,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		mainFrame.setPreferredSize(new Dimension(1024, 730));
 		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setResizable(false);
+		mainFrame.setResizable(true);
 
 		mainFrame.setJMenuBar(createMenu());
 
@@ -1352,8 +1352,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		try {
 			currentClub = new ClientClub();
 
-			String userTest = "k";
-			String passTest = "k";
+			String userTest = "banana";
+			String passTest = "banana";
 
 			boolean isLogged = currentClub.clubAccess(userTest, passTest);
 			// System.out.println("Logged = " + isLogged);
