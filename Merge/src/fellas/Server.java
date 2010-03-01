@@ -42,9 +42,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	final String _URL = "http://diana.netsons.org/";
 
 	public Server() throws RemoteException {
+		openConnection();
 		GrabberThread grabber = new GrabberThread();
 		new Thread(grabber).start();
-		openConnection();
+		//openConnection();
 		//closeConnection();
 	}
 
@@ -2146,6 +2147,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			long finishDifference;
 			int eventId;
 			try {
+				System.out.println(checkConnection());
 				if(!checkConnection()) openConnection();
 				query = "SELECT * FROM events";
 				statement = connection.createStatement();
