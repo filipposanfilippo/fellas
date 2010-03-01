@@ -1870,7 +1870,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// ---------
 
 			// Retrieve the ServerName
-			InetAddress serverAddr = InetAddress.getByName("192.168.1.100"); // HTC
+			InetAddress serverAddr = InetAddress.getByName("192.168.1.102"); // HTC
 			// ip
 			// address
 			// where
