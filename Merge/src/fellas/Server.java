@@ -35,11 +35,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	private ResultSet rs = null;
 	private static String keyword = "perorapassworddiprova";
 	private ResultSet primaryRs = null;
-
+	
+	//__FTP access
 	final String _HOST = "diana.netsons.org";
 	final String _USERNAME = "diananet";
 	final String _PASSWORD = "password1234";
 	final String _URL = "http://diana.netsons.org/";
+	
+	//___DB access
+	final String dbUser = "diana";
+	final String dbPass = "password1234";
+	final String dbHost = "db4free.net";
+	final String dbDriver = "com.mysql.jdbc.Driver";
+	final String dbUrl = "jdbc:mysql://db4free.net:3306/";
 
 	public Server() throws RemoteException {
 		openConnection();
@@ -52,8 +60,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	public boolean openConnection() {
 		try {
 			// TODO add connection controls whether the connection falls down
-			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-			connection = DriverManager.getConnection("jdbc:odbc:diana");// diana4free
+			Class.forName(dbDriver);
+			connection = DriverManager.getConnection(dbUrl, dbUser, dbPass);// diana4free
+			connection.setCatalog("diana");
 			return true;
 		} catch (Exception ex) {
 			// handle any errors
@@ -572,7 +581,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int eventId = rs.getInt("id");
 
 			if (startDifference < 7 * 60 * 60 * 24 * 1000) {
-				System.out.println("Immediatily adding to POI");
+				System.out.println("Immediately adding to POI");
 				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 						+ "VALUES ('"
 						+ eventId
@@ -2147,7 +2156,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			long finishDifference;
 			int eventId;
 			try {
-				System.out.println(checkConnection());
 				if(!checkConnection()) openConnection();
 				query = "SELECT * FROM events";
 				statement = connection.createStatement();
@@ -2242,7 +2250,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							statement = connection.createStatement();
 							rs = statement.executeQuery(query);
 							if (!rs.next()) {
-								System.out.println("Immediatily adding event "
+								System.out.println("Immediately adding event "
 										+ primaryRs.getInt("id") + "to POI");
 								query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
 										+ "VALUES ('"
