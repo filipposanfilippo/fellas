@@ -268,8 +268,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "' AND psw = '" + psw + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			rs.next();
-			insertClubLog(username, "clubAuthentication", rs.getInt("id"));
+			if(rs.next())
+				insertClubLog(username, "clubAuthentication", rs.getInt("id"));
 			return res;
 		} catch (Exception e) {
 			e.printStackTrace();
