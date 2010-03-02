@@ -11,6 +11,9 @@ public interface ServerInterface extends Remote {
 
 	public boolean clubAuthentication(String name, String cs)
 			throws RemoteException;
+	
+	public String userAuthentication(String username, String psw)
+		throws RemoteException;
 
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEMail, String cType,

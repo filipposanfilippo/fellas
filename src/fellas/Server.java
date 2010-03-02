@@ -266,19 +266,48 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			if (!checkConnection())
 				openConnection();
-			boolean res = clubAccess(username, psw);
+			//boolean res = clubAccess(username, psw);
 			query = "SELECT id FROM clubs WHERE username='" + username
 					+ "' AND psw = '" + psw + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next())
+			if (rs.next()){
 				insertClubLog(username, "clubAuthentication", rs.getInt("id"));
-			return res;
+				return true;
+			}
+			else
+				return false;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
+	
+	
+	@Override
+	public String userAuthentication(String username, String psw)
+			throws RemoteException {
+		System.out.println(username + " : " + psw);
+		try {
+			if (!checkConnection())
+				openConnection();
+			//boolean res = clubAccess(username, psw);
+			query = "SELECT uTel FROM users WHERE username='" + username
+					+ "' AND psw = '" + psw + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next()){
+				insertUserLog(rs.getString("uTel"), "userAuthentication", "");
+				return rs.getString("uTel");
+			}
+			else
+				return "NOT_EXISTING";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "ERROR";
+		}
+	}
+	
 
 	/*
 	 * public LinkedList<Club> getClubList() throws RemoteException {
@@ -971,8 +1000,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			/*
 			 * note: in poi table, id has to be the same to event id and action
 			 * id. Aggiunti i seguenti attributi alla classe event e alla
-			 * tabella: - eInfoTel: che è il telefono dell'organizzatore
-			 * dell'evento (può essere diverso dal club) - eImageURL
+			 * tabella: - eInfoTel: che ï¿½ il telefono dell'organizzatore
+			 * dell'evento (puï¿½ essere diverso dal club) - eImageURL
 			 */
 
 			// if something is changed, start starterTask (if it is necessary)
@@ -1006,7 +1035,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			startDifference = dayOfStart.getTime() - today.getTime();
 
 			if (startDifference < 7 * 60 * 60 * 24 * 1000) {
-				// può essere che già c'è e va aggiornato
+				// puï¿½ essere che giï¿½ c'ï¿½ e va aggiornato
 
 				if (isPOIeventExisting(event.getId())) {
 					System.out.println("Updating POI for event: "
@@ -1068,7 +1097,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					statement = connection.createStatement();
 					statement.execute(query);
 				}
-			} else {// può essere che già c'è e va cancellato
+			} else {// puï¿½ essere che giï¿½ c'ï¿½ e va cancellato
 				if (isPOIeventExisting(event.getId())) {
 					query = "SELECT id FROM POI WHERE type=3 AND idItem='"
 							+ event.getId() + "'";
@@ -1212,9 +1241,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	// TODO ritorniamo cmq answer. se si verifica un errore, sarà vuota.
+	// TODO ritorniamo cmq answer. se si verifica un errore, sarï¿½ vuota.
 	// correggere???
-	// anche perchè così faccio il log anche se si è verificato un errore!!!
+	// anche perchï¿½ cosï¿½ faccio il log anche se si ï¿½ verificato un errore!!!
 	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException {
 		if (!keyword.equals(key))
