@@ -104,7 +104,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	public boolean clubRegistration(String oName, String oSurname,
-			String cAddress, String cTel, String cEMail, String cType,
+			String cAddress, String cTel, String cEmail, String cType,
 			String cName, String username, String psw, String cImageURL)
 			throws RemoteException {
 		try {
@@ -113,7 +113,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if (isClubExisting(username))
 				return false;
 			// adding club in the club's table
-			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEMail,cType,cName,username,psw,cImageURL)"
+			query = "INSERT INTO clubs(oName,oSurname,cAddress,cTel,cEmail,cType,cName,username,psw,cImageURL)"
 					+ "VALUES ('"
 					+ oName
 					+ "','"
@@ -123,7 +123,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ cTel
 					+ "','"
-					+ cEMail
+					+ cEmail
 					+ "','"
 					+ cType
 					+ "','"
@@ -180,7 +180,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ " "
 					+ oSurname
 					+ "','"
-					+ cEMail
+					+ cEmail
 					+ "','" + cName + "','2')";
 			statement = connection.createStatement();
 			statement.execute(query);
