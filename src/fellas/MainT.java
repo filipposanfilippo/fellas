@@ -103,9 +103,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eRestriction;
 	JTextField eInfoTel;
 
-	private String eSelectedImage;
-	private String ePreviousImage;
-	private String eRemoteImage;
+	JPanel rightEvP;
+
+	private String eSelectedImage = "";
+	private String ePreviousImage = "";
+	private String eRemoteImage = "";
 
 	JButton selectEImgB;
 	JLabel eImg;
@@ -131,7 +133,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JLabel eOImg;
 
 	JList eventJList3;
-	// -------------- Profile Items ---------------------------
+	// -------------- Club Profile Items ---------------------------
 	JTextField nameR;
 	JTextField surnameR;
 	JTextField addressR;
@@ -144,14 +146,30 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JPasswordField confPwdR;
 	JLabel profileStatus;
 
-	JTextField cLocalImageURL;
-	JTextField cRemoteImageURL;
+	// Club Profile Image
+	JTextField cImageURL;
+
 	JButton selectCImgB;
 	JLabel cImg;
 
 	JButton modifyProfB;
 	JButton unregProfB;
 
+	// File Chooser Settings
+	FileFilter filter = new FileFilter() {
+		public boolean accept(File f) {
+			if (f.getName().endsWith(".jpg") || f.getName().endsWith(".gif")
+					|| f.getName().endsWith(".png"))
+				return true;
+			return false;
+		}
+
+		public String getDescription() {
+			return "jpg,gif,png";
+		}
+	};
+	JFileChooser chooser = new JFileChooser();
+	
 	// ******************************************************************************
 	// MENU
 	// ******************************************************************************
@@ -295,7 +313,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 	private void refreshImage(JLabel imglabel, String imgURL) {
 		try {
-			if (imgURL.equals("")) {
+			if (imgURL.equals("") || imgURL.equals(_URL)) {
 				imglabel.setIcon(new ImageIcon("default.jpg"));
 			} else {
 				if (imgURL.startsWith("C:")) {
@@ -326,10 +344,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		// ------------------------ RIGHT ------------------------------------
 
-		JPanel rightEvP = new JPanel(new SpringLayout());
+		rightEvP = new JPanel(new SpringLayout());
 
 		rightEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
-		eName = new JTextField();
+		eName = new JTextField("New Event");
 		rightEvP.add(eName);
 
 		rightEvP.add(new JLabel("Location:", JLabel.TRAILING));
@@ -404,19 +422,17 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightEvP.add(new JLabel(""));
 		rightEvP.add(evButtonsP);
 
-		// ------------------- Img Ev Panel ---------------------------
-		JPanel evImgP = new JPanel();
-
+		// ------------------- Event Img ---------------------------
 		eImg = new JLabel(new ImageIcon("default.jpg"));
-		eImg.setPreferredSize(new Dimension(200, 200));
 		eImg.setHorizontalAlignment(SwingConstants.CENTER);
-		evImgP.add(eImg);
+		eImg.setPreferredSize(new Dimension(150, 150));
 
 		selectEImgB = new JButton("Select Event Image");
 		selectEImgB.addActionListener(this);
+		// -------------------------------------------------------------
 
 		rightEvP.add(new JLabel("Event Image:", JLabel.TRAILING));
-		rightEvP.add(evImgP);
+		rightEvP.add(eImg);
 		rightEvP.add(new JLabel(""));
 		rightEvP.add(selectEImgB);
 
@@ -511,7 +527,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightOldEvP.add(descrScrollPane);
 
 		eOImg = new JLabel(new ImageIcon("default.jpg"));
-		eOImg.setPreferredSize(new Dimension(200, 200));
+		eOImg.setPreferredSize(new Dimension(150, 150));
 		eOImg.setHorizontalAlignment(SwingConstants.CENTER);
 		rightOldEvP.add(new JLabel("Event Image:", JLabel.TRAILING));
 		rightOldEvP.add(eOImg);
@@ -647,23 +663,16 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		rightProfileP.setBorder(BorderFactory.createTitledBorder("Club Image"));
 
 		cImg = new JLabel(new ImageIcon("default.jpg"));
-		// img.setPreferredSize(new Dimension(50, 50));
+		// cImg.setPreferredSize(new Dimension(50, 50));
 		cImg.setHorizontalAlignment(SwingConstants.CENTER);
 		rightProfileP.add(cImg);
 
-		cLocalImageURL = new JTextField();
-		cLocalImageURL.setPreferredSize(new Dimension(300, 20));
-		cLocalImageURL.setEditable(false);
-		cLocalImageURL.setVisible(false);
-		rightProfileP.add(cLocalImageURL);
+		cImageURL = new JTextField(clubData.getcImageURL());
+		cImageURL.setEditable(false);
+		cImageURL.setVisible(false);
+		rightProfileP.add(cImageURL);
 
-		cRemoteImageURL = new JTextField(clubData.getcImageURL());
-		cRemoteImageURL.setPreferredSize(new Dimension(300, 20));
-		cRemoteImageURL.setEditable(false);
-		cRemoteImageURL.setVisible(false);
-		rightProfileP.add(cRemoteImageURL);
-
-		refreshImage(cImg, cRemoteImageURL.getText());
+		refreshImage(cImg, cImageURL.getText());
 
 		profileP.add(leftProfileP);
 		profileP.add(rightProfileP);
@@ -747,7 +756,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	}
 
 	private void cleanBoxes() {
-		eName.setText("");
+		// rightEvP.setVisible(false); // TODO ho messo globale il right per
+		// vedere se spostare il new..se tolgo questo metto locale il rightEvP
+		eName.setText("New Event");
 		eShortDescription.setText("");
 		eLongDescription.setText("");
 		eLocation.setText("");
@@ -763,6 +774,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eRemoteImage = "";
 		eImg.setIcon(new ImageIcon("default.jpg"));
 		setEventEditable(true);
+
+		modifyEvB.setEnabled(false);
+		deleteEvB.setEnabled(false);
+
+		populateList(eventJList, getEventsArray());
+		populateList(eventJList2, getEventsArray());
+		populateList(eventJList3, getOldEventsArray());
 	}
 
 	private boolean checkEvErrors() {
@@ -783,7 +801,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			errMsg = "Date are not well formatted! C:1";
 			JOptionPane.showMessageDialog(mainFrame, errMsg, "Creation Error!",
 					JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
 			return false;
 		}
 
@@ -791,7 +808,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			errMsg = "Type a correct event name to preceed.";
 			flag = false;
 		} else if (dayOfStart.before(new Date())) {
-			errMsg = "StartDate must be later than today!";
+			errMsg = "Start Date/Time must be later now!";
 			flag = false;
 		} else if (eStartDate.getDate() == null
 				|| eFinishDate.getDate() == null) {
@@ -815,6 +832,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	private void setEventEditable(boolean flag) {
 		eFinishDate.setEnabled(flag);
 		eName.setEditable(flag);
+		if (!flag) {
+			eName.setToolTipText("Unmodifiable Ongoing Event");
+			eName.setBackground(Color.green);
+		} else {
+			eName.setToolTipText("Event Name");
+			eName.setBackground(Color.white);
+		}
 		eLocation.setEditable(flag);
 		eCategory.setEditable(flag);
 		eStartDate.setEnabled(flag);
@@ -827,6 +851,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		modifyEvB.setEnabled(flag);
 		deleteEvB.setEnabled(flag);
 		selectEImgB.setEnabled(flag);
+		saveEvB.setEnabled(flag);
 	}
 
 	// ******************************************************************************
@@ -835,10 +860,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	public void run() {
 		mainFrame = new JFrame(TITLE + VERSION);
-		mainFrame.setPreferredSize(new Dimension(1024, 730));
-		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setResizable(true);
 
 		mainFrame.setJMenuBar(createMenu());
 
@@ -852,7 +873,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		tabPanel.add("Profile", createProfilePanel());
 		tabPanel.addFocusListener(this);
 
+		// mainFrame.setPreferredSize(new Dimension(1024, 730));
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setResizable(false);
+
 		mainFrame.pack();
+
 		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setVisible(true);
 	}
@@ -919,7 +945,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									.getText().replace("'", "\\'"), clubNameR
 									.getText().replace("'", "\\'"), usernameR
 									.getText(), new String(pwdR.getPassword()),
-							cLocalImageURL.getText());
+							cImageURL.getText());
 					if (res) {
 						profileStatus.setForeground(Color.green);
 						profileStatus.setText("Data updated succesfully!");
@@ -959,22 +985,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			}
 		}
 		if (event == selectEImgB) {
-			JFileChooser chooser = new JFileChooser();
-			chooser.setCurrentDirectory(new java.io.File("."));
-			chooser.setDialogTitle("Choose Event Image");
-			FileFilter filter = new FileFilter() {
-				public boolean accept(File f) {
-					if (f.getName().endsWith(".jpg")
-							|| f.getName().endsWith(".gif")
-							|| f.getName().endsWith(".png"))
-						return true;
-					return false;
-				}
-
-				public String getDescription() {
-					return "jpg,gif,png";
-				}
-			};
 			chooser.setFileFilter(filter);
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
 				eSelectedImage = chooser.getSelectedFile().getAbsolutePath();
@@ -982,31 +992,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			}
 		}
 		if (event == selectCImgB) {
-			JFileChooser chooser = new JFileChooser();
-			chooser.setCurrentDirectory(new java.io.File("."));
-			chooser.setDialogTitle("Choose Event Image");
-			FileFilter filter = new FileFilter() {
-				public boolean accept(File f) {
-					if (f.getName().endsWith(".jpg")
-							|| f.getName().endsWith(".gif")
-							|| f.getName().endsWith(".png"))
-						return true;
-					return false;
-				}
-
-				public String getDescription() {
-					return "jpg,gif,png";
-				}
-			};
 			chooser.setFileFilter(filter);
 			if (chooser.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
-				cLocalImageURL.setText(chooser.getSelectedFile()
-						.getAbsolutePath());
-				String ext = cLocalImageURL.getText().substring(
-						cLocalImageURL.getText().length() - 3);
-				cRemoteImageURL.setText("clubs/"
-						+ currentClub.getClub().getcName() + "." + ext);
-				refreshImage(cImg, cLocalImageURL.getText());
+				cImageURL.setText(chooser.getSelectedFile().getAbsolutePath());
+				refreshImage(cImg, cImageURL.getText());
 			}
 		}
 		if (event == saveEvB) {
@@ -1017,12 +1006,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 								.replace("'", "_");
 						String ext = eSelectedImage.substring(eSelectedImage
 								.length() - 3);
-						eRemoteImage = "events/"
+						eRemoteImage = _URL + "events/"
 								+ currentClub.getClub().getId() + "/"
 								+ eventName + eStartDate.getDate().getTime()
 								+ "." + ext;
 					} else {
-						eRemoteImage = "";
+						eRemoteImage = ePreviousImage;
 					}
 					currentClub.createEvent(
 							eName.getText().replace("'", "\\'"),
@@ -1033,29 +1022,27 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									.getDate(), eFinishDate.getDate(),
 							eStartTime.getText(), eFinishTime.getText(),
 							eRestriction.getText().replace("'", "\\'"),
-							eInfoTel.getText().replace("'", "\\'"), _URL
-									+ eRemoteImage);
+							eInfoTel.getText().replace("'", "\\'"),
+							eRemoteImage);
 
 					if (!eSelectedImage.equals("")) {
 						FTPConnection connection = new FTPConnection();
-						connection.uploadFile("www/" + eRemoteImage,
+						connection.uploadFile("www/"
+								+ eRemoteImage.replace(_URL, ""),
 								eSelectedImage);
 					}
-					populateList(eventJList, getEventsArray());
-					populateList(eventJList2, getEventsArray());
-					populateList(eventJList3, getOldEventsArray());
 
 					JOptionPane.showMessageDialog(mainFrame,
 							"Created succesfully " + eName.getText(),
 							"Created!", JOptionPane.INFORMATION_MESSAGE);
 					cleanBoxes();
-					modifyEvB.setEnabled(false);
-					deleteEvB.setEnabled(false);
+
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(mainFrame,
 							"An error occured during creation of "
 									+ eName.getText(), "Error!",
 							JOptionPane.ERROR_MESSAGE);
+					e1.printStackTrace();
 				}
 			}
 		}
@@ -1069,7 +1056,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 								.length() - 3);
 						String eventName = eName.getText().replace(" ", "_")
 								.replace("'", "_");
-						eRemoteImage = "events/"
+						eRemoteImage = _URL + "events/"
 								+ currentClub.getClub().getId() + "/"
 								+ eventName + eStartDate.getDate().getTime()
 								+ "." + ext;
@@ -1086,14 +1073,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 									.getDate(), eFinishDate.getDate(),
 							eStartTime.getText(), eFinishTime.getText(),
 							eRestriction.getText().replace("'", "\\'"),
-							eInfoTel.getText().replace("'", "\\'"), _URL
-									+ eRemoteImage));
-					populateList(eventJList, getEventsArray());
-					populateList(eventJList2, getEventsArray());
+							eInfoTel.getText().replace("'", "\\'"),
+							eRemoteImage));
 
 					if (!eSelectedImage.equals("")) {
 						FTPConnection connection = new FTPConnection();
-						connection.uploadFile("www/" + eRemoteImage,
+						connection.uploadFile("www/"
+								+ eRemoteImage.replace(_URL, ""),
 								eSelectedImage);
 					}
 					JOptionPane.showMessageDialog(mainFrame,
@@ -1142,17 +1128,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == newEvB) {
 			cleanBoxes();
-			modifyEvB.setEnabled(false);
-			deleteEvB.setEnabled(false);
 		}
 		if (event == reloadEvents) {
 			cleanBoxes();
-			modifyEvB.setEnabled(false);
-			deleteEvB.setEnabled(false);
 			populateList(eventJList, getEventsArray());
 			populateList(eventJList2, getEventsArray());
 			populateList(eventJList3, getOldEventsArray());
-
 		}
 		if (event == exit) {
 			int answer = JOptionPane.showConfirmDialog(mainFrame,
@@ -1184,7 +1165,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 				JFrame helpFrame = new JFrame("Fellas : Help");
 				JTabbedPane tPane = new JTabbedPane();
-				tPane.setPreferredSize(new Dimension(600, 500));
+				// tPane.setPreferredSize(new Dimension(500, 500));
 
 				// ------------ Italian Help ---------------------
 				JPanel itaPanel = new JPanel();
@@ -1334,13 +1315,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 	// TODO check whether is useful
 	public void focusGained(FocusEvent e) {
-		if (tabPanel.getSelectedIndex() == 1) {
-			System.out.println("FOCUS 1: " + e.getID());
-		} else if (tabPanel.getSelectedIndex() == 2) {
-			System.out.println("FOCUS 2: " + e.getID());
-		} else if (tabPanel.getSelectedIndex() == 3) {
-			System.out.println("FOCUS 3: " + e.getID());
-		}
+		cleanBoxes();
 	}
 
 	public void focusLost(FocusEvent e) {
