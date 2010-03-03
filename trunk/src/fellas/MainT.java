@@ -257,7 +257,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
 		try {
 			messageEventJTable = populateTab(currentClub.getClubEventsList());
-			leftDownP.add(new JScrollPane(messageEventJTable));
+			// leftDownP.add(new JScrollPane(messageEventJTable));
 		} catch (RemoteException e) {
 			// inserire messaggio d'erorre ed uscire dalla grafica
 			// TODO Auto-generated catch block
@@ -471,8 +471,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JScrollPane eventScrollPane = new JScrollPane(oldEventJTable);
-		leftOldEvP.add(eventScrollPane);
+		leftOldEvP.add(new JScrollPane(oldEventJTable));
 
 		// ------------------------ RIGHT ------------------------------------
 
@@ -736,7 +735,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		JTable table = new JTable(eventsVector, columnNames);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// table.setBackground(new Color(153, 204, 255));
-		table.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		// table.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		// table.getSelectionModel().addListSelectionListener(this);
 		// table.setFillsViewportHeight(true);
 		return table;
@@ -1150,7 +1149,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 				JFrame helpFrame = new JFrame("Fellas : Help");
 				JTabbedPane tPane = new JTabbedPane();
-				// tPane.setPreferredSize(new Dimension(500, 500));
+				tPane.setPreferredSize(new Dimension(500, 500));
 
 				// ------------ Italian Help ---------------------
 				JPanel itaPanel = new JPanel();
@@ -1306,6 +1305,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	public void focusLost(FocusEvent e) {
 		// TODO Auto-generated method stub
 	}
+
+	// ******************************************************************************
 
 	public static void main(String[] args) {
 		ClientClub currentClub;
