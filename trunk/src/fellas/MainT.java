@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -43,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -88,7 +90,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextArea message;
 
 	JList usersJList;
-	JList eventJList;
+	JTable messageEventJTable;
 
 	// -------------- Events Items ----------------------------
 	JTextField eName;
@@ -117,7 +119,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JButton modifyEvB;
 	JButton deleteEvB;
 
-	JList eventJList2;
+	JTable eventJTable;
 	// -------------- Old Events Items ----------------------------
 	JTextField eOName;
 	JTextField eOShortDescription;
@@ -132,7 +134,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JTextField eOInfoTel;
 	JLabel eOImg;
 
-	JList eventJList3;
+	JTable oldEventJTable;
 	// -------------- Club Profile Items ---------------------------
 	JTextField nameR;
 	JTextField surnameR;
@@ -169,7 +171,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 	};
 	JFileChooser chooser = new JFileChooser();
-	
+
 	// ******************************************************************************
 	// MENU
 	// ******************************************************************************
@@ -253,10 +255,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.Y_AXIS));
 
 		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
-
-		eventJList = createEventList(getEventsArray());
-		JScrollPane eventScrollPane = new JScrollPane(eventJList);
-		leftDownP.add(eventScrollPane);
+		try {
+			messageEventJTable = populateTab(currentClub.getClubEventsList());
+			leftDownP.add(new JScrollPane(messageEventJTable));
+		} catch (RemoteException e) {
+			// inserire messaggio d'erorre ed uscire dalla grafica
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		usersJList = new JList();
 		usersJList
@@ -336,12 +342,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftEvP = new JPanel();
-		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
-
-		eventJList2 = createEventList(getEventsArray());
-		JScrollPane eventScrollPane = new JScrollPane(eventJList2);
-		leftEvP.add(eventScrollPane);
-
+		try {
+			leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
+			eventJTable = populateTab(currentClub.getClubEventsList());
+			leftEvP.add(new JScrollPane(eventJTable));
+		} catch (Exception e) {
+			// visualizzare l'errore ed uscire dalla grafica
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// ------------------------ RIGHT ------------------------------------
 
 		rightEvP = new JPanel(new SpringLayout());
@@ -456,8 +465,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		JPanel leftOldEvP = new JPanel();
 		leftOldEvP.setLayout(new BoxLayout(leftOldEvP, BoxLayout.Y_AXIS));
 
-		eventJList3 = createEventList(getOldEventsArray());
-		JScrollPane eventScrollPane = new JScrollPane(eventJList3);
+		try {
+			oldEventJTable = populateTab(currentClub.getOldClubEventsList());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JScrollPane eventScrollPane = new JScrollPane(oldEventJTable);
 		leftOldEvP.add(eventScrollPane);
 
 		// ------------------------ RIGHT ------------------------------------
@@ -683,40 +697,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// Utility
 	// ******************************************************************************
 
-	private String[] getEventsArray() {
-		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		try {
-			eventsList = currentClub.getClubEventsList();
-		} catch (Exception ex) {
-			// TODO add error alert
-			ex.printStackTrace();
-		}
-		return doArray(eventsList);
-	}
-
-	private String[] getOldEventsArray() {
-		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		try {
-			eventsList = currentClub.getOldClubEventsList();
-		} catch (Exception ex) {
-			// TODO add error alert
-			ex.printStackTrace();
-		}
-		return doArray(eventsList);
-	}
-
-	private String[] doArray(LinkedList<MyEvent> eventsList) {
-		if (eventsList != null) {
-			String[] events = new String[eventsList.size()];
-			int i = 0;
-			for (MyEvent e : eventsList) {
-				events[i++] = e.getId() + "]" + e.geteName();
-			}
-			return events;
-		}
-		return new String[0];
-	}
-
 	private String[] getUsersArray(int eventId) {
 		LinkedList<User> userssList = new LinkedList<User>();
 		try {
@@ -737,22 +717,29 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		return new String[0];
 	}
 
-	private JList createEventList(String[] eventArray) {
-		JList eJList = new JList(new DefaultListModel());
-		eJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		eJList.setBackground(new Color(153, 204, 255));
-		eJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		eJList.addListSelectionListener(this);
-		populateList(eJList, eventArray);
-		return eJList;
-	}
+	private JTable populateTab(LinkedList<MyEvent> list) {
+		Vector<String> columnNames = new Vector<String>();
+		columnNames.addElement("ID");
+		columnNames.addElement("Event Name");
+		columnNames.addElement("Start");
+		columnNames.addElement("End");
 
-	private void populateList(JList list, String[] elements) {
-		DefaultListModel model = (DefaultListModel) list.getModel();
-		model.clear();
-		for (String e : elements) {
-			model.addElement(e);
+		Vector<Vector<String>> eventsVector = new Vector<Vector<String>>();
+		for (MyEvent e : list) {
+			Vector<String> row = new Vector<String>();
+			row.addElement(e.getId() + "");
+			row.addElement(e.geteName());
+			row.addElement(e.geteStartDate() + " " + e.geteStartTime());
+			row.addElement(e.geteFinishDate() + " " + e.geteFinishTime());
+			eventsVector.addElement(row);
 		}
+		JTable table = new JTable(eventsVector, columnNames);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		// table.setBackground(new Color(153, 204, 255));
+		table.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		// table.getSelectionModel().addListSelectionListener(this);
+		// table.setFillsViewportHeight(true);
+		return table;
 	}
 
 	private void cleanBoxes() {
@@ -778,9 +765,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		modifyEvB.setEnabled(false);
 		deleteEvB.setEnabled(false);
 
-		populateList(eventJList, getEventsArray());
-		populateList(eventJList2, getEventsArray());
-		populateList(eventJList3, getOldEventsArray());
+		try {
+			messageEventJTable = populateTab(currentClub.getClubEventsList());
+			eventJTable = populateTab(currentClub.getClubEventsList());
+			oldEventJTable = populateTab(currentClub.getOldClubEventsList());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private boolean checkEvErrors() {
@@ -1046,9 +1038,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 			}
 		}
-		if (event == modifyEvB && eventJList2.getSelectedValue() != null) {
-			String selEv[] = eventJList2.getSelectedValue().toString().split(
-					"]");
+		if (event == modifyEvB && eventJTable.getSelectedRow() != -1) {
+			int sel = Integer.parseInt(eventJTable.getValueAt(
+					eventJTable.getSelectedRow(), 0).toString());
 			if (checkEvErrors()) {
 				try {
 					if (!eSelectedImage.equals("")) {
@@ -1063,13 +1055,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 					} else {
 						eRemoteImage = ePreviousImage;
 					}
-					currentClub.updateEvent(new MyEvent(Integer
-							.parseInt(selEv[0]), currentClub.getClub().getId(),
-							eName.getText().replace("'", "\\'"),
-							eShortDescription.getText().replace("'", "\\'"),
-							eLongDescription.getText().replace("'", "\\'"),
-							eLocation.getText().replace("'", "\\'"), eCategory
-									.getText().replace("'", "\\'"), eStartDate
+					currentClub.updateEvent(new MyEvent(sel, currentClub
+							.getClub().getId(), eName.getText().replace("'",
+							"\\'"), eShortDescription.getText().replace("'",
+							"\\'"), eLongDescription.getText().replace("'",
+							"\\'"), eLocation.getText().replace("'", "\\'"),
+							eCategory.getText().replace("'", "\\'"), eStartDate
 									.getDate(), eFinishDate.getDate(),
 							eStartTime.getText(), eFinishTime.getText(),
 							eRestriction.getText().replace("'", "\\'"),
@@ -1083,7 +1074,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 								eSelectedImage);
 					}
 					JOptionPane.showMessageDialog(mainFrame,
-							"Modified succesfully " + selEv[1], "Modified!",
+							"Modified succesfully " + sel, "Modified!",
 							JOptionPane.INFORMATION_MESSAGE);
 					cleanBoxes();
 				} catch (Exception ex) {
@@ -1093,27 +1084,24 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				}
 			}
 		}
-		if (event == deleteEvB && eventJList2.getSelectedValue() != null) {
-			String selEv[] = eventJList2.getSelectedValue().toString().split(
-					"]");
+		if (event == deleteEvB && eventJTable.getSelectedRow() != -1) {
+			int sel = Integer.parseInt(eventJTable.getValueAt(
+					eventJTable.getSelectedRow(), 0).toString());
 			try {
-				currentClub.deleteEvent(Integer.parseInt(selEv[0]));
+				currentClub.deleteEvent(sel);
 				cleanBoxes();
-				JOptionPane
-						.showMessageDialog(mainFrame, "Deleted succesfully "
-								+ selEv[1], "Deleted!",
-								JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(mainFrame, "Deleted succesfully "
+						+ sel, "Deleted!", JOptionPane.INFORMATION_MESSAGE);
 			} catch (NumberFormatException e1) {
-				JOptionPane.showMessageDialog(mainFrame, "Not Deleted!"
-						+ selEv[1], "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(mainFrame, "Not Deleted!" + sel,
+						"Error", JOptionPane.ERROR_MESSAGE);
 				e1.printStackTrace();
 			} catch (RemoteException e1) {
-				JOptionPane.showMessageDialog(mainFrame, "Not Deleted!"
-						+ selEv[1], "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(mainFrame, "Not Deleted!" + sel,
+						"Error", JOptionPane.ERROR_MESSAGE);
 				e1.printStackTrace();
 			}
-			populateList(eventJList2, getEventsArray());
-			populateList(eventJList, getEventsArray());
+			cleanBoxes();
 		}
 
 		if (event == credits) {
@@ -1131,9 +1119,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == reloadEvents) {
 			cleanBoxes();
-			populateList(eventJList, getEventsArray());
-			populateList(eventJList2, getEventsArray());
-			populateList(eventJList3, getOldEventsArray());
 		}
 		if (event == exit) {
 			int answer = JOptionPane.showConfirmDialog(mainFrame,
@@ -1233,21 +1218,20 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// ******************************************************************************
 
 	public void valueChanged(ListSelectionEvent e) {
-		if (e.getSource() == eventJList
-				&& eventJList.getSelectedValue() != null) {
+		if (e.getSource() == messageEventJTable
+				&& messageEventJTable.getSelectedRow() != -1) {
 			sendMessB.setEnabled(true);
 			sendToAllB.setEnabled(true);
-			int sel = Integer.parseInt(eventJList.getSelectedValue().toString()
-					.split("]")[0]);
+			int sel = Integer.parseInt(messageEventJTable.getValueAt(
+					messageEventJTable.getSelectedRow(), 0).toString());
 			usersJList.setListData(getUsersArray(sel));
 		}
-		if (e.getSource() == eventJList2
-				&& eventJList2.getSelectedValue() != null) {
+		if (e.getSource() == eventJTable && eventJTable.getSelectedRow() != -1) {
 			modifyEvB.setEnabled(true);
 			deleteEvB.setEnabled(true);
 			try {
-				int sel = Integer.parseInt(eventJList2.getSelectedValue()
-						.toString().split("]")[0]);
+				int sel = Integer.parseInt(eventJTable.getValueAt(
+						eventJTable.getSelectedRow(), 0).toString());
 				MyEvent event = currentClub.getEvent(sel);
 
 				eName.setText(event.geteName());
@@ -1283,11 +1267,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				e1.printStackTrace();
 			}
 		}
-		if (e.getSource() == eventJList3
-				&& eventJList3.getSelectedValue() != null) {
+		if (e.getSource() == oldEventJTable
+				&& oldEventJTable.getSelectedRow() != -1) {
 			try {
-				int sel = Integer.parseInt(eventJList3.getSelectedValue()
-						.toString().split("]")[0]);
+				int sel = Integer.parseInt(oldEventJTable.getValueAt(
+						oldEventJTable.getSelectedRow(), 0).toString());
+
 				MyEvent event = currentClub.getOldEvent(sel);
 
 				eOName.setText(event.geteName());
