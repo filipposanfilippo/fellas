@@ -341,7 +341,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	
-	public Club getClub(String key, String senderTel, String scope, String value){
+	public Club getClub(String key, String senderTel, String scope, String value) throws RemoteException{
 		try {
 			if (!checkConnection())
 				openConnection();
@@ -372,7 +372,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new Club(-1,"NOT FOUND","","","","","","","","","");
 	}
 	
-	public User getUser(String key, String senderTel, String scope, String value){
+	
+	public User getUser(String key, String senderTel, String scope, String value)throws RemoteException{
 		try {
 			if (!checkConnection())
 				openConnection();
