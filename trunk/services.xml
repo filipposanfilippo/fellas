@@ -1,5 +1,5 @@
-<service name="pippo">
-<description>Performs sticazzi</description>
+<service name="fellaServices">
+<description>Offers a number of services useful to use the "fellas" platform</description>
 <messageReceivers>
 <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only" 		class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
 <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out" class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
