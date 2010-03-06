@@ -91,13 +91,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	// TODO to cancel
-	public boolean authenticationClub(String name, String psw)
-			throws RemoteException {
-		// invoke client club method to check user-password
-		return false;
-	}
-
-	// TODO to cancel
 	public boolean authenticationMobile() throws RemoteException {
 		// invoke client club method to check user-password
 		return false;
@@ -347,6 +340,71 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new Club();
 	}
 
+	
+	public Club getClub(String key, String senderTel, String scope, String value){
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key))
+				return new Club(-1,"NOT AUTHORIZED","","","","","","","","","");
+			query = "SELECT * FROM clubs WHERE " + scope + "='" + value + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next()){
+				insertUserLog(senderTel, "getClub", scope+": "+value);
+				return new Club(rs.getInt("id"), rs
+						.getString("oName"), rs
+						.getString("oSurname"), rs
+						.getString("cAddress"), rs
+						.getString("cTel"), rs
+						.getString("cEMail"), rs
+						.getString("cType"), rs
+						.getString("cName"), rs
+						.getString("username"), rs
+						.getString("psw"), rs
+						.getString("cImageURL"));
+			}
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getClub: ");
+			e.printStackTrace();
+			return new Club(-1,"ERROR","","","","","","","","","");
+		}
+		return new Club(-1,"NOT FOUND","","","","","","","","","");
+	}
+	
+	public User getUser(String key, String senderTel, String scope, String value){
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key))
+				return new User(-1,"NOT AUTHORIZED","","","","","","","","","",1);;
+			query = "SELECT * FROM users WHERE " + scope + "='" + value + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if (rs.next()){
+				insertUserLog(senderTel, "getUser", scope+": "+value);
+				return new User(rs.getInt("id"), rs
+						.getString("uTel"), rs
+						.getString("uName"), rs
+						.getString("uAge"), rs
+						.getString("uSex"), rs
+						.getString("uStatus"), rs
+						.getString("username"), rs
+						.getString("psw"), rs
+						.getString("uSurname"), rs
+						.getString("uLocation"), rs
+						.getString("imageURL"), rs
+						.getInt("privacy"));
+			}
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getUser: ");
+			e.printStackTrace();
+			return new User(-1,"ERROR","","","","","","","","","",1);
+		}
+		return new User(-1,"NOT FOUND","","","","","","","","","",1);
+	}
+	
+	
 	public LinkedList<MyEvent> getClubEventsList(String username, String psw,
 			int cId, String table) throws RemoteException {
 		try {
@@ -534,12 +592,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public MobileUser getMobileUser(String name) {
-		// TODO IS IT NECESSARY???
-		openConnection();
-		closeConnection();
-		return null;
-	}
 
 	public boolean createEvent(String username, String psw, int cId,
 			String eName, String eShortDescription, String eLongDescription,
