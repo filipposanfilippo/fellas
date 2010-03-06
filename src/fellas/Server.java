@@ -341,18 +341,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	
-	public Club getClub(String key, String senderTel, String scope, String value) throws RemoteException{
+	public LinkedList<Club> getClub(String key, String senderTel, String scope, String value) throws RemoteException{
+		LinkedList<Club> results = new LinkedList<Club>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key))
-				return new Club(-1,"NOT AUTHORIZED","","","","","","","","","");
+			if (!keyword.equals(key)){
+				results.add(new Club(-1,"","","-1","","NOT AUTHORIZED","","","","",""));
+				return results;
+			}
 			query = "SELECT * FROM clubs WHERE " + scope + "='" + value + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next()){
+			while (rs.next()){
 				insertUserLog(senderTel, "getClub", scope+": "+value);
-				return new Club(rs.getInt("id"), rs
+				results.add(new Club(rs.getInt("id"), rs
 						.getString("oName"), rs
 						.getString("oSurname"), rs
 						.getString("cAddress"), rs
@@ -362,29 +365,35 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("cName"), rs
 						.getString("username"), rs
 						.getString("psw"), rs
-						.getString("cImageURL"));
+						.getString("cImageURL")));
 			}
+			if(results.isEmpty())
+				results.add(new Club(-1,"","","-1","","NOT FOUND","","","","",""));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClub: ");
 			e.printStackTrace();
-			return new Club(-1,"ERROR","","","","","","","","","");
+			results.add( new Club(-1,"","","-1","","ERROR","","","","",""));
+			return results;
 		}
-		return new Club(-1,"NOT FOUND","","","","","","","","","");
+		return results;
 	}
 	
 	
-	public User getUser(String key, String senderTel, String scope, String value)throws RemoteException{
+	public LinkedList<User> getUser(String key, String senderTel, String scope, String value)throws RemoteException{
+		LinkedList<User> results = new LinkedList<User>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key))
-				return new User(-1,"NOT AUTHORIZED","","","","","","","","","",1);;
+			if (!keyword.equals(key)){
+				results.add(new User(-1,"","","","","","","NOT AUTHORIZED","","","",1));
+				return results;
+			}
 			query = "SELECT * FROM users WHERE " + scope + "='" + value + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next()){
+			while(rs.next()){
 				insertUserLog(senderTel, "getUser", scope+": "+value);
-				return new User(rs.getInt("id"), rs
+				 results.add(new User(rs.getInt("id"), rs
 						.getString("uTel"), rs
 						.getString("uName"), rs
 						.getString("uAge"), rs
@@ -395,14 +404,17 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("uSurname"), rs
 						.getString("uLocation"), rs
 						.getString("imageURL"), rs
-						.getInt("privacy"));
+						.getInt("privacy")));
 			}
+			if(results.isEmpty())
+				results.add(new User(-1,"","","","","","","NOT FOUND","","","",1));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getUser: ");
 			e.printStackTrace();
-			return new User(-1,"ERROR","","","","","","","","","",1);
+			results.add(new User(-1,"","","","","","","ERROR","","","",1));
+			return results;
 		}
-		return new User(-1,"NOT FOUND","","","","","","","","","",1);
+		return results;
 	}
 	
 	

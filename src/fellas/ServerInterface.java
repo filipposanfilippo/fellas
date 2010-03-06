@@ -23,10 +23,10 @@ public interface ServerInterface extends Remote {
 
 	public Club getClubData(String cName, String psw) throws RemoteException;
 
-	public Club getClub(String key, String senderTel, String scope, String value)
+	public LinkedList<Club> getClub(String key, String senderTel, String scope, String value)
 	throws RemoteException;
 	
-	public User getUser(String key, String senderTel, String scope, String value)
+	public LinkedList<User> getUser(String key, String senderTel, String scope, String value)
 	throws RemoteException;
 	
 	public boolean updateClubData(String cName, String psw, Club club)
