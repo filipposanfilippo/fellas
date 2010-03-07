@@ -1849,6 +1849,127 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "REGISTRATION ERROR%";
 		}
 	}
+	
+	
+	
+	
+	
+	public String userRegistration(String key, String uTel, String username,
+			String psw, String uSex, String uAge, String uLocation,
+			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException {
+		if (!keyword.equals(key))
+			return "You are not authorized";
+		if (!checkConnection())
+			openConnection();
+		if (isUserExisting(uTel))
+			return "Already registered%";
+		try {
+			query = "INSERT INTO users (uTel,username,psw,uSex,uAge,uLocation,privacy,uName, uStatus, uSurname, imageURL)"
+					+ "VALUES ('"
+					+ uTel
+					+ "','"
+					+ username
+					+ "','"
+					+ psw
+					+ "','"
+					+ uSex
+					+ "','"
+					+ uAge
+					+ "','"
+					+ uLocation
+					+ "','"
+					+ uPrivacy 
+					+ "','"
+					+ uName
+					+ "','"
+					+ uStatus
+					+ "','"
+					+ uSurname
+					+ "','"
+					+ imageURL
+					+ "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// recupera id user
+			query = "SELECT id, privacy FROM users WHERE username='" + username
+					+ "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int id = rs.getInt("id");
+			int privacy = rs.getInt("privacy");
+
+			// insert user in POI
+			String[] coordinates = new String[2];
+			coordinates = address2GEOcoordinates(uLocation);
+			if (privacy == 0)
+				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+						+ "VALUES ('"
+						+ id
+						+ "','','"
+						+ coordinates[0]
+						+ "','"
+						+ coordinates[1]
+						+ "','"
+						+ uSex
+						+ "','"
+						+ uAge
+						+ "', '"
+						+ username 
+						+ "',1,'"
+						+ imageURL
+						+ "','"
+						+ uName + " " + uSurname
+						+"')";
+			else
+				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+						+ "VALUES ('"
+						+ id
+						+ "','"
+						+ uTel
+						+ "','"
+						+ coordinates[0]
+						+ "','"
+						+ coordinates[1]
+						+ "','"
+						+ uSex
+						+ "','"
+						+ uAge
+						+ "', '"
+						+ username 
+						+ "',1,'"
+						+ imageURL
+						+ "','"
+						+ uName + " " + uSurname
+						+"')";
+
+			statement = connection.createStatement();
+			statement.execute(query);
+
+			// add action to poi
+			// recupera id del poi
+			query = "SELECT id FROM POI WHERE type=1 AND idItem='" + id + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			int poiId = rs.getInt("id");
+
+			query = "INSERT INTO Action (uri,label,poiId)"
+					+ "VALUES ('http://diana.netsons.org/users/" + username
+					+ ".php','Visit user page','" + poiId + "')";
+			statement = connection.createStatement();
+			statement.execute(query);
+			insertUserLog(uTel, "userRegistration", username);
+			return "Welcome to Fellas, you can now use our services%";
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "REGISTRATION ERROR%";
+		}
+	}
+	
+	
+	
 
 	public String usersList(String key, String senderTel, String criterion)
 			throws RemoteException {
@@ -1909,6 +2030,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "USERLIST ERROR%";
 		}
 	}
+	
+	
+	
+	
 
 	public String clubsList(String key, String senderTel, String criterion)
 			throws RemoteException {

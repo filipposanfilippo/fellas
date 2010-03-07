@@ -67,6 +67,10 @@ public interface ServerInterface extends Remote {
 	public String mobileRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
 			String uPrivacy) throws RemoteException;
+	
+	public String userRegistration(String key, String uTel, String username,
+			String psw, String uSex, String uAge, String uLocation,
+			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException; 
 
 	public boolean authenticationMobile() throws RemoteException;
 
