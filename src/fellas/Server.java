@@ -512,6 +512,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("eRestriction"), rs
 						.getString("eInfoTel"), rs
 						.getString("eImageURL"))));
+			
+			for(MyEvent e: eventsList)
+				e=addClubToEvent(e);
+			
 			if(eventsList.isEmpty())
 				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
 		} catch (SQLException e) {
@@ -534,11 +538,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				clubName = rs.getString("cName");
 			else
 				return null;
-			return new MyEvent(
-					m.getId(), m.getcId(),m.geteName(), m.geteShortDescription(), m.geteLongDescription(),
-					m.geteLocation(), m.geteCategory(), m.geteStartDate(), m.geteFinishDate(), 
-					m.geteStartTime(), m.geteFinishTime(), m.geteRestriction(), m.geteInfoTel(),
-					m.geteImageURL(), clubName); 
+			m.setClubName(clubName);
+			return m;
 		}catch(SQLException e){
 			e.printStackTrace();
 			return null;
