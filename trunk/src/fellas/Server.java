@@ -430,7 +430,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventList.add(addClubToEvent(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+				eventList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
 						.getString("eName"), rs.getString("eShortDescription"),
 						rs.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
@@ -499,7 +499,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventsList.add(addClubToEvent(new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+				eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
 						rs.getString("eName"), rs
 						.getString("eShortDescription"), rs
 						.getString("eLongDescription"), rs
