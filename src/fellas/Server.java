@@ -430,7 +430,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+				eventList.add(addClubToEvent(new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
 						.getString("eName"), rs.getString("eShortDescription"),
 						rs.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
@@ -441,7 +441,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eFinishTime"), rs
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
-								.getString("eImageURL")));
+								.getString("eImageURL"))));
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
@@ -499,7 +499,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventsList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+				eventsList.add(addClubToEvent(new MyEvent(rs.getInt("id"), rs.getInt("cId"),
 						rs.getString("eName"), rs
 						.getString("eShortDescription"), rs
 						.getString("eLongDescription"), rs
@@ -511,21 +511,39 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("eFinishTime"), rs
 						.getString("eRestriction"), rs
 						.getString("eInfoTel"), rs
-						.getString("eImageURL")));
+						.getString("eImageURL"))));
 			if(eventsList.isEmpty())
 				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
 		} catch (SQLException e) {
 			e.printStackTrace(System.err);
-			try {
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+			eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
 			return eventsList;
 		}
 		return eventsList;
 	}
 	
+	public MyEvent addClubToEvent(MyEvent m){
+		try {
+			if (!checkConnection())
+				openConnection();
+			String clubName="";
+			query = "SELECT cName FROM clubs WHERE id=" + m.getcId();
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			if(rs.next())
+				clubName = rs.getString("cName");
+			else
+				return null;
+			return new MyEvent(
+					m.getId(), m.getcId(),m.geteName(), m.geteShortDescription(), m.geteLongDescription(),
+					m.geteLocation(), m.geteCategory(), m.geteStartDate(), m.geteFinishDate(), 
+					m.geteStartTime(), m.geteFinishTime(), m.geteRestriction(), m.geteInfoTel(),
+					m.geteImageURL(), clubName); 
+		}catch(SQLException e){
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	public LinkedList<User> getEventUsersList(String username, String psw,
 			int eventId) throws RemoteException {

@@ -1,21 +1,10 @@
 package fellas;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.util.Date;
 
 public class MyEvent implements Serializable {
-	// ___DB access
-	final String dbUser = "diana";
-	final String dbPass = "password1234";
-	final String dbHost = "db4free.net";
-	final String dbDriver = "com.mysql.jdbc.Driver";
-	final String dbUrl = "jdbc:mysql://db4free.net:3306/";
-
 	private int id;
 	private int cId;
 	private String eName;
@@ -36,12 +25,8 @@ public class MyEvent implements Serializable {
 			String eLongDescription, String eLocation, String eCategory,
 			Date eStartDate, Date eFinishDate, String eStartTime,
 			String eFinishTime, String eRestriction, String eInfoTel,
-			String eImageURL) throws SQLException {
+			String eImageURL){
 		super();
-		String query = "";
-		Connection connection = null;
-		Statement statement = null;
-		ResultSet rs = null;
 		this.id = id;
 		this.cId = cId;
 		this.eName = eName;
@@ -56,22 +41,29 @@ public class MyEvent implements Serializable {
 		this.eRestriction = eRestriction;
 		this.eInfoTel = eInfoTel;
 		this.eImageURL = eImageURL;
-		try {
-			Class.forName(dbDriver);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		connection = DriverManager.getConnection(dbUrl, dbUser, dbPass);// diana4free
-		connection.setCatalog("diana");
-		query = "SELECT cName FROM clubs WHERE cId=" + cId;
-		statement = connection.createStatement();
-		rs = statement.executeQuery(query);
-		if (rs.next())
-			setClubName(rs.getString("cName"));
-		else
-			setClubName("");
-		connection.close();
+	}
+	
+	public MyEvent(int id, int cId, String eName, String eShortDescription,
+			String eLongDescription, String eLocation, String eCategory,
+			Date eStartDate, Date eFinishDate, String eStartTime,
+			String eFinishTime, String eRestriction, String eInfoTel,
+			String eImageURL, String clubName){
+		super();
+		this.id = id;
+		this.cId = cId;
+		this.eName = eName;
+		this.eShortDescription = eShortDescription;
+		this.eLongDescription = eLongDescription;
+		this.eLocation = eLocation;
+		this.eCategory = eCategory;
+		this.eStartDate = eStartDate;
+		this.eFinishDate = eFinishDate;
+		this.eStartTime = eStartTime;
+		this.eFinishTime = eFinishTime;
+		this.eRestriction = eRestriction;
+		this.eInfoTel = eInfoTel;
+		this.eImageURL = eImageURL;
+		this.clubName = clubName;
 	}
 
 	public MyEvent() {
