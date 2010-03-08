@@ -50,8 +50,11 @@ public interface ServerInterface extends Remote {
 	public boolean deleteEvent(String cName, String psw, int eventId)
 			throws RemoteException;
 
-	public LinkedList<User> getEventUsersList(String cName, String psw,
+	public LinkedList<User> getEventUsersList(String username, String psw,
 			int eventId) throws RemoteException;
+	
+	public LinkedList<MyEvent> getUserEventsList(String key, String senderTel,
+			int userId) throws RemoteException;
 
 	public String spamMobile(String cName, String psw, String message,
 			String criterion) throws RemoteException;
@@ -73,6 +76,10 @@ public interface ServerInterface extends Remote {
 			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException; 
 
 	public boolean authenticationMobile() throws RemoteException;
+	
+	public boolean userEditProfile(String key, String uTel, String NEWusername,
+			String NEWpsw, String NEWuSex, String NEWuAge, String NEWuLocation,
+			String NEWuPrivacy, String NEWuName, String NEWuStatus, String NEWuSurname, String NEWimageURL) throws RemoteException;
 
 	public String mobileUnregistration(String key, String uTel)
 			throws RemoteException;
