@@ -15,7 +15,7 @@ public class MyEvent implements Serializable {
 	final String dbHost = "db4free.net";
 	final String dbDriver = "com.mysql.jdbc.Driver";
 	final String dbUrl = "jdbc:mysql://db4free.net:3306/";
-	
+
 	private int id;
 	private int cId;
 	private String eName;
@@ -38,7 +38,7 @@ public class MyEvent implements Serializable {
 			String eFinishTime, String eRestriction, String eInfoTel,
 			String eImageURL) throws SQLException {
 		super();
-		String query="";
+		String query = "";
 		Connection connection = null;
 		Statement statement = null;
 		ResultSet rs = null;
@@ -56,23 +56,22 @@ public class MyEvent implements Serializable {
 		this.eRestriction = eRestriction;
 		this.eInfoTel = eInfoTel;
 		this.eImageURL = eImageURL;
-		try{
+		try {
 			Class.forName(dbDriver);
-			connection = DriverManager.getConnection(dbUrl, dbUser, dbPass);// diana4free
-			connection.setCatalog("diana");
-			query = "SELECT cName FROM clubs WHERE cId=" + cId;
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			if(rs.next())
-				this.clubName = rs.getString("cName");
-			else
-				this.clubName = "";
-			connection.close();
-		}catch(ClassNotFoundException e ){
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			this.clubName = "";
-			connection.close();
 		}
+		connection = DriverManager.getConnection(dbUrl, dbUser, dbPass);// diana4free
+		connection.setCatalog("diana");
+		query = "SELECT cName FROM clubs WHERE cId=" + cId;
+		statement = connection.createStatement();
+		rs = statement.executeQuery(query);
+		if (rs.next())
+			setClubName(rs.getString("cName"));
+		else
+			setClubName("");
+		connection.close();
 	}
 
 	public MyEvent() {
@@ -190,5 +189,13 @@ public class MyEvent implements Serializable {
 
 	public String geteImageURL() {
 		return eImageURL;
+	}
+
+	public void setClubName(String clubName) {
+		this.clubName = clubName;
+	}
+
+	public String getClubName() {
+		return clubName;
 	}
 }
