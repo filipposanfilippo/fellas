@@ -482,6 +482,51 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	
+	
+	public LinkedList<MyEvent> getUserEventsList(String key, String senderTel,
+			int userId) throws RemoteException {
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key)){
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
+			}
+			query = "SELECT * FROM events RIGHT OUTER JOIN subscription "
+					+ "ON events.id = subscription.eId "
+					+ "WHERE subscription.uId=" + userId;
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			while (rs.next())
+				eventsList.add(new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+						rs.getString("eName"), rs
+						.getString("eShortDescription"), rs
+						.getString("eLongDescription"), rs
+						.getString("eLocation"), rs
+						.getString("eCategory"), rs
+						.getDate("eStartDate"), rs
+						.getDate("eFinishDate"), rs
+						.getString("eStartTime"), rs
+						.getString("eFinishTime"), rs
+						.getString("eRestriction"), rs
+						.getString("eInfoTel"), rs
+						.getString("eImageURL")));
+			if(eventsList.isEmpty())
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
+		} catch (SQLException e) {
+			e.printStackTrace(System.err);
+			try {
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			return eventsList;
+		}
+		return eventsList;
+	}
+	
+	
 	public LinkedList<User> getEventUsersList(String username, String psw,
 			int eventId) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty list
@@ -514,7 +559,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	/*
 	 * public MobileUser[] getMobileList(String sqlString) throws
 	 * RemoteException { // TODO IS IT NECESSARY??? try { openConnection(); } //
-	 * catch(SQLException e){ catch (Exception e) { // TODO use the line above
+	 * catch(SQLException e){ catch (Exception e) { 
 	 * 
 	 * } finally { closeConnection(); } return null; }
 	 */
@@ -1968,6 +2013,37 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 	
+	public boolean userEditProfile(String key, String uTel, String NEWusername,
+			String NEWpsw, String NEWuSex, String NEWuAge, String NEWuLocation,
+			String NEWuPrivacy, String NEWuName, String NEWuStatus, String NEWuSurname, String NEWimageURL) throws RemoteException{
+		if (!keyword.equals(key))
+			return false;
+		if (!checkConnection())
+			openConnection();
+		try {
+			query = "UPDATE users SET"
+					+ "username='" + NEWusername + "',"
+					+ "psw='" + NEWpsw + "',"
+					+ "uSex='" + NEWuSex + "',"
+					+ "uAge='" + NEWuAge + "',"
+					+ "uLocation='" + NEWuLocation + "',"
+					+ "privacy='" + NEWuPrivacy + "',"
+					+ "uName='" + NEWuName + "',"
+					+ "uStatus='" + NEWuStatus + "',"
+					+ "uSurname='" + NEWuSurname + "',"
+					+ "imageURL='" + NEWimageURL
+					+ "' WHERE uTel='" + uTel + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			// update new location
+			setLocation(key,uTel,NEWuLocation);
+			insertUserLog(uTel, "userEditProfile", "");
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 	
 	
 
