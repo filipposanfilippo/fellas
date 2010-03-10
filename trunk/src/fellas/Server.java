@@ -2526,18 +2526,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events  WHERE eName = '" + name + "' AND "+ "eLocation = '" + location + "'";
+				query = "SELECT * FROM events  WHERE eName LIKE %'" + name + "'% AND "+ "eLocation LIKE %'" + location + "'%";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM events ";
 			else if (name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events WHERE eLocation = '" + location + "'";
+				query = "SELECT * FROM events WHERE eLocation LIKE %'" + location + "'%";
 			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM events WHERE eName = '" + name + "'";
+				query = "SELECT * FROM events WHERE eName LIKE %'" + name + "'%";
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			
-			
+			insertUserLog(senderTel, "searchEvent", "name: " + name + " - location: " + location + " - date: " + dayOfEvent.toString());
 			while (rs.next()){
 				dayOfStart = rs.getDate("eStartDate");
 				dayOfFinish = rs.getDate("eFinishDate");
@@ -2593,9 +2593,52 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 //	}
 //
 //
-//	public User searchUser(){
-//	
-//	}
+	public LinkedList<User> searchUser(String key, String senderTel, String name, String location)throws RemoteException{
+		LinkedList<User> results = new LinkedList<User>();
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key)){
+				results.add(new User(-1,"","","","","","","NOT AUTHORIZED","","","",1));
+				return results;
+			}
+			
+			if(!name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM users  WHERE uName LIKE %'" + name + "'% AND "+ "uLocation = %'" + location + "'%";
+			else if (name.isEmpty() && location.isEmpty()) 
+				query = "SELECT * FROM users ";
+			else if (name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM users WHERE uLocation LIKE %'" + location + "'%";
+			else if (!name.isEmpty() && location.isEmpty())
+				query = "SELECT * FROM users WHERE uName = %'" + name + "'%";
+			
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			while(rs.next()){
+				insertUserLog(senderTel, "searchUser", "name: " + name + " - location: "+location);
+				results.add(new User(rs.getInt("id"), rs
+						.getString("uTel"), rs
+						.getString("uName"), rs
+						.getString("uAge"), rs
+						.getString("uSex"), rs
+						.getString("uStatus"), rs
+						.getString("username"), rs
+						.getString("psw"), rs
+						.getString("uSurname"), rs
+						.getString("uLocation"), rs
+						.getString("imageURL"), rs
+						.getInt("privacy")));
+			}
+			if(results.isEmpty())
+				results.add(new User(-1,"","","","","","","NOT FOUND","","","",1));
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getUser: ");
+			e.printStackTrace();
+			results.add(new User(-1,"","","","","","","ERROR","","","",1));
+			return results;
+		}
+		return results;
+	}
 	
 	
 	
