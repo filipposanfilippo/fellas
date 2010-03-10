@@ -2508,32 +2508,10 @@ System.out.println("queryPOI: " + query);
 	
 	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException{
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		String eName;
-		String eLocation;
 		Date dayOfEvent= null;
 		Date dayOfStart = null;
 		Date dayOfFinish = null;
 		DateFormat df = null;
-		
-		
-		
-		if(!name.isEmpty()){
-			eName = "eName = ";
-			name = "'"+name+"'";
-		}
-		else {
-			eName = "";
-			name = "";	
-		}
-		
-		if(!location.isEmpty()){
-			eLocation = "eLocation = ";
-			location = "'"+location+"'";
-		}
-		else{
-			eLocation="";
-			location="";
-		}
 		
 		if(!date.isEmpty()){			
 			df = new SimpleDateFormat("yyyy-MM-dd");
@@ -2547,7 +2525,6 @@ System.out.println("queryPOI: " + query);
 		}
 			
 		
-		
 		try {
 			if (!checkConnection())
 				openConnection();
@@ -2556,9 +2533,13 @@ System.out.println("queryPOI: " + query);
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events " + "WHERE " + eName + name + " AND "+ eLocation + location;
-			else 
-				query = "SELECT * FROM events " + "WHERE " + eName + name + eLocation + location;
+				query = "SELECT * FROM events  WHERE eName = '" + name + " AND "+ "eLocation = '" + location + "'";
+			else if (name.isEmpty() && location.isEmpty()) 
+				query = "SELECT * FROM events ";
+			else if (name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM events WHERE eLocation = '" + location + "'";
+			else if (!name.isEmpty() && location.isEmpty())
+				query = "SELECT * FROM events WHERE eName = '" + name + "'";
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
