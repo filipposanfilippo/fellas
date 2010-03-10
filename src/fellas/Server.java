@@ -2587,12 +2587,57 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 	
 
+	public LinkedList<Club> searchClub(String key, String senderTel, String name, String location) throws RemoteException{
+		LinkedList<Club> results = new LinkedList<Club>();
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key)){
+				results.add(new Club(-1,"","","-1","","NOT AUTHORIZED","","","","",""));
+				return results;
+			}
+
+			if(!name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM clubs  WHERE (cName LIKE '%" + name + "%' OR username LIKE '%"+ name + "%')" + "' AND "+ "cAddress LIKE '%" + location + "%'";
+			else if (name.isEmpty() && location.isEmpty()) 
+				query = "SELECT * FROM clubs ";
+			else if (name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM clubs WHERE cAddress LIKE '%" + location + "%'";
+			else if (!name.isEmpty() && location.isEmpty())
+				query = "SELECT * FROM clubs WHERE cName LIKE '%" + name + "%' OR username LIKE '%"+ name + "%'";
+			
+			
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			insertUserLog(senderTel, "searchClub", "name: " + name + " - location: "+location);
+			
+			while (rs.next()){
+				results.add(new Club(rs.getInt("id"), rs
+						.getString("oName"), rs
+						.getString("oSurname"), rs
+						.getString("cAddress"), rs
+						.getString("cTel"), rs
+						.getString("cEMail"), rs
+						.getString("cType"), rs
+						.getString("cName"), rs
+						.getString("username"), rs
+						.getString("psw"), rs
+						.getString("cImageURL")));
+			}
+			if(results.isEmpty())
+				results.add(new Club(-1,"","","-1","","NOT FOUND","","","","",""));
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER searchClub: ");
+			e.printStackTrace();
+			results.add( new Club(-1,"","","-1","","ERROR","","","","",""));
+			return results;
+		}
+		return results;
+	}	
+
+
 	
-//	public Club searchClub(){
-//		
-//	}
-//
-//
+
 	public LinkedList<User> searchUser(String key, String senderTel, String name, String location)throws RemoteException{
 		LinkedList<User> results = new LinkedList<User>();
 		try {
@@ -2614,8 +2659,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
+			
+			insertUserLog(senderTel, "searchUser", "name: " + name + " - location: "+location);
 			while(rs.next()){
-				insertUserLog(senderTel, "searchUser", "name: " + name + " - location: "+location);
 				results.add(new User(rs.getInt("id"), rs
 						.getString("uTel"), rs
 						.getString("uName"), rs
@@ -2632,7 +2678,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			if(results.isEmpty())
 				results.add(new User(-1,"","","","","","","NOT FOUND","","","",1));
 		} catch (SQLException e) {
-			System.out.println("ERRORE IN SERVER getUser: ");
+			System.out.println("ERRORE IN SERVER searchUser: ");
 			e.printStackTrace();
 			results.add(new User(-1,"","","","","","","ERROR","","","",1));
 			return results;

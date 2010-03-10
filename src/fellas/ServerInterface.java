@@ -81,6 +81,8 @@ public interface ServerInterface extends Remote {
 	
 	public LinkedList<User> searchUser(String key, String senderTel, String name, String location) throws RemoteException;
 	
+	public LinkedList<Club> searchClub(String key, String senderTel, String name, String location) throws RemoteException;
+	
 	public boolean userEditProfile(String key, String uTel, String NEWusername,
 			String NEWpsw, String NEWuSex, String NEWuAge, String NEWuLocation,
 			String NEWuPrivacy, String NEWuName, String NEWuStatus, String NEWuSurname, String NEWimageURL) throws RemoteException;
