@@ -2507,14 +2507,6 @@ System.out.println("queryPOI: " + query);
 	
 	
 	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException{
-		System.out.println("merda");
-		System.out.println("merda");
-		System.out.println("merda");
-		System.out.println("merda");
-		System.out.println("merda");
-		System.out.println("merda");
-		System.out.println("merda");
-		System.out.println("merda");
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		Date dayOfEvent= null;
 		Date dayOfStart = null;
