@@ -2099,7 +2099,7 @@ System.out.println("Sto per uploadare il POI");
 					+ "line4='" + line4 + "',"
 					+ "title='" + title
 					+ "' WHERE idItem='" + idItem 
-					+ "' AND type='" + idItem + "'";
+					+ "' AND type='" + type + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 System.out.println("queryPOI: " + query);
