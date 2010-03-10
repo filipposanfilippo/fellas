@@ -2040,7 +2040,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		if (!checkConnection())
 			openConnection();
-System.out.println("USER EDIT PROFILE");
 		try {
 			query = "UPDATE users SET "
 					+ "username='" + NEWusername + "',"
@@ -2060,22 +2059,18 @@ System.out.println("USER EDIT PROFILE");
 			//setLocation(key,uTel,NEWuLocation);  la tolgo xke' altrimenti mi inserirebbe il log
 			int id = getUserId(uTel);
 			String[] coordinates = new String[2];
-			coordinates = address2GEOcoordinates(NEWuLocation);
-System.out.println("Aggiorno la localit�");			
+			coordinates = address2GEOcoordinates(NEWuLocation);			
 			query = "UPDATE POI SET "
 					+ " lat='" + coordinates[0] + "'," + " lon='"
 					+ coordinates[1]
 					+ "' WHERE type=1 AND idItem=" + id;
 			statement = connection.createStatement();
 			statement.execute(query);	
-System.out.println("query2: " + query);
 			// update in POI
 			String tel=uTel;
 			if (Integer.parseInt(NEWuPrivacy)==0)
 				tel = "";
-System.out.println("aggiorno in POI");
-			updatePoi(tel,NEWimageURL,NEWuSex,NEWuAge,NEWuStatus,NEWusername,"1",id);
-System.out.println("TUTTO APPOSTO A FERRAGOSTO");			
+			updatePoi(tel,NEWimageURL,NEWuSex,NEWuAge,NEWuStatus,NEWusername,"1",id);			
 			insertUserLog(uTel, "userEditProfile", "");
 			return true;
 		} catch (SQLException e) {
@@ -2090,7 +2085,6 @@ System.out.println("TUTTO APPOSTO A FERRAGOSTO");
 		if (!checkConnection())
 			openConnection();
 		try {
-System.out.println("Sto per uploadare il POI");
 			query = "UPDATE POI SET "
 					+ "attribution='" + attribution + "',"
 					+ "imageURL='" + imageURL + "',"
@@ -2102,7 +2096,6 @@ System.out.println("Sto per uploadare il POI");
 					+ "' AND type='" + type + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-System.out.println("queryPOI: " + query);
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
