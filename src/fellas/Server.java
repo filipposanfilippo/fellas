@@ -2507,6 +2507,14 @@ System.out.println("queryPOI: " + query);
 	
 	
 	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException{
+		System.out.println("merda");
+		System.out.println("merda");
+		System.out.println("merda");
+		System.out.println("merda");
+		System.out.println("merda");
+		System.out.println("merda");
+		System.out.println("merda");
+		System.out.println("merda");
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		Date dayOfEvent= null;
 		Date dayOfStart = null;
@@ -2546,12 +2554,8 @@ System.out.println("queryPOI: " + query);
 			
 			
 			while (rs.next()){
-				try {
-					dayOfStart = df.parse(rs.getDate("eStartDate").toString());
-					dayOfFinish = df.parse(rs.getDate("eFinishDate").toString());
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+				dayOfStart = rs.getDate("eStartDate");
+				dayOfFinish = rs.getDate("eFinishDate");
 				
 				if(date.isEmpty())
 					eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
