@@ -2598,7 +2598,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM clubs  WHERE (cName LIKE '%" + name + "%' OR username LIKE '%"+ name + "%')" + "' AND "+ "cAddress LIKE '%" + location + "%'";
+				query = "SELECT * FROM clubs  WHERE (cName LIKE '%" + name + "%' OR username LIKE '%"+ name + "%')" + " AND "+ "cAddress LIKE '%" + location + "%'";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM clubs ";
 			else if (name.isEmpty() && !location.isEmpty())
@@ -2649,7 +2649,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM users  WHERE (uName LIKE '%" + name + "%' OR uSurname LIKE '%"+ name + "%')" + "' AND "+ "uLocation LIKE '%" + location + "%'";
+				query = "SELECT * FROM users  WHERE (uName LIKE '%" + name + "%' OR uSurname LIKE '%"+ name + "%')" + " AND "+ "uLocation LIKE '%" + location + "%'";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM users ";
 			else if (name.isEmpty() && !location.isEmpty())
