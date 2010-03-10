@@ -2056,14 +2056,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update new location
-			//setLocation(key,uTel,NEWuLocation); ����� la tolgo xk� altrimenti mi inserirebbe il log
+			//setLocation(key,uTel,NEWuLocation);  la tolgo xke' altrimenti mi inserirebbe il log
 			int id = getUserId(uTel);
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(NEWuLocation);
 			query = "UPDATE POI SET "
 					+ " lat='" + coordinates[0] + "'," + " lon='"
 					+ coordinates[1]
-					+ " WHERE type=1 AND idItem=" + id;
+					+ "' WHERE type=1 AND idItem=" + id;
 			statement = connection.createStatement();
 			statement.execute(query);			
 			// update in POI
