@@ -2526,13 +2526,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events  WHERE eName LIKE %'" + name + "'% AND "+ "eLocation LIKE %'" + location + "'%";
+				query = "SELECT * FROM events  WHERE eName LIKE '%" + name + "%' AND "+ "eLocation LIKE '%" + location + "%'";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM events ";
 			else if (name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events WHERE eLocation LIKE %'" + location + "'%";
+				query = "SELECT * FROM events WHERE eLocation LIKE '%" + location + "%'";
 			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM events WHERE eName LIKE %'" + name + "'%";
+				query = "SELECT * FROM events WHERE eName LIKE '%" + name + "%'";
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
@@ -2604,13 +2604,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM users  WHERE (uName LIKE %'" + name + "'% OR uSurname LIKE %'"+ name + "'%)" + "' AND "+ "uLocation = %'" + location + "'%";
+				query = "SELECT * FROM users  WHERE (uName LIKE '%" + name + "%' OR uSurname LIKE '%"+ name + "%')" + "' AND "+ "uLocation LIKE '%" + location + "%'";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM users ";
 			else if (name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM users WHERE uLocation LIKE %'" + location + "'%";
+				query = "SELECT * FROM users WHERE uLocation LIKE '%" + location + "%'";
 			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM users WHERE uName LIKE %'" + name + "'% OR uSurname LIKE %'"+ name + "'%";
+				query = "SELECT * FROM users WHERE uName LIKE '%" + name + "%' OR uSurname LIKE '%"+ name + "%'";
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
