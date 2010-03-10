@@ -2541,7 +2541,7 @@ System.out.println("queryPOI: " + query);
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events  WHERE eName = '" + name + " AND "+ "eLocation = '" + location + "'";
+				query = "SELECT * FROM events  WHERE eName = '" + name + "' AND "+ "eLocation = '" + location + "'";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM events ";
 			else if (name.isEmpty() && !location.isEmpty())
