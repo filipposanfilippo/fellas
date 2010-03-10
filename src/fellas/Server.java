@@ -221,6 +221,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "UPDATE POI SET attribution='" + club.getcTel() + "',"
 					+ " lat='" + coordinates[0] + "'," + " lon='"
 					+ coordinates[1] + "'," + " line2='" + club.getcType()
+					+ "'," + " line3='" + club.getoName() + " " + club.getoSurname() 
 					+ "'," + " line4='" + club.getcEMail() + "'"
 					+ " WHERE type=2 AND idItem=" + club.getId();
 			statement = connection.createStatement();
@@ -2055,7 +2056,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update new location
-			setLocation(key,uTel,NEWuLocation);
+			//setLocation(key,uTel,NEWuLocation); еееее la tolgo xkш altrimenti mi inserirebbe il log
+			int id = getUserId(uTel);
+			String[] coordinates = new String[2];
+			coordinates = address2GEOcoordinates(NEWuLocation);
+			query = "UPDATE POI SET "
+					+ " lat='" + coordinates[0] + "'," + " lon='"
+					+ coordinates[1]
+					+ " WHERE type=1 AND idItem=" + id;
+			statement = connection.createStatement();
+			statement.execute(query);			
+			// update in POI
+			String tel=uTel;
+			if (Integer.parseInt(NEWuPrivacy)==0)
+				tel = "";
+			updatePoi(tel,NEWimageURL,NEWuSex,NEWuAge,NEWuStatus,NEWusername,"1",id);
 			insertUserLog(uTel, "userEditProfile", "");
 			return true;
 		} catch (SQLException e) {
@@ -2065,6 +2080,28 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	}
 	
 	
+	public boolean updatePoi(String attribution, String imageURL, String line2, 
+			String line3, String line4, String title, String type, int idItem){
+		if (!checkConnection())
+			openConnection();
+		try {
+			query = "UPDATE POI SET "
+					+ "attribution='" + attribution + "',"
+					+ "imgURL='" + imageURL + "',"
+					+ "line2='" + line2 + "',"
+					+ "line3='" + line3 + "',"
+					+ "line4='" + line4 + "',"
+					+ "title='" + title
+					+ "' WHERE idItem='" + idItem 
+					+ "' AND type='" + idItem + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	public String usersList(String key, String senderTel, String criterion)
 			throws RemoteException {
