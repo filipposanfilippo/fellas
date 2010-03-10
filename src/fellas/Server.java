@@ -2087,7 +2087,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			query = "UPDATE POI SET "
 					+ "attribution='" + attribution + "',"
-					+ "imgURL='" + imageURL + "',"
+					+ "imageURL='" + imageURL + "',"
 					+ "line2='" + line2 + "',"
 					+ "line3='" + line3 + "',"
 					+ "line4='" + line4 + "',"
