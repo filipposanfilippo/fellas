@@ -2056,13 +2056,12 @@ System.out.println("USER EDIT PROFILE");
 					+ "' WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-System.out.println("query1: " + query);
 			// update new location
 			//setLocation(key,uTel,NEWuLocation);  la tolgo xke' altrimenti mi inserirebbe il log
 			int id = getUserId(uTel);
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(NEWuLocation);
-System.out.println("Aggiorno la località");			
+System.out.println("Aggiorno la localitï¿½");			
 			query = "UPDATE POI SET "
 					+ " lat='" + coordinates[0] + "'," + " lon='"
 					+ coordinates[1]
@@ -2560,6 +2559,7 @@ System.out.println("queryPOI: " + query);
 				query = "SELECT * FROM events " + "WHERE " + eName + name + " AND "+ eLocation + location;
 			else 
 				query = "SELECT * FROM events " + "WHERE " + eName + name + eLocation + location;
+			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			
