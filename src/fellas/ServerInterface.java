@@ -79,7 +79,7 @@ public interface ServerInterface extends Remote {
 	
 	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException;
 	
-	public LinkedList<User> searchUser(String key, String senderTel, String name, String location);
+	public LinkedList<User> searchUser(String key, String senderTel, String name, String location) throws RemoteException;
 	
 	public boolean userEditProfile(String key, String uTel, String NEWusername,
 			String NEWpsw, String NEWuSex, String NEWuAge, String NEWuLocation,
