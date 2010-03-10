@@ -2604,13 +2604,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 			
 			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM users  WHERE uName LIKE %'" + name + "'% AND "+ "uLocation = %'" + location + "'%";
+				query = "SELECT * FROM users  WHERE (uName LIKE %'" + name + "'% OR uSurname LIKE %'"+ name + "'%)" + "' AND "+ "uLocation = %'" + location + "'%";
 			else if (name.isEmpty() && location.isEmpty()) 
 				query = "SELECT * FROM users ";
 			else if (name.isEmpty() && !location.isEmpty())
 				query = "SELECT * FROM users WHERE uLocation LIKE %'" + location + "'%";
 			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM users WHERE uName = %'" + name + "'%";
+				query = "SELECT * FROM users WHERE uName LIKE %'" + name + "'% OR uSurname LIKE %'"+ name + "'%";
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
