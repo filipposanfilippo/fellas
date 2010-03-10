@@ -2056,7 +2056,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update new location
-			//setLocation(key,uTel,NEWuLocation); ¥¥¥¥¥ la tolgo xkè altrimenti mi inserirebbe il log
+			//setLocation(key,uTel,NEWuLocation); ï¿½ï¿½ï¿½ï¿½ï¿½ la tolgo xkï¿½ altrimenti mi inserirebbe il log
 			int id = getUserId(uTel);
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(NEWuLocation);
@@ -2496,6 +2496,110 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
+	
+	
+	
+	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date){
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
+		String eName;
+		String eLocation;
+		Date dayOfEvent= null;
+		Date dayOfStart = null;
+		Date dayOfFinish = null;
+		DateFormat df = null;
+		
+		
+		
+		if(!name.isEmpty())
+			eName = "eName = ";
+		else {
+			eName = "";
+			name = "";	
+		}
+		
+		if(!location.isEmpty())
+			eLocation = "eLocation = ";
+		else{
+			eLocation="";
+			location="";
+		}
+		
+		if(!date.isEmpty()){			
+			df = new SimpleDateFormat("yyyy-MM-dd");
+			try{
+				dayOfEvent = df.parse(date);
+			}
+			catch (ParseException e) {
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+				return eventsList;
+			}
+		}
+			
+		
+		
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key)){
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
+			}
+			
+			query = "SELECT * FROM events " + "WHERE " + eName + name + eLocation + location;
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			
+			
+			while (rs.next()){
+				try {
+					dayOfStart = df.parse(rs.getDate("eStartDate").toString());
+					dayOfFinish = df.parse(rs.getDate("eFinishDate").toString());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				
+				if(date.isEmpty() || (!date.isEmpty() && (dayOfEvent.after(dayOfStart)  && dayOfEvent.before(dayOfFinish)) ) )
+				
+					eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+						rs.getString("eName"), rs
+						.getString("eShortDescription"), rs
+						.getString("eLongDescription"), rs
+						.getString("eLocation"), rs
+						.getString("eCategory"), rs
+						.getDate("eStartDate"), rs
+						.getDate("eFinishDate"), rs
+						.getString("eStartTime"), rs
+						.getString("eFinishTime"), rs
+						.getString("eRestriction"), rs
+						.getString("eInfoTel"), rs
+						.getString("eImageURL"))));
+				}
+			
+			for(MyEvent e: eventsList)
+				e=addClubToEvent(e);
+			
+			if(eventsList.isEmpty())
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
+		} catch (SQLException e) {
+			e.printStackTrace(System.err);
+			eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			return eventsList;
+		}
+		return eventsList;
+	}
+	
+
+	
+//	public Club searchClub(){
+//		
+//	}
+//
+//
+//	public User searchUser(){
+//	
+//	}
+	
+	
+	
 
 	public String setPrivacy(String key, String senderTel, int privacy)
 			throws RemoteException {
