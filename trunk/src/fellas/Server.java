@@ -2499,7 +2499,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	
 	
 	
-	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date){
+	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException{
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		String eName;
 		String eLocation;
@@ -2510,15 +2510,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		
 		
 		
-		if(!name.isEmpty())
+		if(!name.isEmpty()){
 			eName = "eName = ";
+			name = "'"+name+"'";
+		}
 		else {
 			eName = "";
 			name = "";	
 		}
 		
-		if(!location.isEmpty())
+		if(!location.isEmpty()){
 			eLocation = "eLocation = ";
+			location = "'"+location+"'";
+		}
 		else{
 			eLocation="";
 			location="";
@@ -2544,7 +2548,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
 			}
 			
-			query = "SELECT * FROM events " + "WHERE " + eName + name + eLocation + location;
+			if(!name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM events " + "WHERE " + eName + name + " AND "+ eLocation + location;
+			else 
+				query = "SELECT * FROM events " + "WHERE " + eName + name + eLocation + location;
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			
@@ -2557,8 +2564,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					e.printStackTrace();
 				}
 				
-				if(date.isEmpty() || (!date.isEmpty() && (dayOfEvent.after(dayOfStart)  && dayOfEvent.before(dayOfFinish)) ) )
-				
+				if(date.isEmpty())
 					eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
 						rs.getString("eName"), rs
 						.getString("eShortDescription"), rs
@@ -2572,6 +2578,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("eRestriction"), rs
 						.getString("eInfoTel"), rs
 						.getString("eImageURL"))));
+				
+				else if (dayOfEvent.after(dayOfStart)  && dayOfEvent.before(dayOfFinish))
+					eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+							rs.getString("eName"), rs
+							.getString("eShortDescription"), rs
+							.getString("eLongDescription"), rs
+							.getString("eLocation"), rs
+							.getString("eCategory"), rs
+							.getDate("eStartDate"), rs
+							.getDate("eFinishDate"), rs
+							.getString("eStartTime"), rs
+							.getString("eFinishTime"), rs
+							.getString("eRestriction"), rs
+							.getString("eInfoTel"), rs
+							.getString("eImageURL"))));
 				}
 			
 			for(MyEvent e: eventsList)
