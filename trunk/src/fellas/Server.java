@@ -2040,12 +2040,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (!checkConnection())
 			openConnection();
 		try {
-			query = "UPDATE users SET"
+			query = "UPDATE users SET "
 					+ "username='" + NEWusername + "',"
 					+ "psw='" + NEWpsw + "',"
 					+ "uSex='" + NEWuSex + "',"
 					+ "uAge='" + NEWuAge + "',"
-					+ "uLocation='" + NEWuLocation + "',"
+					//+ "uLocation='" + NEWuLocation + "',"
 					+ "privacy='" + NEWuPrivacy + "',"
 					+ "uName='" + NEWuName + "',"
 					+ "uStatus='" + NEWuStatus + "',"
