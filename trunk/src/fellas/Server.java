@@ -2525,6 +2525,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
 			}
 			
+			if(!date.isEmpty())
+				insertUserLog(senderTel, "searchEvent", "name: " + name + " - location: " + location + " - date: " + dayOfEvent.toString());
+			else
+				insertUserLog(senderTel, "searchEvent", "name: " + name + " - location: " + location);
+			
 			if(!name.isEmpty() && !location.isEmpty())
 				query = "SELECT * FROM events  WHERE eName LIKE '%" + name + "%' AND "+ "eLocation LIKE '%" + location + "%'";
 			else if (name.isEmpty() && location.isEmpty()) 
@@ -2537,7 +2542,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			
-			insertUserLog(senderTel, "searchEvent", "name: " + name + " - location: " + location + " - date: " + dayOfEvent.toString());
 			while (rs.next()){
 				dayOfStart = rs.getDate("eStartDate");
 				dayOfFinish = rs.getDate("eFinishDate");
