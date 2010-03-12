@@ -35,7 +35,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -88,9 +87,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// -------------- Message Items ---------------------------
 	JButton sendMessB;
 	JButton sendToAllB;
-	JTextArea message;
+	JTextField message;
 
-	JList usersJList;
+	JTable usersJTable;
 	JTable messageEventJTable;
 
 	// -------------- Events Items ----------------------------
@@ -244,75 +243,61 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 	private JPanel createMessagePanel() {
 		JPanel messageP = new JPanel();
-		messageP.setLayout(new GridLayout(2, 1));
+		messageP.setLayout(new BoxLayout(messageP, BoxLayout.Y_AXIS));
 
 		// ------------------------ TOP ------------------------------------
-		JPanel topMsgP = new JPanel();
-		topMsgP.setBorder(BorderFactory.createTitledBorder(""));
-		topMsgP.setLayout(new BoxLayout(topMsgP, BoxLayout.Y_AXIS));
-
-		// leftMsgP.setLayout(new GridLayout(2, 3));
-		JPanel leftUpP = new JPanel();
-		leftUpP.setLayout(new BoxLayout(leftUpP, BoxLayout.Y_AXIS));
-
-		JPanel leftDownP = new JPanel(new GridLayout(1, 2));
+		JPanel topMsgP = new JPanel(new GridLayout(1, 2));
+		messageEventJTable = new JTable(new DefaultTableModel());
+		messageEventJTable.setAutoCreateRowSorter(true);
+		messageEventJTable.setRowSelectionAllowed(true);
+		messageEventJTable
+				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		messageEventJTable.getSelectionModel().addListSelectionListener(this);
 		try {
-			messageEventJTable = new JTable(new DefaultTableModel());
-			messageEventJTable.setAutoCreateRowSorter(true);
-			messageEventJTable.setRowSelectionAllowed(true);
-			messageEventJTable
-					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			messageEventJTable.getSelectionModel().addListSelectionListener(
-					this);
 			populateTab(currentClub.getClubEventsList(), messageEventJTable);
-			// leftDownP.add(new JScrollPane(messageEventJTable));
 		} catch (RemoteException e) {
 			// inserire messaggio d'erorre ed uscire dalla grafica
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		usersJList = new JList();
-		usersJList
-				.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		usersJList.setBackground(new Color(153, 204, 255));
-		usersJList.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		JScrollPane usersScrollPane = new JScrollPane(usersJList);
-		leftDownP.add(usersScrollPane);
+		usersJTable = new JTable(new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		});
+		usersJTable.setAutoCreateRowSorter(true);
+		usersJTable.setRowSelectionAllowed(true);
 
-		topMsgP.add(leftUpP);
-		topMsgP.add(leftDownP);
+		usersJTable
+				.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+		topMsgP.add(new JScrollPane(messageEventJTable));
+		topMsgP.add(new JScrollPane(usersJTable));
 
 		// ------------------------ BOTTOM -----------------------------------
-		JPanel bottomMsgP = new JPanel();
-		bottomMsgP.setLayout(new GridLayout(1, 2));
+		JPanel bottomMsgP = new JPanel(new GridLayout(3, 1));
+		
 		bottomMsgP.setBorder(BorderFactory.createTitledBorder(""));
-
-		JPanel leftBMsgP = new JPanel();
-		leftBMsgP.setLayout(new GridLayout(2, 1));
 
 		sendMessB = new JButton("Send Message");
 		sendMessB.addActionListener(this);
 		sendMessB.setEnabled(false);
-		leftBMsgP.add(sendMessB);
+		
 
 		sendToAllB = new JButton("Send To All");
 		sendToAllB.addActionListener(this);
 		sendToAllB.setEnabled(false);
-		leftBMsgP.add(sendToAllB);
-
-		JPanel rightBMsgP = new JPanel();
-		rightBMsgP.setLayout(new GridLayout(1, 1));
-
-		message = new JTextArea("Type here your message...", 13, 28);
+				
+		message = new JTextField("Type here your message...");
 		// message.setBackground(new Color(255, 215, 0));
 		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		message.setLineWrap(true);
-		JScrollPane messageScrollPane = new JScrollPane(message);
-		rightBMsgP.add(messageScrollPane);
-
-		bottomMsgP.add(leftBMsgP);
-		bottomMsgP.add(rightBMsgP);
+		
+		bottomMsgP.add(message);
+		bottomMsgP.add(sendMessB);
+		bottomMsgP.add(sendToAllB);
+		
 
 		// ------------------------------------------------------------------
 		messageP.add(topMsgP);
@@ -365,65 +350,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			populateTab(currentClub.getClubEventsList(), eventJTable);
 
 			eventJTable.getSelectionModel().addListSelectionListener(
-					new ListSelectionListener() {
-						public void valueChanged(ListSelectionEvent e) {
-							int selectedIndex = eventJTable.getSelectedRow();
-							if (selectedIndex != -1) {
-								modifyEvB.setEnabled(true);
-								deleteEvB.setEnabled(true);
-								try {
-									MyEvent event = currentClub
-											.getEvent(Integer
-													.parseInt((String) eventJTable
-															.getValueAt(
-																	selectedIndex,
-																	0)));
-
-									eName.setText(event.geteName());
-									eShortDescription.setText(event
-											.geteShortDescription());
-									eLongDescription.setText(event
-											.geteLongDescription());
-									eLocation.setText(event.geteLocation());
-									eCategory.setText(event.geteCategory());
-									eStartDate.setDate(event.geteStartDate());
-									eFinishDate.setDate(event.geteFinishDate());
-									eStartTime.setText(event.geteStartTime());
-									eFinishTime.setText(event.geteFinishTime());
-									eRestriction.setText(event
-											.geteRestriction());
-									eInfoTel.setText(event.geteInfoTel());
-									eSelectedImage = "";
-									eRemoteImage = "";
-									ePreviousImage = event.geteImageURL();
-									refreshImage(eImg, event.geteImageURL());
-									eLongDescription.setText(event
-											.geteLongDescription());
-
-									DateFormat df = new SimpleDateFormat(
-											"yyyy-MM-dd HH:mm:ss");
-									SimpleDateFormat dateFormat = new SimpleDateFormat(
-											"yyyy-MM-dd");
-									Date dayOfStart = df
-											.parse(new StringBuilder(dateFormat
-													.format(eStartDate
-															.getDate()))
-													.toString()
-													+ " "
-													+ eStartTime.getText());
-									if (dayOfStart.before(new Date()))
-										setEventEditable(false);
-									else
-										setEventEditable(true);
-								} catch (Exception e1) {
-									// TODO add error messaggio che dice che
-									// l'evento è stato
-									// eliminato da qualcuno
-									e1.printStackTrace();
-								}
-							}
-						}
-					});
+					this);
 			leftEvP.add(new JScrollPane(eventJTable));
 			eventJTable.setFillsViewportHeight(true);
 		} catch (Exception e) {
@@ -556,49 +483,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 			oldEventJTable.setRowSelectionAllowed(true);
 			oldEventJTable
 					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+			oldEventJTable.getSelectionModel().addListSelectionListener(this);
 			populateTab(currentClub.getOldClubEventsList(), oldEventJTable);
 
-			oldEventJTable.getSelectionModel().addListSelectionListener(
-					new ListSelectionListener() {
-						public void valueChanged(ListSelectionEvent e) {
-							int selectedIndex = oldEventJTable.getSelectedRow();
-							if (selectedIndex != -1) {
-								try {
-									MyEvent event = currentClub
-											.getOldEvent(Integer
-													.parseInt(oldEventJTable
-															.getValueAt(
-																	selectedIndex,
-																	0)
-															.toString()));
-
-									eOName.setText(event.geteName());
-									eOShortDescription.setText(event
-											.geteShortDescription());
-									eOLongDescription.setText(event
-											.geteLongDescription());
-									eOLocation.setText(event.geteLocation());
-									eOCategory.setText(event.geteCategory());
-									eOStartDate.setDate(event.geteStartDate());
-									eOFinishDate
-											.setDate(event.geteFinishDate());
-									eOStartTime.setText(event.geteStartTime());
-									eOFinishTime
-											.setText(event.geteFinishTime());
-									eORestriction.setText(event
-											.geteRestriction());
-									eOInfoTel.setText(event.geteInfoTel());
-									refreshImage(eOImg, event.geteImageURL());
-									eOLongDescription.setText(event
-											.geteLongDescription());
-								} catch (RemoteException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							}
-						}
-					});
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -828,24 +715,29 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	// Utility
 	// ******************************************************************************
 
-	private String[] getUsersArray(int eventId) {
-		LinkedList<User> userssList = new LinkedList<User>();
+	private Vector<Vector<String>> getUsersVector(int eventId) {
+		Vector<Vector<String>> usersVector = new Vector<Vector<String>>();
+
+		LinkedList<User> usersList = new LinkedList<User>();
 		try {
-			userssList = currentClub.getEventUsersList(eventId);
+			usersList = currentClub.getEventUsersList(eventId);
 		} catch (Exception ex) {
 			// TODO add error alert
 			ex.printStackTrace();
 		}
-		if (userssList != null) {
-			String[] users = new String[userssList.size()];
-			int i = 0;
-			for (User u : userssList) {
-				users[i++] = u.getId() + "]" + u.getuName() + " "
-						+ u.getuSurname() + "( " + u.getusername() + " )";
+		if (usersList != null) {
+			for (User u : usersList) {
+				Vector<String> v = new Vector<String>();
+				v.add(u.getId() + "");
+				v.add(u.getuName());
+				v.add(u.getuSurname());
+				v.add(u.getuAge());
+				v.add(u.getuSex());
+				usersVector.add(v);
 			}
-			return users;
+			return usersVector;
 		}
-		return new String[0];
+		return null;
 	}
 
 	private void populateTab(LinkedList<MyEvent> list, JTable table) {
@@ -1012,10 +904,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	public void actionPerformed(ActionEvent e) {
 		Object event = e.getSource();
 		if (event == sendMessB) {
-			if (usersJList.getSelectedValues() != null) {
+			if (usersJTable.getSelectedRowCount() > 0) {
 				String criterion = "";
-				for (Object s : usersJList.getSelectedValues()) {
-					criterion += "id=" + s.toString().split("]")[0] + " OR ";
+				for (int s : usersJTable.getSelectedRows()) {
+					criterion += "id=" + usersJTable.getValueAt(s, 0) + " OR ";
 				}
 				if (criterion != "") {
 					try {
@@ -1036,7 +928,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		}
 		if (event == sendToAllB) {
 			String criterion = "";
-			DefaultListModel model = (DefaultListModel) usersJList.getModel();
+			DefaultListModel model = (DefaultListModel) usersJTable.getModel();
 			String[] ele = new String[model.size()];
 			model.copyInto(ele);
 			for (String s : ele) {
@@ -1350,36 +1242,106 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getSource() == messageEventJTable.getSelectionModel()
 				&& messageEventJTable.getRowSelectionAllowed()) {
+
+			Vector<String> columnNames = new Vector<String>();
+			columnNames.addElement("ID");
+			columnNames.addElement("Nome");
+			columnNames.addElement("Cognome");
+			columnNames.addElement("Età");
+			columnNames.addElement("Sesso");
+
 			sendMessB.setEnabled(true);
 			sendToAllB.setEnabled(true);
 			int sel = Integer.parseInt(messageEventJTable.getValueAt(
 					messageEventJTable.getSelectedRow(), 0).toString());
-			usersJList.setListData(getUsersArray(sel));
+			((DefaultTableModel) usersJTable.getModel()).setDataVector(
+					getUsersVector(sel), columnNames);
 		}
-		if (e.getSource() == oldEventJTable
-				&& oldEventJTable.getSelectedRow() != -1) {
+		if (e.getSource() == eventJTable.getSelectionModel()
+				&&eventJTable.getRowSelectionAllowed()) {
+		int selIndex = eventJTable.getSelectedRow();
+		if (selIndex != -1) {
+			modifyEvB.setEnabled(true);
+			deleteEvB.setEnabled(true);
 			try {
-				int sel = Integer.parseInt(oldEventJTable.getValueAt(
-						oldEventJTable.getSelectedRow(), 0).toString());
+				MyEvent event = currentClub
+						.getEvent(Integer
+								.parseInt((String) eventJTable
+										.getValueAt(
+												selIndex,
+												0)));
 
-				MyEvent event = currentClub.getOldEvent(sel);
+				eName.setText(event.geteName());
+				eShortDescription.setText(event
+						.geteShortDescription());
+				eLongDescription.setText(event
+						.geteLongDescription());
+				eLocation.setText(event.geteLocation());
+				eCategory.setText(event.geteCategory());
+				eStartDate.setDate(event.geteStartDate());
+				eFinishDate.setDate(event.geteFinishDate());
+				eStartTime.setText(event.geteStartTime());
+				eFinishTime.setText(event.geteFinishTime());
+				eRestriction.setText(event
+						.geteRestriction());
+				eInfoTel.setText(event.geteInfoTel());
+				eSelectedImage = "";
+				eRemoteImage = "";
+				ePreviousImage = event.geteImageURL();
+				refreshImage(eImg, event.geteImageURL());
+				eLongDescription.setText(event
+						.geteLongDescription());
 
-				eOName.setText(event.geteName());
-				eOShortDescription.setText(event.geteShortDescription());
-				eOLongDescription.setText(event.geteLongDescription());
-				eOLocation.setText(event.geteLocation());
-				eOCategory.setText(event.geteCategory());
-				eOStartDate.setDate(event.geteStartDate());
-				eOFinishDate.setDate(event.geteFinishDate());
-				eOStartTime.setText(event.geteStartTime());
-				eOFinishTime.setText(event.geteFinishTime());
-				eORestriction.setText(event.geteRestriction());
-				eOInfoTel.setText(event.geteInfoTel());
-				refreshImage(eOImg, event.geteImageURL());
-				eOLongDescription.setText(event.geteLongDescription());
-			} catch (RemoteException e1) {
-				// TODO add error
+				DateFormat df = new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");
+				SimpleDateFormat dateFormat = new SimpleDateFormat(
+						"yyyy-MM-dd");
+				Date dayOfStart = df
+						.parse(new StringBuilder(dateFormat
+								.format(eStartDate
+										.getDate()))
+								.toString()
+								+ " "
+								+ eStartTime.getText());
+				if (dayOfStart.before(new Date()))
+					setEventEditable(false);
+				else
+					setEventEditable(true);
+			} catch (Exception e1) {
+				// TODO add error messaggio che dice che
+				// l'evento è stato
+				// eliminato da qualcuno
 				e1.printStackTrace();
+			}
+		}
+		}
+		
+		if (e.getSource() == oldEventJTable.getSelectionModel()
+				&& oldEventJTable.getRowSelectionAllowed()) {
+			int selectedIndex = oldEventJTable.getSelectedRow();
+			if (selectedIndex != -1) {
+				try {
+					MyEvent event = currentClub.getOldEvent(Integer
+							.parseInt(oldEventJTable.getValueAt(selectedIndex,
+									0).toString()));
+
+					eOName.setText(event.geteName());
+					eOShortDescription.setText(event.geteShortDescription());
+					eOLongDescription.setText(event.geteLongDescription());
+					eOLocation.setText(event.geteLocation());
+					eOCategory.setText(event.geteCategory());
+					eOStartDate.setDate(event.geteStartDate());
+					eOFinishDate.setDate(event.geteFinishDate());
+					eOStartTime.setText(event.geteStartTime());
+					eOFinishTime.setText(event.geteFinishTime());
+					eORestriction.setText(event.geteRestriction());
+					eOInfoTel.setText(event.geteInfoTel());
+					refreshImage(eOImg, event.geteImageURL());
+					eOLongDescription.setText(event.geteLongDescription());
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
