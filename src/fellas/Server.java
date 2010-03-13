@@ -451,6 +451,40 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	public LinkedList<MyEvent> getEventsList(String key, String uTel, int cId) throws RemoteException {
+		// TODO insert NOT_AUTHORIZED return value for wrong keyword
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key))				
+				return null;
+			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
+			query = "SELECT * FROM clubs WHERE cId=" + cId;
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			while (rs.next())
+				eventList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+						.getString("eName"), rs.getString("eShortDescription"),
+						rs.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
+								.getString("eRestriction"), rs
+								.getString("eInfoTel"), rs
+								.getString("eImageURL"))));
+			insertUserLog(uTel, "getEvetsList", String.valueOf(cId));
+			return eventList;
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER getEvents: " + cId);
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
 	public MyEvent getEvent(int id, String table) {
 		try {
 			if (!checkConnection())

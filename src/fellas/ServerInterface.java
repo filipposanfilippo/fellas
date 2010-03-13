@@ -92,6 +92,8 @@ public interface ServerInterface extends Remote {
 
 	public String eventsList(String key, String senderPhone, String criterion)
 			throws RemoteException;
+	
+	public LinkedList<MyEvent> getEventsList(String key, String uTel, int cId) throws RemoteException;
 
 	public String disJoinEvent(String key, String senderPhone, String eventCode)
 			throws RemoteException;
