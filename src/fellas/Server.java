@@ -453,17 +453,19 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public LinkedList<MyEvent> getEventsList(String key, String uTel, int cId) throws RemoteException {
 		// TODO insert NOT_AUTHORIZED return value for wrong keyword
+		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key))				
-				return null;
-			LinkedList<MyEvent> eventList = new LinkedList<MyEvent>();
-			query = "SELECT * FROM clubs WHERE cId=" + cId;
+			if (!keyword.equals(key)){				
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
+				return  eventsList;
+			}
+			query = "SELECT * FROM events WHERE cId=" + cId;
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
+				eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
 						.getString("eName"), rs.getString("eShortDescription"),
 						rs.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
@@ -475,13 +477,18 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL"))));
-			insertUserLog(uTel, "getEvetsList", String.valueOf(cId));
-			return eventList;
+			insertUserLog(uTel, "getEventsList", String.valueOf(cId));
+			for(MyEvent e: eventsList)
+				e=addClubToEvent(e);
+			
+			if(eventsList.isEmpty())
+				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getEvents: " + cId);
-			e.printStackTrace();
-			return null;
+			eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			return eventsList;
 		}
+		return eventsList;
 	}
 	
 	
