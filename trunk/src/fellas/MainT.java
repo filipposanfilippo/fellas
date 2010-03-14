@@ -70,9 +70,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	final String _PASSWORD = "password1234";
 	final String _URL = "http://diana.netsons.org/";
 
-	final String HELP_ITA = "text/ita.txt"; // TODO creare ita help
-	final String HELP_ENG = "text/eng.txt"; // TODO creare eng help
-
 	// --------------Default Operations
 	JFrame mainFrame;
 	JTabbedPane tabPanel;
@@ -81,7 +78,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 	JMenuItem logout;
 	JMenuItem reloadEvents;
 	JMenuItem exit;
-	JMenuItem help;
 	JMenuItem credits;
 
 	// -------------- Message Items ---------------------------
@@ -217,15 +213,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		// Create a menu
 		JMenu about = new JMenu("About");
 		menuBar.add(about);
-
-		// Create a menu item
-		help = new JMenuItem("Help");
-		help.addActionListener(this);
-		help.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
-				Event.ALT_MASK));
-		about.add(help);
-
-		about.addSeparator();
 
 		// Create a menu item
 		credits = new JMenuItem("Credits");
@@ -1160,77 +1147,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 				} catch (RemoteException e1) {
 					System.exit(0);
 				}
-			}
-		}
-		if (event == help) {
-			try {
-				BufferedReader ita = new BufferedReader(
-						new FileReader(HELP_ITA));
-				BufferedReader eng = new BufferedReader(
-						new FileReader(HELP_ENG));
-				String line = "";
-
-				JFrame helpFrame = new JFrame("Fellas : Help");
-				JTabbedPane tPane = new JTabbedPane();
-				tPane.setPreferredSize(new Dimension(500, 500));
-
-				// ------------ Italian Help ---------------------
-				JPanel itaPanel = new JPanel();
-				itaPanel.setBackground(Color.white);
-
-				itaPanel.setBorder(BorderFactory
-						.createTitledBorder("Help - Italiano"));
-
-				JTextArea itaT = new JTextArea();
-
-				itaT.setEditable(false);
-
-				JScrollPane scrollIta = new JScrollPane(itaT);
-				scrollIta
-						.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-				while (((line = ita.readLine()) != null)) {
-					itaT.append(line + "\n");
-				}
-				itaT.setCaretPosition(0);
-				itaPanel.add(scrollIta);
-				// ------------ English Help ---------------------
-				JPanel engPanel = new JPanel();
-				engPanel.setBackground(Color.white);
-
-				engPanel.setBorder(BorderFactory
-						.createTitledBorder("Help - English"));
-
-				JTextArea engT = new JTextArea();
-
-				JScrollPane scrollEng = new JScrollPane(engT);
-				scrollEng
-						.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-				engT.setEditable(false);
-
-				while (((line = eng.readLine()) != null)) {
-					engT.append(line + "\n");
-				}
-				engT.setCaretPosition(0);
-				engPanel.add(scrollEng);
-				// -----------------------------------------------
-
-				tPane.addTab("ITALIANO", scrollIta);
-				tPane.addTab("ENGLISH", scrollEng);
-
-				helpFrame.add(tPane);
-				helpFrame.pack();
-				helpFrame.setVisible(true);
-				ita.close();
-				eng.close();
-			} catch (FileNotFoundException e1) {
-				JOptionPane.showMessageDialog(mainFrame,
-						"Could not find the help txt file.", "File Error!",
-						JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
 			}
 		}
 	}
