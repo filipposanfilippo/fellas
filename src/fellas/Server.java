@@ -90,12 +90,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	// TODO to cancel
-	public boolean authenticationMobile() throws RemoteException {
-		// invoke client club method to check user-password
-		return false;
-	}
-
 	public boolean clubRegistration(String oName, String oSurname,
 			String cAddress, String cTel, String cEmail, String cType,
 			String cName, String username, String psw, String cImageURL)
@@ -245,7 +239,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			res = rs.next();
-			// insertClubLog(username, "clubAccess", rs.getInt("id"));
 			return res;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -326,13 +319,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "SELECT * FROM clubs WHERE username='" + username + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next())
+			if (rs.next()){
+				insertClubLog(username, "getClubData", rs.getInt("id"));
 				return new Club(rs.getInt("id"), rs.getString("oName"), rs
 						.getString("oSurname"), rs.getString("cAddress"), rs
 						.getString("cTel"), rs.getString("cEMail"), rs
 						.getString("cType"), rs.getString("cName"), rs
 						.getString("username"), rs.getString("psw"), rs
 						.getString("cImageURL"));
+			}
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubData: " + username);
 			e.printStackTrace();
@@ -443,6 +438,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL"))));
+			insertClubLog(username, "getClubData", cId);
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
@@ -554,7 +550,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						.getString("eRestriction"), rs
 						.getString("eInfoTel"), rs
 						.getString("eImageURL"))));
-			
+			insertUserLog(senderTel, "getUserEvetsList", String.valueOf(userId));
 			for(MyEvent e: eventsList)
 				e=addClubToEvent(e);
 			
@@ -610,6 +606,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("uSurname"), rs
 								.getString("uLocation"), rs
 								.getString("imageURL"), rs.getInt("privacy")));
+			insertClubLog(username, "getEventUsersList", eventId);
 			return usersList;
 		} catch (SQLException e) {
 			e.printStackTrace(System.err);
@@ -1412,9 +1409,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	// TODO ritorniamo cmq answer. se si verifica un errore, sar� vuota.
-	// correggere???
-	// anche perch� cos� faccio il log anche se si � verificato un errore!!!
 	public String chatUp(String key, String senderTel, String username)
 			throws RemoteException {
 		if (!keyword.equals(key))
@@ -1552,8 +1546,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	// TODO stesso problema della chatUp. torno cmq answer anche se succede un
-	// errore
+
 	public String inviteFriend(String key, String senderTel,
 			String friendPhone, int eventId) throws RemoteException {
 		if (!keyword.equals(key))
@@ -2333,8 +2326,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	// TODO add information for an aborted operation?
-	// TODO check if the method done an error?
 	public void insertUserLog(String uTel, String operation, String value) {
 		try {
 			if (!checkConnection())
@@ -2558,7 +2549,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			}
 		}
 			
-		
 		try {
 			if (!checkConnection())
 				openConnection();
@@ -2620,7 +2610,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			
 			for(MyEvent e: eventsList)
 				e=addClubToEvent(e);
-			
+			insertUserLog(senderTel, "searchEvent", name + " " + location + " " + date);
 			if(eventsList.isEmpty())
 				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
 		} catch (SQLException e) {
@@ -2654,7 +2644,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			insertUserLog(senderTel, "searchClub", "name: " + name + " - location: "+location);
+			insertUserLog(senderTel, "searchClub", name + " " + location);
 			
 			while (rs.next()){
 				results.add(new Club(rs.getInt("id"), rs
@@ -2705,7 +2695,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			
-			insertUserLog(senderTel, "searchUser", "name: " + name + " - location: "+location);
+			insertUserLog(senderTel, "searchUser", name + " " + location);
 			while(rs.next()){
 				results.add(new User(rs.getInt("id"), rs
 						.getString("uTel"), rs

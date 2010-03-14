@@ -75,8 +75,6 @@ public interface ServerInterface extends Remote {
 			String psw, String uSex, String uAge, String uLocation,
 			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException; 
 
-	public boolean authenticationMobile() throws RemoteException;
-	
 	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException;
 	
 	public LinkedList<User> searchUser(String key, String senderTel, String name, String location) throws RemoteException;
