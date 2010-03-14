@@ -179,8 +179,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int poiId = rs.getInt("id");
-			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://diana.netsons.org/clubs/"
-					+ cName + ".php','Visit club page','" + poiId + "')";
+			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://facebooktest.netsons.org/site/clubs.php?id="
+					+ clubId + "','Visit club page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			System.out.println("club added");
@@ -827,8 +827,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				int poiId = rs.getInt("id");
 
 				query = "INSERT INTO Action (uri,label,poiId)"
-						+ "VALUES ('http://fellas.netsons.org/events/event"
-						+ poiId + ".php','Join event','" + poiId + "')";
+						+ "VALUES ('http://facebooktest.netsons.org/site/events.php?id="
+						+ eventId + ",'View Full Event Description','" + poiId + "')";
 				statement = connection.createStatement();
 				statement.execute(query);
 			} else {
@@ -1938,8 +1938,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-					+ "VALUES ('http://diana.netsons.org/users/" + username
-					+ ".php','Visit user page','" + poiId + "')";
+					+ "VALUES ('http://facebooktest.netsons.org/site/users.php?is=" + id
+					+ "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertUserLog(uTel, "mobileRegistration", username);
@@ -2056,8 +2056,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-					+ "VALUES ('http://diana.netsons.org/users/" + username
-					+ ".php','Visit user page','" + poiId + "')";
+				+ "VALUES ('http://facebooktest.netsons.org/site/users.php?is=" + id
+				+ "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertUserLog(uTel, "userRegistration", username);
