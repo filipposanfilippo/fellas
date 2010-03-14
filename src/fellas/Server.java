@@ -1895,12 +1895,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int id = rs.getInt("id");
-			int privacy = rs.getInt("privacy");
+			//int privacy = rs.getInt("privacy");
 
 			// insert user in POI
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-			if (privacy == 0)
+			if (uPrivacy.equals('0'))
 				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
 						+ "VALUES ('"
 						+ id
