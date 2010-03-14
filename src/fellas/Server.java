@@ -438,7 +438,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eRestriction"), rs
 								.getString("eInfoTel"), rs
 								.getString("eImageURL"))));
-			insertClubLog(username, "getClubData", cId);
+			insertClubLog(username, "getClubEventsList", cId);
 			return eventList;
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClubEvents: " + cId);
