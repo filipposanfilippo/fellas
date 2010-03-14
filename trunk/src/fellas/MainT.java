@@ -222,7 +222,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Message Panel
 	// ******************************************************************************
 
-	private JPanel createMessagePanel() {
+	private JPanel createMessagePanel(LinkedList<MyEvent> eventsList) {
 		JPanel messageP = new JPanel();
 		messageP.setLayout(new BoxLayout(messageP, BoxLayout.Y_AXIS));
 
@@ -234,13 +234,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		messageEventJTable
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		messageEventJTable.getSelectionModel().addListSelectionListener(this);
-		try {
-			populateTab(currentClub.getClubEventsList(), messageEventJTable);
-		} catch (RemoteException e) {
-			// inserire messaggio d'erorre ed uscire dalla grafica
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		populateTab(eventsList, messageEventJTable);
 
 		usersJTable = new JTable(new DefaultTableModel() {
 			@Override
@@ -308,7 +302,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		}
 	}
 
-	private JPanel createEventsPanel() {
+	private JPanel createEventsPanel(LinkedList<MyEvent> eventsList) {
 		JPanel eventsP = new JPanel();
 		eventsP.setLayout(new GridLayout(1, 2));
 
@@ -326,7 +320,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 			eventJTable.setRowSelectionAllowed(true);
 			eventJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			populateTab(currentClub.getClubEventsList(), eventJTable);
+			populateTab(eventsList, eventJTable);
 
 			eventJTable.getSelectionModel().addListSelectionListener(this);
 			leftEvP.add(new JScrollPane(eventJTable));
@@ -442,7 +436,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Old Event Panel
 	// ******************************************************************************
 
-	private JPanel createOldEventsPanel() {
+	private JPanel createOldEventsPanel(LinkedList<MyEvent> oldEventsList) {
 		JPanel oldEventsP = new JPanel();
 		oldEventsP.setLayout(new GridLayout(1, 2));
 
@@ -450,24 +444,18 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		JPanel leftOldEvP = new JPanel();
 		leftOldEvP.setLayout(new BoxLayout(leftOldEvP, BoxLayout.Y_AXIS));
 
-		try {
-			oldEventJTable = new JTable(new DefaultTableModel() {
-				@Override
-				public boolean isCellEditable(int row, int column) {
-					return false;
-				}
-			});
-			oldEventJTable.setAutoCreateRowSorter(true);
-			oldEventJTable.setRowSelectionAllowed(true);
-			oldEventJTable
-					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			oldEventJTable.getSelectionModel().addListSelectionListener(this);
-			populateTab(currentClub.getOldClubEventsList(), oldEventJTable);
+		oldEventJTable = new JTable(new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		});
+		oldEventJTable.setAutoCreateRowSorter(true);
+		oldEventJTable.setRowSelectionAllowed(true);
+		oldEventJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		oldEventJTable.getSelectionModel().addListSelectionListener(this);
+		populateTab(oldEventsList, oldEventJTable);
 
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		leftOldEvP.add(new JScrollPane(oldEventJTable));
 
 		// ------------------------ RIGHT ------------------------------------
@@ -859,10 +847,19 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 
 		mainFrame.add(tabPanel, BorderLayout.CENTER);
 
-		tabPanel.add("Events", createEventsPanel());
-		tabPanel.add("Old Events", createOldEventsPanel());
-		tabPanel.add("Message", createMessagePanel());
-		tabPanel.add("Profile", createProfilePanel());
+		try {
+			LinkedList<MyEvent> eventsClubList = currentClub
+					.getClubEventsList();
+			LinkedList<MyEvent> oldEventsClubList = currentClub
+					.getOldClubEventsList();
+
+			tabPanel.add("Events", createEventsPanel(eventsClubList));
+			tabPanel.add("Old Events", createOldEventsPanel(oldEventsClubList));
+			tabPanel.add("Message", createMessagePanel(eventsClubList));
+			tabPanel.add("Profile", createProfilePanel());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 		// mainFrame.setPreferredSize(new Dimension(1024, 730));
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
