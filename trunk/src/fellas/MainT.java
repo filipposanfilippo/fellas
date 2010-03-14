@@ -418,8 +418,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 
 		JPanel evButtonsP = new JPanel();
 		newEvB = new JButton("New");
-		saveEvB = new JButton("Save");
-		modifyEvB = new JButton("Modify");
+		saveEvB = new JButton("Save As New");
+		modifyEvB = new JButton("Save");
 		deleteEvB = new JButton("Delete");
 
 		modifyEvB.setEnabled(false);
@@ -770,14 +770,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		eName.setText("New Event");
 		eShortDescription.setText("");
 		eLongDescription.setText("");
-		eLocation.setText("");
+		eLocation.setText(currentClub.getClub().getcAddress());
 		eCategory.setText("");
 		eStartDate.setDate(new Date());
 		eFinishDate.setDate(new Date());
 		eStartTime.setText("00:00:00");
 		eFinishTime.setText("00:00:00");
 		eRestriction.setText("");
-		eInfoTel.setText("");
+		eInfoTel.setText(currentClub.getClub().getcTel());
 		eSelectedImage = "";
 		ePreviousImage = "";
 		eRemoteImage = "";
@@ -1365,8 +1365,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener,
 		try {
 			currentClub = new ClientClub();
 
-			String userTest = "banana";
-			String passTest = "banana";
+			String userTest = "rosy";
+			String passTest = "rosy";
 
 			boolean isLogged = currentClub.clubAccess(userTest, passTest);
 			// System.out.println("Logged = " + isLogged);
