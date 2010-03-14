@@ -57,7 +57,7 @@ public class SmsReceiver extends BroadcastReceiver {
 			try {
 				Log.d("UDP", "C: Connecting...");
 				DatagramSocket clientSocket = new DatagramSocket();
-				InetAddress IPAddress = InetAddress.getByName("10.0.2.2");// 192.168.1.106 PC server address (10.0.2.2
+				InetAddress IPAddress = InetAddress.getByName("192.168.1.100");// 192.168.1.106 PC server address (10.0.2.2
 				// funziona
 				// in
 				// emulazione,
