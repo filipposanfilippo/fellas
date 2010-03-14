@@ -345,7 +345,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		rightEvP.add(eName);
 
 		rightEvP.add(new JLabel("Location:", JLabel.TRAILING));
-		eLocation = new JTextField();
+		eLocation = new JTextField(currentClub.getClub().getcAddress());
 		rightEvP.add(eLocation);
 
 		rightEvP.add(new JLabel("Event Category:", JLabel.TRAILING));
@@ -379,7 +379,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		rightEvP.add(eRestriction);
 
 		rightEvP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
-		eInfoTel = new JTextField();
+		eInfoTel = new JTextField(currentClub.getClub().getcTel());
 
 		rightEvP.add(eInfoTel);
 
