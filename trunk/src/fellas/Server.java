@@ -1893,7 +1893,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// insert user in POI
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-			if (uPrivacy.equals('0'))
+			System.out.println(Integer.parseInt(uPrivacy));
+			if (Integer.parseInt(uPrivacy)==0)
 				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
 						+ "VALUES ('"
 						+ id
@@ -2326,6 +2327,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
+	// TODO add information for an aborted operation?
+	// TODO check if the method done an error?
 	public void insertUserLog(String uTel, String operation, String value) {
 		try {
 			if (!checkConnection())
