@@ -124,7 +124,7 @@ public class SMS extends Activity {
 	}
 
 	class ServerThread extends Thread {	//è il server di Server.java quando questo chiama spamMobile
-		public static final String SERVERIP = "192.168.1.104"; // htc ip address
+		public static final String SERVERIP = "192.168.1.102"; // 192.168.1.101 htc ip address
 		// (10.0.2.2
 		// within' the
 		// emulator!)
