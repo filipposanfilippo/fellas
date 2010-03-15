@@ -2917,7 +2917,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							} else
 								System.out.println("Event "
 										+ primaryRs.getInt("id")
-										+ " was already added POI");
+										+ " was already added to POI");
 						} else {
 							System.out
 									.println("Starting starterTask for event: "
