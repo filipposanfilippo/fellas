@@ -154,7 +154,7 @@ public class LoginT implements Runnable, ActionListener {
 		leftP.add(nameR);
 		leftP.add(new JLabel("Owner Surname:"));
 		leftP.add(surnameR);
-		leftP.add(new JLabel("Club Address:"));
+		leftP.add(new JLabel("Club Full Address:"));
 		leftP.add(addressR);
 		leftP.add(new JLabel("Club Tel.:"));
 		leftP.add(telR);
