@@ -24,7 +24,6 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -285,43 +284,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// ******************************************************************************
 	// Event Panel
 	// ******************************************************************************
-	private void refreshImage(JLabel imglabel, String imgURL) {
-		try {
-			if (imgURL.equals("") || imgURL.equals(_URL)) {
-				imglabel.setIcon(new ImageIcon("default.jpg"));
-			} else {
-				if (imgURL.startsWith("C:")) {
-					imglabel.setIcon(new ImageIcon(imgURL));
-				} else {
-					URL url = new URL(imgURL);// TODO check url
-					ImageIcon ic = new ImageIcon(ImageIO.read(url));
-					imglabel.setIcon(ic);
-				}
-			}
-		} catch (IOException e) {
-			imglabel.setIcon(new ImageIcon("default.jpg"));
-			// e.printStackTrace();
-		}
-	}
-
-	public class JTextFieldLimit extends PlainDocument {
-		private int limit;
-
-		JTextFieldLimit(int limit) {
-			super();
-			this.limit = limit;
-		}
-
-		public void insertString(int offset, String str, AttributeSet attr)
-				throws BadLocationException {
-			if (str == null)
-				return;
-
-			if ((getLength() + str.length()) <= limit) {
-				super.insertString(offset, str, attr);
-			}
-		}
-	}
 
 	private JPanel createEventsPanel(LinkedList<MyEvent> eventsList) {
 		JPanel eventsP = new JPanel();
@@ -706,6 +668,43 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// ******************************************************************************
 	// Utility
 	// ******************************************************************************
+	private void refreshImage(JLabel imglabel, String imgURL) {
+		try {
+			if (imgURL.equals("") || imgURL.equals(_URL)) {
+				imglabel.setIcon(new ImageIcon("default.jpg"));
+			} else {
+				if (imgURL.startsWith("C:")) {
+					imglabel.setIcon(new ImageIcon(imgURL));
+				} else {
+					URL url = new URL(imgURL);// TODO check url
+					ImageIcon ic = new ImageIcon(ImageIO.read(url));
+					imglabel.setIcon(ic);
+				}
+			}
+		} catch (IOException e) {
+			imglabel.setIcon(new ImageIcon("default.jpg"));
+			// e.printStackTrace();
+		}
+	}
+
+	public class JTextFieldLimit extends PlainDocument {
+		private int limit;
+
+		JTextFieldLimit(int limit) {
+			super();
+			this.limit = limit;
+		}
+
+		public void insertString(int offset, String str, AttributeSet attr)
+				throws BadLocationException {
+			if (str == null)
+				return;
+
+			if ((getLength() + str.length()) <= limit) {
+				super.insertString(offset, str, attr);
+			}
+		}
+	}
 
 	private Vector<Vector<String>> getUsersVector(int eventId) {
 		Vector<Vector<String>> usersVector = new Vector<Vector<String>>();
@@ -721,6 +720,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 			for (User u : usersList) {
 				Vector<String> v = new Vector<String>();
 				v.add(u.getId() + "");
+				v.add(u.getUsername() + "");
 				v.add(u.getuName());
 				v.add(u.getuSurname());
 				v.add(u.getuAge());
@@ -933,8 +933,9 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 			}
 			if (criterion != "") {
 				try {
-					currentClub.spamMobile(message.getText(), criterion
-							.substring(0, criterion.length() - 3));
+					currentClub.spamMobile(currentClub.getClubName() + "-"
+							+ message.getText(), criterion.substring(0,
+							criterion.length() - 3));
 				} catch (RemoteException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -1171,6 +1172,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 
 			Vector<String> columnNames = new Vector<String>();
 			columnNames.addElement("ID");
+			columnNames.addElement("Username");
 			columnNames.addElement("Nome");
 			columnNames.addElement("Cognome");
 			columnNames.addElement("Età");
