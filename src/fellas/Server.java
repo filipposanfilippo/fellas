@@ -152,10 +152,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ clubId
 					+ "','"
 					+ cTel
-					+ "','http://diana.netsons.org/clubs/"
-					+ cName
-					+ ".jpg',"
-					+ "'"
+					+ "','"
+					+ cImageURL
+					+ "','"
 					+ geo[0]
 					+ "',"
 					+ "'"
