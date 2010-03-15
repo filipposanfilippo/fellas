@@ -828,7 +828,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 				query = "INSERT INTO Action (uri,label,poiId)"
 						+ "VALUES ('http://facebooktest.netsons.org/site/events.php?id="
-						+ eventId + ",'View Full Event Description','" + poiId + "')";
+						+ eventId + "','View Full Event Description','" + poiId + "')";
 				statement = connection.createStatement();
 				statement.execute(query);
 			} else {
