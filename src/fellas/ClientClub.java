@@ -14,10 +14,10 @@ public class ClientClub extends UnicastRemoteObject {
 	private String host = "localhost";
 	private Club clubLogged;
 
-	final String _HOST = "diana.netsons.org";
-	final String _USERNAME = "diananet";
-	final String _PASSWORD = "password1234";
-	final String _URL = "http://diana.netsons.org/";
+	final String _HOST = "fellas.netsons.org";
+	final String _USERNAME = "fellasne";
+	final String _PASSWORD = "mxYuHCg7dB";
+	final String _URL = "http://fellas.netsons.org/";
 
 	public ClientClub() throws RemoteException, MalformedURLException,
 			NotBoundException {
