@@ -15,7 +15,7 @@ public class ClientClub extends UnicastRemoteObject {
 	private Club clubLogged;
 
 	final String _HOST = "fellas.netsons.org";
-	final String _USERNAME = "fellasne";
+	final String _USERNAME = "fellasne@fellas.netsons.org";
 	final String _PASSWORD = "mxYuHCg7dB";
 	final String _URL = "http://fellas.netsons.org/";
 
