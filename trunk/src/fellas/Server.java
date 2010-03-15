@@ -214,9 +214,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "UPDATE POI SET attribution='" + club.getcTel() + "',"
 					+ " lat='" + coordinates[0] + "'," + " lon='"
 					+ coordinates[1] + "'," + " line2='" + club.getcType()
-					+ "'," + " line3='" + club.getoName() + " " + club.getoSurname() 
-					+ "'," + " line4='" + club.getcEMail() + "'"
-					+ " WHERE type=2 AND idItem=" + club.getId();
+					+ "'," + " line3='" + club.getoName() + " "
+					+ club.getoSurname() + "'," + " line4='" + club.getcEMail()
+					+ "'" + " WHERE type=2 AND idItem=" + club.getId();
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertClubLog(username, "updateClubData", club.getId());
@@ -252,24 +252,22 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			if (!checkConnection())
 				openConnection();
-			//boolean res = clubAccess(username, psw);
+			// boolean res = clubAccess(username, psw);
 			query = "SELECT id FROM clubs WHERE username='" + username
 					+ "' AND psw = '" + psw + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next()){
+			if (rs.next()) {
 				insertClubLog(username, "clubAuthentication", rs.getInt("id"));
 				return true;
-			}
-			else
+			} else
 				return false;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
-	
-	
+
 	@Override
 	public String userAuthentication(String username, String psw)
 			throws RemoteException {
@@ -277,23 +275,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			if (!checkConnection())
 				openConnection();
-			//boolean res = clubAccess(username, psw);
+			// boolean res = clubAccess(username, psw);
 			query = "SELECT uTel FROM users WHERE username='" + username
 					+ "' AND psw = '" + psw + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next()){
+			if (rs.next()) {
 				insertUserLog(rs.getString("uTel"), "userAuthentication", "");
 				return rs.getString("uTel");
-			}
-			else
+			} else
 				return "NOT_EXISTING";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "ERROR";
 		}
 	}
-	
 
 	/*
 	 * public LinkedList<Club> getClubList() throws RemoteException {
@@ -318,7 +314,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "SELECT * FROM clubs WHERE username='" + username + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if (rs.next()){
+			if (rs.next()) {
 				insertClubLog(username, "getClubData", rs.getInt("id"));
 				return new Club(rs.getInt("id"), rs.getString("oName"), rs
 						.getString("oSurname"), rs.getString("cAddress"), rs
@@ -335,84 +331,78 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		return new Club();
 	}
 
-	
-	public LinkedList<Club> getClub(String key, String senderTel, String scope, String value) throws RemoteException{
+	public LinkedList<Club> getClub(String key, String senderTel, String scope,
+			String value) throws RemoteException {
 		LinkedList<Club> results = new LinkedList<Club>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key)){
-				results.add(new Club(-1,"","","-1","","NOT AUTHORIZED","","","","",""));
+			if (!keyword.equals(key)) {
+				results.add(new Club(-1, "", "", "-1", "", "NOT AUTHORIZED",
+						"", "", "", "", ""));
 				return results;
 			}
 			query = "SELECT * FROM clubs WHERE " + scope + "='" + value + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			while (rs.next()){
-				insertUserLog(senderTel, "getClub", scope+": "+value);
-				results.add(new Club(rs.getInt("id"), rs
-						.getString("oName"), rs
-						.getString("oSurname"), rs
-						.getString("cAddress"), rs
-						.getString("cTel"), rs
-						.getString("cEMail"), rs
-						.getString("cType"), rs
-						.getString("cName"), rs
-						.getString("username"), rs
-						.getString("psw"), rs
+			while (rs.next()) {
+				insertUserLog(senderTel, "getClub", scope + ": " + value);
+				results.add(new Club(rs.getInt("id"), rs.getString("oName"), rs
+						.getString("oSurname"), rs.getString("cAddress"), rs
+						.getString("cTel"), rs.getString("cEMail"), rs
+						.getString("cType"), rs.getString("cName"), rs
+						.getString("username"), rs.getString("psw"), rs
 						.getString("cImageURL")));
 			}
-			if(results.isEmpty())
-				results.add(new Club(-1,"","","-1","","NOT FOUND","","","","",""));
+			if (results.isEmpty())
+				results.add(new Club(-1, "", "", "-1", "", "NOT FOUND", "", "",
+						"", "", ""));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getClub: ");
 			e.printStackTrace();
-			results.add( new Club(-1,"","","-1","","ERROR","","","","",""));
+			results.add(new Club(-1, "", "", "-1", "", "ERROR", "", "", "", "",
+					""));
 			return results;
 		}
 		return results;
 	}
-	
-	
-	public LinkedList<User> getUser(String key, String senderTel, String scope, String value)throws RemoteException{
+
+	public LinkedList<User> getUser(String key, String senderTel, String scope,
+			String value) throws RemoteException {
 		LinkedList<User> results = new LinkedList<User>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key)){
-				results.add(new User(-1,"","","","","","","NOT AUTHORIZED","","","",1));
+			if (!keyword.equals(key)) {
+				results.add(new User(-1, "", "", "", "", "", "",
+						"NOT AUTHORIZED", "", "", "", 1));
 				return results;
 			}
 			query = "SELECT * FROM users WHERE " + scope + "='" + value + "'";
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			while(rs.next()){
-				insertUserLog(senderTel, "getUser", scope+": "+value);
-				 results.add(new User(rs.getInt("id"), rs
-						.getString("uTel"), rs
-						.getString("uName"), rs
-						.getString("uAge"), rs
-						.getString("uSex"), rs
-						.getString("uStatus"), rs
-						.getString("username"), rs
-						.getString("psw"), rs
-						.getString("uSurname"), rs
-						.getString("uLocation"), rs
-						.getString("imageURL"), rs
-						.getInt("privacy")));
+			while (rs.next()) {
+				insertUserLog(senderTel, "getUser", scope + ": " + value);
+				results.add(new User(rs.getInt("id"), rs.getString("uTel"), rs
+						.getString("uName"), rs.getString("uAge"), rs
+						.getString("uSex"), rs.getString("uStatus"), rs
+						.getString("username"), rs.getString("psw"), rs
+						.getString("uSurname"), rs.getString("uLocation"), rs
+						.getString("imageURL"), rs.getInt("privacy")));
 			}
-			if(results.isEmpty())
-				results.add(new User(-1,"","","","","","","NOT FOUND","","","",1));
+			if (results.isEmpty())
+				results.add(new User(-1, "", "", "", "", "", "", "NOT FOUND",
+						"", "", "", 1));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getUser: ");
 			e.printStackTrace();
-			results.add(new User(-1,"","","","","","","ERROR","","","",1));
+			results.add(new User(-1, "", "", "", "", "", "", "ERROR", "", "",
+					"", 1));
 			return results;
 		}
 		return results;
 	}
-	
-	
+
 	public LinkedList<MyEvent> getClubEventsList(String username, String psw,
 			int cId, String table) throws RemoteException {
 		try {
@@ -425,9 +415,10 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
-						.getString("eName"), rs.getString("eShortDescription"),
-						rs.getString("eLongDescription"), rs
+				eventList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+						rs.getString("eName"), rs
+								.getString("eShortDescription"), rs
+								.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
 								.getString("eCategory"), rs
 								.getDate("eStartDate"), rs
@@ -446,23 +437,26 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public LinkedList<MyEvent> getEventsList(String key, String uTel, int cId) throws RemoteException {
+	public LinkedList<MyEvent> getEventsList(String key, String uTel, int cId)
+			throws RemoteException {
 		// TODO insert NOT_AUTHORIZED return value for wrong keyword
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key)){				
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
-				return  eventsList;
+			if (!keyword.equals(key)) {
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "NOT AUTHORIZED", "", "", ""));
+				return eventsList;
 			}
 			query = "SELECT * FROM events WHERE cId=" + cId;
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			while (rs.next())
-				eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"), rs
-						.getString("eName"), rs.getString("eShortDescription"),
-						rs.getString("eLongDescription"), rs
+				eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
+						rs.getString("eName"), rs
+								.getString("eShortDescription"), rs
+								.getString("eLongDescription"), rs
 								.getString("eLocation"), rs
 								.getString("eCategory"), rs
 								.getDate("eStartDate"), rs
@@ -473,20 +467,21 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 								.getString("eInfoTel"), rs
 								.getString("eImageURL"))));
 			insertUserLog(uTel, "getEventsList", String.valueOf(cId));
-			for(MyEvent e: eventsList)
-				e=addClubToEvent(e);
-			
-			if(eventsList.isEmpty())
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
+			for (MyEvent e : eventsList)
+				e = addClubToEvent(e);
+
+			if (eventsList.isEmpty())
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "NOT FOUND", "", "", ""));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER getEvents: " + cId);
-			eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+					null, "", "ERROR", "", "", ""));
 			return eventsList;
 		}
 		return eventsList;
 	}
-	
-	
+
 	public MyEvent getEvent(int id, String table) {
 		try {
 			if (!checkConnection())
@@ -519,16 +514,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	
-	
 	public LinkedList<MyEvent> getUserEventsList(String key, String senderTel,
 			int userId) throws RemoteException {
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key)){
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
+			if (!keyword.equals(key)) {
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "NOT AUTHORIZED", "", "", ""));
 			}
 			query = "SELECT * FROM events RIGHT OUTER JOIN subscription "
 					+ "ON events.id = subscription.eId "
@@ -538,51 +532,53 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			while (rs.next())
 				eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
 						rs.getString("eName"), rs
-						.getString("eShortDescription"), rs
-						.getString("eLongDescription"), rs
-						.getString("eLocation"), rs
-						.getString("eCategory"), rs
-						.getDate("eStartDate"), rs
-						.getDate("eFinishDate"), rs
-						.getString("eStartTime"), rs
-						.getString("eFinishTime"), rs
-						.getString("eRestriction"), rs
-						.getString("eInfoTel"), rs
-						.getString("eImageURL"))));
+								.getString("eShortDescription"), rs
+								.getString("eLongDescription"), rs
+								.getString("eLocation"), rs
+								.getString("eCategory"), rs
+								.getDate("eStartDate"), rs
+								.getDate("eFinishDate"), rs
+								.getString("eStartTime"), rs
+								.getString("eFinishTime"), rs
+								.getString("eRestriction"), rs
+								.getString("eInfoTel"), rs
+								.getString("eImageURL"))));
 			insertUserLog(senderTel, "getUserEvetsList", String.valueOf(userId));
-			for(MyEvent e: eventsList)
-				e=addClubToEvent(e);
-			
-			if(eventsList.isEmpty())
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
+			for (MyEvent e : eventsList)
+				e = addClubToEvent(e);
+
+			if (eventsList.isEmpty())
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "NOT FOUND", "", "", ""));
 		} catch (SQLException e) {
 			e.printStackTrace(System.err);
-			eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+					null, "", "ERROR", "", "", ""));
 			return eventsList;
 		}
 		return eventsList;
 	}
-	
-	public MyEvent addClubToEvent(MyEvent m){
+
+	public MyEvent addClubToEvent(MyEvent m) {
 		try {
 			if (!checkConnection())
 				openConnection();
-			String clubName="";
+			String clubName = "";
 			query = "SELECT cName FROM clubs WHERE id=" + m.getcId();
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			if(rs.next())
+			if (rs.next())
 				clubName = rs.getString("cName");
 			else
 				return null;
 			m.setClubName(clubName);
 			return m;
-		}catch(SQLException e){
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	public LinkedList<User> getEventUsersList(String username, String psw,
 			int eventId) throws RemoteException {
 		// TODO be careful: if cName & psw are wrong, we return an empty list
@@ -616,7 +612,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	/*
 	 * public MobileUser[] getMobileList(String sqlString) throws
 	 * RemoteException { // TODO IS IT NECESSARY??? try { openConnection(); } //
-	 * catch(SQLException e){ catch (Exception e) { 
+	 * catch(SQLException e){ catch (Exception e) {
 	 * 
 	 * } finally { closeConnection(); } return null; }
 	 */
@@ -706,7 +702,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return true;
 		}
 	}
-
 
 	public boolean createEvent(String username, String psw, int cId,
 			String eName, String eShortDescription, String eLongDescription,
@@ -827,7 +822,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 				query = "INSERT INTO Action (uri,label,poiId)"
 						+ "VALUES ('http://fellas.netsons.org/events.php?id="
-						+ eventId + "','View Full Event Description','" + poiId + "')";
+						+ eventId + "','View Full Event Description','" + poiId
+						+ "')";
 				statement = connection.createStatement();
 				statement.execute(query);
 			} else {
@@ -1422,7 +1418,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				answer += "User " + rs.getString("username");
+				answer1 += "User " + rs.getString("username");
 			else
 				return "You are not registered, please register%";
 
@@ -1433,7 +1429,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			receiverTel = rs.getString("uTel");
 			if (receiverTel.equals(""))
 				return "Any users with this username found%";
-			answer = '@' + receiverTel + '@';
+			answer = '@' + receiverTel + '@' + answer1;
 
 			// check if there is already an entry in chatup table
 
@@ -1461,7 +1457,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			answer += " asks to chatup with you. If you agree, respond 'y&"
+			answer += " asks to chatup with you. If you agree, answer 'y&"
 					+ rs.getString("id") + "$'%";
 			insertUserLog(senderTel, "chatUp", receiverTel);
 			return answer;
@@ -1545,7 +1541,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "EVENTLIST ERROR%";
 		}
 	}
-
 
 	public String inviteFriend(String key, String senderTel,
 			String friendPhone, int eventId) throws RemoteException {
@@ -1853,106 +1848,56 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	/*public String mobileRegistration(String key, String uTel, String username,
-			String psw, String uSex, String uAge, String uLocation,
-			String uPrivacy) throws RemoteException {
-		if (!keyword.equals(key))
-			return "You are not authorized";
-		if (!checkConnection())
-			openConnection();
-		if (isUserExisting(uTel))
-			return "Already registered%";
-		try {
-			query = "INSERT INTO users (uTel,username,psw,uSex,uAge,uLocation,privacy,uName, uStatus, uSurname, imageURL)"
-					+ "VALUES ('"
-					+ uTel
-					+ "','"
-					+ username
-					+ "','"
-					+ psw
-					+ "','"
-					+ uSex
-					+ "','"
-					+ uAge
-					+ "','"
-					+ uLocation
-					+ "','"
-					+ uPrivacy + "','','','','')";
-			statement = connection.createStatement();
-			statement.execute(query);
+	/*
+	 * public String mobileRegistration(String key, String uTel, String
+	 * username, String psw, String uSex, String uAge, String uLocation, String
+	 * uPrivacy) throws RemoteException { if (!keyword.equals(key)) return
+	 * "You are not authorized"; if (!checkConnection()) openConnection(); if
+	 * (isUserExisting(uTel)) return "Already registered%"; try { query =
+	 * "INSERT INTO users (uTel,username,psw,uSex,uAge,uLocation,privacy,uName, uStatus, uSurname, imageURL)"
+	 * + "VALUES ('" + uTel + "','" + username + "','" + psw + "','" + uSex +
+	 * "','" + uAge + "','" + uLocation + "','" + uPrivacy + "','','','','')";
+	 * statement = connection.createStatement(); statement.execute(query);
+	 * 
+	 * // recupera id user query =
+	 * "SELECT id, privacy FROM users WHERE username='" + username + "'";
+	 * statement = connection.createStatement(); rs =
+	 * statement.executeQuery(query); rs.next(); int id = rs.getInt("id"); //int
+	 * privacy = rs.getInt("privacy");
+	 * 
+	 * // insert user in POI String[] coordinates = new String[2]; coordinates =
+	 * address2GEOcoordinates(uLocation);
+	 * System.out.println(Integer.parseInt(uPrivacy)); if
+	 * (Integer.parseInt(uPrivacy)==0) query =
+	 * "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+	 * + "VALUES ('" + id + "','','" + coordinates[0] + "','" + coordinates[1] +
+	 * "','" + uSex + "','" + uAge + "', '" + username + "',1,'','')"; else
+	 * query =
+	 * "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+	 * + "VALUES ('" + id + "','" + uTel + "','" + coordinates[0] + "','" +
+	 * coordinates[1] + "','" + uSex + "','" + uAge + "', '" + username +
+	 * "',1,'','')";
+	 * 
+	 * statement = connection.createStatement(); statement.execute(query);
+	 * 
+	 * // add action to poi // recupera id del poi query =
+	 * "SELECT id FROM POI WHERE type=1 AND idItem='" + id + "'"; statement =
+	 * connection.createStatement(); rs = statement.executeQuery(query);
+	 * rs.next(); int poiId = rs.getInt("id");
+	 * 
+	 * query = "INSERT INTO Action (uri,label,poiId)" +
+	 * "VALUES ('http://facebooktest.netsons.org/site/users.php?id=" + id +
+	 * "','Visit user page','" + poiId + "')"; statement =
+	 * connection.createStatement(); statement.execute(query);
+	 * insertUserLog(uTel, "mobileRegistration", username); return
+	 * "Welcome to Fellas, you can now use our services%"; } catch (SQLException
+	 * e) { e.printStackTrace(); return "REGISTRATION ERROR%"; } }
+	 */
 
-			// recupera id user
-			query = "SELECT id, privacy FROM users WHERE username='" + username
-					+ "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int id = rs.getInt("id");
-			//int privacy = rs.getInt("privacy");
-
-			// insert user in POI
-			String[] coordinates = new String[2];
-			coordinates = address2GEOcoordinates(uLocation);
-			System.out.println(Integer.parseInt(uPrivacy));
-			if (Integer.parseInt(uPrivacy)==0)
-				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
-						+ "VALUES ('"
-						+ id
-						+ "','','"
-						+ coordinates[0]
-						+ "','"
-						+ coordinates[1]
-						+ "','"
-						+ uSex
-						+ "','"
-						+ uAge
-						+ "', '"
-						+ username + "',1,'','')";
-			else
-				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
-						+ "VALUES ('"
-						+ id
-						+ "','"
-						+ uTel
-						+ "','"
-						+ coordinates[0]
-						+ "','"
-						+ coordinates[1]
-						+ "','"
-						+ uSex
-						+ "','"
-						+ uAge
-						+ "', '"
-						+ username
-						+ "',1,'','')";
-
-			statement = connection.createStatement();
-			statement.execute(query);
-
-			// add action to poi
-			// recupera id del poi
-			query = "SELECT id FROM POI WHERE type=1 AND idItem='" + id + "'";
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			rs.next();
-			int poiId = rs.getInt("id");
-
-			query = "INSERT INTO Action (uri,label,poiId)"
-					+ "VALUES ('http://facebooktest.netsons.org/site/users.php?id=" + id
-					+ "','Visit user page','" + poiId + "')";
-			statement = connection.createStatement();
-			statement.execute(query);
-			insertUserLog(uTel, "mobileRegistration", username);
-			return "Welcome to Fellas, you can now use our services%";
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return "REGISTRATION ERROR%";
-		}
-	}*/
-	
 	public String userRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
-			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException {
+			String uPrivacy, String uName, String uStatus, String uSurname,
+			String imageURL) throws RemoteException {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		if (!checkConnection())
@@ -1974,16 +1919,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ uLocation
 					+ "','"
-					+ uPrivacy 
+					+ uPrivacy
 					+ "','"
 					+ uName
 					+ "','"
 					+ uStatus
 					+ "','"
 					+ uSurname
-					+ "','"
-					+ imageURL
-					+ "')";
+					+ "','" + imageURL + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -2012,12 +1955,13 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "','"
 						+ uAge
 						+ "', '"
-						+ username 
+						+ username
 						+ "',1,'"
 						+ imageURL
 						+ "','"
-						+ uName + " " + uSurname
-						+"')";
+						+ uName
+						+ " "
+						+ uSurname + "')";
 			else
 				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
 						+ "VALUES ('"
@@ -2033,12 +1977,9 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "','"
 						+ uAge
 						+ "', '"
-						+ username 
+						+ username
 						+ "',1,'"
-						+ imageURL
-						+ "','"
-						+ uName + " " + uSurname
-						+"')";
+						+ imageURL + "','" + uName + " " + uSurname + "')";
 
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -2052,8 +1993,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-				+ "VALUES ('http://fellas.netsons.org/users.php?id=" + id
-				+ "','Visit user page','" + poiId + "')";
+					+ "VALUES ('http://fellas.netsons.org/users.php?id=" + id
+					+ "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertUserLog(uTel, "userRegistration", username);
@@ -2063,45 +2004,45 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "REGISTRATION ERROR%";
 		}
 	}
-	
+
 	public boolean userEditProfile(String key, String uTel, String NEWusername,
 			String NEWpsw, String NEWuSex, String NEWuAge, String NEWuLocation,
-			String NEWuPrivacy, String NEWuName, String NEWuStatus, String NEWuSurname, String NEWimageURL) throws RemoteException{
+			String NEWuPrivacy, String NEWuName, String NEWuStatus,
+			String NEWuSurname, String NEWimageURL) throws RemoteException {
 		if (!keyword.equals(key))
 			return false;
 		if (!checkConnection())
 			openConnection();
 		try {
-			query = "UPDATE users SET "
-					+ "username='" + NEWusername + "',"
-					+ "psw='" + NEWpsw + "',"
-					+ "uSex='" + NEWuSex + "',"
-					+ "uAge='" + NEWuAge + "',"
-					//+ "uLocation='" + NEWuLocation + "',"
-					+ "privacy='" + NEWuPrivacy + "',"
-					+ "uName='" + NEWuName + "',"
-					+ "uStatus='" + NEWuStatus + "',"
-					+ "uSurname='" + NEWuSurname + "',"
-					+ "imageURL='" + NEWimageURL
+			query = "UPDATE users SET " + "username='" + NEWusername + "',"
+					+ "psw='" + NEWpsw + "'," + "uSex='" + NEWuSex + "',"
+					+ "uAge='"
+					+ NEWuAge
+					+ "',"
+					// + "uLocation='" + NEWuLocation + "',"
+					+ "privacy='" + NEWuPrivacy + "'," + "uName='" + NEWuName
+					+ "'," + "uStatus='" + NEWuStatus + "'," + "uSurname='"
+					+ NEWuSurname + "'," + "imageURL='" + NEWimageURL
 					+ "' WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update new location
-			//setLocation(key,uTel,NEWuLocation);  la tolgo xke' altrimenti mi inserirebbe il log
+			// setLocation(key,uTel,NEWuLocation); la tolgo xke' altrimenti mi
+			// inserirebbe il log
 			int id = getUserId(uTel);
 			String[] coordinates = new String[2];
-			coordinates = address2GEOcoordinates(NEWuLocation);			
-			query = "UPDATE POI SET "
-					+ " lat='" + coordinates[0] + "'," + " lon='"
-					+ coordinates[1]
-					+ "' WHERE type=1 AND idItem=" + id;
+			coordinates = address2GEOcoordinates(NEWuLocation);
+			query = "UPDATE POI SET " + " lat='" + coordinates[0] + "',"
+					+ " lon='" + coordinates[1] + "' WHERE type=1 AND idItem="
+					+ id;
 			statement = connection.createStatement();
-			statement.execute(query);	
+			statement.execute(query);
 			// update in POI
-			String tel=uTel;
-			if (Integer.parseInt(NEWuPrivacy)==0)
+			String tel = uTel;
+			if (Integer.parseInt(NEWuPrivacy) == 0)
 				tel = "";
-			updatePoi(tel,NEWimageURL,NEWuSex,NEWuAge,NEWuStatus,NEWusername,"1",id);			
+			updatePoi(tel, NEWimageURL, NEWuSex, NEWuAge, NEWuStatus,
+					NEWusername, "1", id);
 			insertUserLog(uTel, "userEditProfile", "");
 			return true;
 		} catch (SQLException e) {
@@ -2109,21 +2050,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
-	
-	public boolean updatePoi(String attribution, String imageURL, String line2, 
-			String line3, String line4, String title, String type, int idItem){
+
+	public boolean updatePoi(String attribution, String imageURL, String line2,
+			String line3, String line4, String title, String type, int idItem) {
 		if (!checkConnection())
 			openConnection();
 		try {
-			query = "UPDATE POI SET "
-					+ "attribution='" + attribution + "',"
-					+ "imageURL='" + imageURL + "',"
-					+ "line2='" + line2 + "',"
-					+ "line3='" + line3 + "',"
-					+ "line4='" + line4 + "',"
-					+ "title='" + title
-					+ "' WHERE idItem='" + idItem 
+			query = "UPDATE POI SET " + "attribution='" + attribution + "',"
+					+ "imageURL='" + imageURL + "'," + "line2='" + line2 + "',"
+					+ "line3='" + line3 + "'," + "line4='" + line4 + "',"
+					+ "title='" + title + "' WHERE idItem='" + idItem
 					+ "' AND type='" + type + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -2193,10 +2129,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return "USERLIST ERROR%";
 		}
 	}
-	
-	
-	
-	
 
 	public String clubsList(String key, String senderTel, String criterion)
 			throws RemoteException {
@@ -2233,7 +2165,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			if (clubList.size() < 7) {
 				while (!clubList.isEmpty() && answer.length() < 130) {
-					answer += clubList.getFirst().getcName() + clubList.getFirst().getId() + ',';
+					answer += clubList.getFirst().getcName()
+							+ clubList.getFirst().getId() + ',';
 					clubList.removeFirst();
 				}
 			} else
@@ -2402,7 +2335,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from subscription WHERE uId='" + id + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			
+
 			return "You have been unregistered%";
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -2532,201 +2465,206 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			return false;
 		}
 	}
-	
-	
-	
-	public LinkedList<MyEvent> searchEvent(String key, String senderTel, String name, String location, String date) throws RemoteException{
+
+	public LinkedList<MyEvent> searchEvent(String key, String senderTel,
+			String name, String location, String date) throws RemoteException {
 		LinkedList<MyEvent> eventsList = new LinkedList<MyEvent>();
-		Date dayOfEvent= null;
+		Date dayOfEvent = null;
 		Date dayOfStart = null;
 		Date dayOfFinish = null;
 		DateFormat df = null;
-		
-		if(!date.isEmpty()){			
+
+		if (!date.isEmpty()) {
 			df = new SimpleDateFormat("yyyy-MM-dd");
-			try{
+			try {
 				dayOfEvent = df.parse(date);
-			}
-			catch (ParseException e) {
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			} catch (ParseException e) {
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "ERROR", "", "", ""));
 				return eventsList;
 			}
 		}
-			
+
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key)){
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT AUTHORIZED","","",""));
+			if (!keyword.equals(key)) {
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "NOT AUTHORIZED", "", "", ""));
 			}
-			
-			if(!date.isEmpty())
-				insertUserLog(senderTel, "searchEvent", "name: " + name + " - location: " + location + " - date: " + dayOfEvent.toString());
+
+			if (!date.isEmpty())
+				insertUserLog(senderTel, "searchEvent", "name: " + name
+						+ " - location: " + location + " - date: "
+						+ dayOfEvent.toString());
 			else
-				insertUserLog(senderTel, "searchEvent", "name: " + name + " - location: " + location);
-			
-			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events  WHERE eName LIKE '%" + name + "%' AND "+ "eLocation LIKE '%" + location + "%'";
-			else if (name.isEmpty() && location.isEmpty()) 
+				insertUserLog(senderTel, "searchEvent", "name: " + name
+						+ " - location: " + location);
+
+			if (!name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM events  WHERE eName LIKE '%" + name
+						+ "%' AND " + "eLocation LIKE '%" + location + "%'";
+			else if (name.isEmpty() && location.isEmpty())
 				query = "SELECT * FROM events ";
 			else if (name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM events WHERE eLocation LIKE '%" + location + "%'";
+				query = "SELECT * FROM events WHERE eLocation LIKE '%"
+						+ location + "%'";
 			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM events WHERE eName LIKE '%" + name + "%'";
-			
+				query = "SELECT * FROM events WHERE eName LIKE '%" + name
+						+ "%'";
+
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
-			
-			while (rs.next()){
+
+			while (rs.next()) {
 				dayOfStart = rs.getDate("eStartDate");
 				dayOfFinish = rs.getDate("eFinishDate");
-				
-				if(date.isEmpty())
-					eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
-						rs.getString("eName"), rs
-						.getString("eShortDescription"), rs
-						.getString("eLongDescription"), rs
-						.getString("eLocation"), rs
-						.getString("eCategory"), rs
-						.getDate("eStartDate"), rs
-						.getDate("eFinishDate"), rs
-						.getString("eStartTime"), rs
-						.getString("eFinishTime"), rs
-						.getString("eRestriction"), rs
-						.getString("eInfoTel"), rs
-						.getString("eImageURL"))));
-				
-				else if (dayOfEvent.after(dayOfStart)  && dayOfEvent.before(dayOfFinish))
-					eventsList.add((new MyEvent(rs.getInt("id"), rs.getInt("cId"),
-							rs.getString("eName"), rs
+
+				if (date.isEmpty())
+					eventsList.add((new MyEvent(rs.getInt("id"), rs
+							.getInt("cId"), rs.getString("eName"), rs
 							.getString("eShortDescription"), rs
 							.getString("eLongDescription"), rs
-							.getString("eLocation"), rs
-							.getString("eCategory"), rs
-							.getDate("eStartDate"), rs
-							.getDate("eFinishDate"), rs
-							.getString("eStartTime"), rs
-							.getString("eFinishTime"), rs
-							.getString("eRestriction"), rs
-							.getString("eInfoTel"), rs
-							.getString("eImageURL"))));
-				}
-			
-			for(MyEvent e: eventsList)
-				e=addClubToEvent(e);
-			insertUserLog(senderTel, "searchEvent", name + " " + location + " " + date);
-			if(eventsList.isEmpty())
-				eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","NOT FOUND","","",""));
+							.getString("eLocation"), rs.getString("eCategory"),
+							rs.getDate("eStartDate"),
+							rs.getDate("eFinishDate"), rs
+									.getString("eStartTime"), rs
+									.getString("eFinishTime"), rs
+									.getString("eRestriction"), rs
+									.getString("eInfoTel"), rs
+									.getString("eImageURL"))));
+
+				else if (dayOfEvent.after(dayOfStart)
+						&& dayOfEvent.before(dayOfFinish))
+					eventsList.add((new MyEvent(rs.getInt("id"), rs
+							.getInt("cId"), rs.getString("eName"), rs
+							.getString("eShortDescription"), rs
+							.getString("eLongDescription"), rs
+							.getString("eLocation"), rs.getString("eCategory"),
+							rs.getDate("eStartDate"),
+							rs.getDate("eFinishDate"), rs
+									.getString("eStartTime"), rs
+									.getString("eFinishTime"), rs
+									.getString("eRestriction"), rs
+									.getString("eInfoTel"), rs
+									.getString("eImageURL"))));
+			}
+
+			for (MyEvent e : eventsList)
+				e = addClubToEvent(e);
+			insertUserLog(senderTel, "searchEvent", name + " " + location + " "
+					+ date);
+			if (eventsList.isEmpty())
+				eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+						null, "", "NOT FOUND", "", "", ""));
 		} catch (SQLException e) {
 			e.printStackTrace(System.err);
-			eventsList.add(new MyEvent(-1,-1,"","","","","-1",null,null,"","ERROR","","",""));
+			eventsList.add(new MyEvent(-1, -1, "", "", "", "", "-1", null,
+					null, "", "ERROR", "", "", ""));
 			return eventsList;
 		}
 		return eventsList;
 	}
-	
 
-	public LinkedList<Club> searchClub(String key, String senderTel, String name, String location) throws RemoteException{
+	public LinkedList<Club> searchClub(String key, String senderTel,
+			String name, String location) throws RemoteException {
 		LinkedList<Club> results = new LinkedList<Club>();
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!keyword.equals(key)){
-				results.add(new Club(-1,"","","-1","","NOT AUTHORIZED","","","","",""));
+			if (!keyword.equals(key)) {
+				results.add(new Club(-1, "", "", "-1", "", "NOT AUTHORIZED",
+						"", "", "", "", ""));
 				return results;
 			}
 
-			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM clubs  WHERE (cName LIKE '%" + name + "%' OR username LIKE '%"+ name + "%')" + " AND "+ "cAddress LIKE '%" + location + "%'";
-			else if (name.isEmpty() && location.isEmpty()) 
+			if (!name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM clubs  WHERE (cName LIKE '%" + name
+						+ "%' OR username LIKE '%" + name + "%')" + " AND "
+						+ "cAddress LIKE '%" + location + "%'";
+			else if (name.isEmpty() && location.isEmpty())
 				query = "SELECT * FROM clubs ";
 			else if (name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM clubs WHERE cAddress LIKE '%" + location + "%'";
+				query = "SELECT * FROM clubs WHERE cAddress LIKE '%" + location
+						+ "%'";
 			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM clubs WHERE cName LIKE '%" + name + "%' OR username LIKE '%"+ name + "%'";
-			
-			
+				query = "SELECT * FROM clubs WHERE cName LIKE '%" + name
+						+ "%' OR username LIKE '%" + name + "%'";
+
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			insertUserLog(senderTel, "searchClub", name + " " + location);
-			
-			while (rs.next()){
-				results.add(new Club(rs.getInt("id"), rs
-						.getString("oName"), rs
-						.getString("oSurname"), rs
-						.getString("cAddress"), rs
-						.getString("cTel"), rs
-						.getString("cEMail"), rs
-						.getString("cType"), rs
-						.getString("cName"), rs
-						.getString("username"), rs
-						.getString("psw"), rs
+
+			while (rs.next()) {
+				results.add(new Club(rs.getInt("id"), rs.getString("oName"), rs
+						.getString("oSurname"), rs.getString("cAddress"), rs
+						.getString("cTel"), rs.getString("cEMail"), rs
+						.getString("cType"), rs.getString("cName"), rs
+						.getString("username"), rs.getString("psw"), rs
 						.getString("cImageURL")));
 			}
-			if(results.isEmpty())
-				results.add(new Club(-1,"","","-1","","NOT FOUND","","","","",""));
+			if (results.isEmpty())
+				results.add(new Club(-1, "", "", "-1", "", "NOT FOUND", "", "",
+						"", "", ""));
 		} catch (SQLException e) {
 			System.out.println("ERRORE IN SERVER searchClub: ");
 			e.printStackTrace();
-			results.add( new Club(-1,"","","-1","","ERROR","","","","",""));
-			return results;
-		}
-		return results;
-	}	
-
-
-	
-
-	public LinkedList<User> searchUser(String key, String senderTel, String name, String location)throws RemoteException{
-		LinkedList<User> results = new LinkedList<User>();
-		try {
-			if (!checkConnection())
-				openConnection();
-			if (!keyword.equals(key)){
-				results.add(new User(-1,"","","","","","","NOT AUTHORIZED","","","",1));
-				return results;
-			}
-			
-			if(!name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM users  WHERE (uName LIKE '%" + name + "%' OR uSurname LIKE '%"+ name + "%')" + " AND "+ "uLocation LIKE '%" + location + "%'";
-			else if (name.isEmpty() && location.isEmpty()) 
-				query = "SELECT * FROM users ";
-			else if (name.isEmpty() && !location.isEmpty())
-				query = "SELECT * FROM users WHERE uLocation LIKE '%" + location + "%'";
-			else if (!name.isEmpty() && location.isEmpty())
-				query = "SELECT * FROM users WHERE uName LIKE '%" + name + "%' OR uSurname LIKE '%"+ name + "%'";
-			
-			statement = connection.createStatement();
-			rs = statement.executeQuery(query);
-			
-			insertUserLog(senderTel, "searchUser", name + " " + location);
-			while(rs.next()){
-				results.add(new User(rs.getInt("id"), rs
-						.getString("uTel"), rs
-						.getString("uName"), rs
-						.getString("uAge"), rs
-						.getString("uSex"), rs
-						.getString("uStatus"), rs
-						.getString("username"), rs
-						.getString("psw"), rs
-						.getString("uSurname"), rs
-						.getString("uLocation"), rs
-						.getString("imageURL"), rs
-						.getInt("privacy")));
-			}
-			if(results.isEmpty())
-				results.add(new User(-1,"","","","","","","NOT FOUND","","","",1));
-		} catch (SQLException e) {
-			System.out.println("ERRORE IN SERVER searchUser: ");
-			e.printStackTrace();
-			results.add(new User(-1,"","","","","","","ERROR","","","",1));
+			results.add(new Club(-1, "", "", "-1", "", "ERROR", "", "", "", "",
+					""));
 			return results;
 		}
 		return results;
 	}
-	
-	
-	
+
+	public LinkedList<User> searchUser(String key, String senderTel,
+			String name, String location) throws RemoteException {
+		LinkedList<User> results = new LinkedList<User>();
+		try {
+			if (!checkConnection())
+				openConnection();
+			if (!keyword.equals(key)) {
+				results.add(new User(-1, "", "", "", "", "", "",
+						"NOT AUTHORIZED", "", "", "", 1));
+				return results;
+			}
+
+			if (!name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM users  WHERE (uName LIKE '%" + name
+						+ "%' OR uSurname LIKE '%" + name + "%')" + " AND "
+						+ "uLocation LIKE '%" + location + "%'";
+			else if (name.isEmpty() && location.isEmpty())
+				query = "SELECT * FROM users ";
+			else if (name.isEmpty() && !location.isEmpty())
+				query = "SELECT * FROM users WHERE uLocation LIKE '%"
+						+ location + "%'";
+			else if (!name.isEmpty() && location.isEmpty())
+				query = "SELECT * FROM users WHERE uName LIKE '%" + name
+						+ "%' OR uSurname LIKE '%" + name + "%'";
+
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+
+			insertUserLog(senderTel, "searchUser", name + " " + location);
+			while (rs.next()) {
+				results.add(new User(rs.getInt("id"), rs.getString("uTel"), rs
+						.getString("uName"), rs.getString("uAge"), rs
+						.getString("uSex"), rs.getString("uStatus"), rs
+						.getString("username"), rs.getString("psw"), rs
+						.getString("uSurname"), rs.getString("uLocation"), rs
+						.getString("imageURL"), rs.getInt("privacy")));
+			}
+			if (results.isEmpty())
+				results.add(new User(-1, "", "", "", "", "", "", "NOT FOUND",
+						"", "", "", 1));
+		} catch (SQLException e) {
+			System.out.println("ERRORE IN SERVER searchUser: ");
+			e.printStackTrace();
+			results.add(new User(-1, "", "", "", "", "", "", "ERROR", "", "",
+					"", 1));
+			return results;
+		}
+		return results;
+	}
 
 	public String setPrivacy(String key, String senderTel, int privacy)
 			throws RemoteException {
