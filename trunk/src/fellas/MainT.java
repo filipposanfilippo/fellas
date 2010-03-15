@@ -628,7 +628,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		dataP.add(lb);
 		dataP.add(surnameR);
 
-		lb = new JLabel("Club Address:", JLabel.TRAILING);
+		lb = new JLabel("Club Full Address:", JLabel.TRAILING);
 		lb.setPreferredSize(new Dimension(100, 20));
 		dataP.add(lb);
 		dataP.add(addressR);
