@@ -928,11 +928,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		}
 		if (event == sendToAllB) {
 			String criterion = "";
-			DefaultListModel model = (DefaultListModel) usersJTable.getModel();
-			String[] ele = new String[model.size()];
-			model.copyInto(ele);
-			for (String s : ele) {
-				criterion += "id=" + s.toString().split("]")[0] + " OR ";
+			for (int i = 0; i < usersJTable.getRowCount(); i++) {
+				criterion += "id=" + usersJTable.getValueAt(i, 0) + " OR ";
 			}
 			if (criterion != "") {
 				try {
