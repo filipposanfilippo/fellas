@@ -49,6 +49,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -301,6 +304,25 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		}
 	}
 
+	public class JTextFieldLimit extends PlainDocument {
+		private int limit;
+
+		JTextFieldLimit(int limit) {
+			super();
+			this.limit = limit;
+		}
+
+		public void insertString(int offset, String str, AttributeSet attr)
+				throws BadLocationException {
+			if (str == null)
+				return;
+
+			if ((getLength() + str.length()) <= limit) {
+				super.insertString(offset, str, attr);
+			}
+		}
+	}
+
 	private JPanel createEventsPanel(LinkedList<MyEvent> eventsList) {
 		JPanel eventsP = new JPanel();
 		eventsP.setLayout(new GridLayout(1, 2));
@@ -330,19 +352,22 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 			e.printStackTrace();
 		}
 		// ------------------------ RIGHT ------------------------------------
-
 		rightEvP = new JPanel(new SpringLayout());
 
 		rightEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
-		eName = new JTextField("New Event");
+		eName = new JTextField();
+		eName.setDocument(new JTextFieldLimit(20));
 		rightEvP.add(eName);
 
 		rightEvP.add(new JLabel("Location:", JLabel.TRAILING));
-		eLocation = new JTextField(currentClub.getClub().getcAddress());
+		eLocation = new JTextField();
+		eLocation.setDocument(new JTextFieldLimit(50));
+		eLocation.setText(currentClub.getClub().getcAddress());
 		rightEvP.add(eLocation);
 
 		rightEvP.add(new JLabel("Event Category:", JLabel.TRAILING));
 		eCategory = new JTextField();
+		eCategory.setDocument(new JTextFieldLimit(20));
 		rightEvP.add(eCategory);
 
 		rightEvP.add(new JLabel("Starting Date:", JLabel.TRAILING));
@@ -368,23 +393,25 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 
 		rightEvP.add(new JLabel("Restriction:", JLabel.TRAILING));
 		eRestriction = new JTextField();
-
+		eRestriction.setDocument(new JTextFieldLimit(20));
 		rightEvP.add(eRestriction);
 
 		rightEvP.add(new JLabel("Telephon Info.:", JLabel.TRAILING));
-		eInfoTel = new JTextField(currentClub.getClub().getcTel());
-
+		eInfoTel = new JTextField();
+		eInfoTel.setDocument(new JTextFieldLimit(50));
+		eInfoTel.setText(currentClub.getClub().getcTel());
 		rightEvP.add(eInfoTel);
 
 		rightEvP.add(new JLabel("Short Desciption:", JLabel.TRAILING));
 		eShortDescription = new JTextField();
-
+		eShortDescription.setDocument(new JTextFieldLimit(80));
 		rightEvP.add(eShortDescription);
 
 		rightEvP.add(new JLabel("Long Description:", JLabel.TRAILING));
 		eLongDescription = new JTextArea(5, 27);
 		eLongDescription.setLineWrap(true);
 		JScrollPane descrScrollPane = new JScrollPane(eLongDescription);
+		eLongDescription.setDocument(new JTextFieldLimit(400));
 		rightEvP.add(descrScrollPane);
 
 		JPanel evButtonsP = new JPanel();
@@ -732,7 +759,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	private void cleanBoxes() {
 		// rightEvP.setVisible(false); // TODO ho messo globale il right per
 		// vedere se spostare il new..se tolgo questo metto locale il rightEvP
-		eName.setText("New Event");
+		eName.setText("");
 		eShortDescription.setText("");
 		eLongDescription.setText("");
 		eLocation.setText(currentClub.getClub().getcAddress());
