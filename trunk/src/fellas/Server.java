@@ -1413,6 +1413,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		String answer = "";
+		String answer1 = "";
 		String receiverTel = "";
 		try {
 			if (!checkConnection())
@@ -1421,7 +1422,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				answer += "User " + rs.getString("username");
+				answer1 += "User " + rs.getString("username");
 			else
 				return "You are not registered, please register%";
 
@@ -1432,7 +1433,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			receiverTel = rs.getString("uTel");
 			if (receiverTel.equals(""))
 				return "Any users with this username found%";
-			answer = '@' + receiverTel + '@';
+			answer = '@' + receiverTel + '@'+answer1;
 
 			// check if there is already an entry in chatup table
 
@@ -1460,7 +1461,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			answer += " asks to chatup with you. If you agree, respond 'y&"
+			answer += " asks to chatup with you. If you agree, answer 'y&"
 					+ rs.getString("id") + "$'%";
 			insertUserLog(senderTel, "chatUp", receiverTel);
 			return answer;
@@ -2264,7 +2265,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			if (!checkConnection())
 				openConnection();
-			if (!clubAccess(rs.getString("cName"), psw))
+			if (!clubAccess(username, psw))
 				return "";
 			query = "SELECT uTel FROM users WHERE " + criterion + "";
 			System.out.println("SPAM QUERY: " + query);
