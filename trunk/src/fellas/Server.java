@@ -2401,7 +2401,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from Action WHERE poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
-			insertUserLog(senderTel, "mobileUnregistration", "");
+			insertUserLog(senderTel, "mobileUnregistration", String.valueOf(id));
+			// delete entry from subscription
+			query = "DELETE from subscription WHERE uId='" + id + "'";
+			statement = connection.createStatement();
+			statement.execute(query);
+			
 			return "You have been unregistered%";
 		} catch (SQLException e) {
 			e.printStackTrace();
