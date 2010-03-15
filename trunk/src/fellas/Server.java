@@ -179,7 +179,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int poiId = rs.getInt("id");
-			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://facebooktest.netsons.org/site/clubs.php?id="
+			query = "INSERT INTO Action (uri, label,poiId) VALUES ('http://fellas.netsons.org/clubs.php?id="
 					+ clubId + "','Visit club page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
@@ -827,7 +827,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				int poiId = rs.getInt("id");
 
 				query = "INSERT INTO Action (uri,label,poiId)"
-						+ "VALUES ('http://facebooktest.netsons.org/site/events.php?id="
+						+ "VALUES ('http://fellas.netsons.org/events.php?id="
 						+ eventId + "','View Full Event Description','" + poiId + "')";
 				statement = connection.createStatement();
 				statement.execute(query);
@@ -2052,7 +2052,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-				+ "VALUES ('http://facebooktest.netsons.org/site/users.php?id=" + id
+				+ "VALUES ('http://fellas.netsons.org/users.php?id=" + id
 				+ "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
