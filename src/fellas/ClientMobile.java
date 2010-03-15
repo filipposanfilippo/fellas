@@ -94,8 +94,10 @@ class ClientMobile extends UnicastRemoteObject {
 					System.out.println("\nlocation: " + uLocation);
 					System.out.println("\nprivacy: " + uPrivacy);
 					// invoke remote method
-					serverAnswer = server.mobileRegistration(keyword, uTel,
-							username, psw, uSex, uAge, uLocation, uPrivacy);
+					serverAnswer = server.userRegistration(keyword, uTel,
+							username, psw, uSex, uAge, uLocation, uPrivacy, "", 
+							"Appena iscritto in fellas", "", "");
+										
 					// System.out.println("\nServerAnswer: " + serverAnswer);
 					served = true;
 					break;
