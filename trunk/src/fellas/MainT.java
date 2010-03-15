@@ -58,11 +58,10 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	String TITLE = "FELLAS: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
 
-	// TODO check if is better move all ftp sending operation to clientclub
-	final String _HOST = "diana.netsons.org";
-	final String _USERNAME = "diananet";
-	final String _PASSWORD = "password1234";
-	final String _URL = "http://diana.netsons.org/";
+	final String _HOST = "fellas.netsons.org";
+	final String _USERNAME = "fellasne@fellas.netsons.org";
+	final String _PASSWORD = "mxYuHCg7dB";
+	final String _URL = "http://fellas.netsons.org/";
 
 	// --------------Default Operations
 	JFrame mainFrame;
