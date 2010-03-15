@@ -82,7 +82,7 @@ public class User implements Serializable {
 		this.uStatus = uStatus;
 	}
 
-	public String getusername() {
+	public String getUsername() {
 		return username;
 	}
 
