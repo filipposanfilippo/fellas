@@ -2232,14 +2232,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			if (clubList.size() < 7) {
 				while (!clubList.isEmpty() && answer.length() < 130) {
-					answer += clubList.getFirst().getcName() + ',';
+					answer += clubList.getFirst().getcName() + clubList.getFirst().getId() + ',';
 					clubList.removeFirst();
 				}
 			} else
 				// extract 7 random clubs
 				while (!clubList.isEmpty() && answer.length() < 130) {
 					lucky = rn.nextInt(clubList.size());
-					answer += clubList.get(lucky).getcName() + ',';
+					answer += clubList.get(lucky).getcName() + clubList.get(lucky).getId() + ',';
 					clubList.remove(lucky);
 				}
 			if (answer.equals(""))
