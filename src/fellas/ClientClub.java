@@ -75,7 +75,7 @@ public class ClientClub extends UnicastRemoteObject {
 				cAddress, cTel, cEMail, cType, cName, username, psw,
 				imgRemoteURL);
 
-		if (server.updateClubData(clubLogged.getcName(), clubLogged.getPsw(),
+		if (server.updateClubData(clubLogged.getUsername(), clubLogged.getPsw(),
 				tempClub)) {
 			clubLogged = tempClub;
 			if (!imgLocalURL.equals("")) {
