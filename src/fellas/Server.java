@@ -1853,7 +1853,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		}
 	}
 
-	public String mobileRegistration(String key, String uTel, String username,
+	/*public String mobileRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
 			String uPrivacy) throws RemoteException {
 		if (!keyword.equals(key))
@@ -1948,11 +1948,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			e.printStackTrace();
 			return "REGISTRATION ERROR%";
 		}
-	}
-	
-	
-	
-	
+	}*/
 	
 	public String userRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
@@ -2401,6 +2397,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			query = "DELETE from Action WHERE poiId='" + poiId + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
+			insertUserLog(senderTel, "mobileUnregistration", String.valueOf(id));
 			insertUserLog(senderTel, "mobileUnregistration", String.valueOf(id));
 			// delete entry from subscription
 			query = "DELETE from subscription WHERE uId='" + id + "'";
