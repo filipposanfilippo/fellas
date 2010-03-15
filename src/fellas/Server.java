@@ -2398,7 +2398,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertUserLog(senderTel, "mobileUnregistration", String.valueOf(id));
-			insertUserLog(senderTel, "mobileUnregistration", String.valueOf(id));
 			// delete entry from subscription
 			query = "DELETE from subscription WHERE uId='" + id + "'";
 			statement = connection.createStatement();
