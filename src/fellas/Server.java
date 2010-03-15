@@ -1422,7 +1422,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			if (rs.next())
-				answer1 += "User " + rs.getString("username");
+				answer += "User " + rs.getString("username");
 			else
 				return "You are not registered, please register%";
 
@@ -1433,7 +1433,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			receiverTel = rs.getString("uTel");
 			if (receiverTel.equals(""))
 				return "Any users with this username found%";
-			answer = '@' + receiverTel + '@'+answer1;
+			answer = '@' + receiverTel + '@';
 
 			// check if there is already an entry in chatup table
 
@@ -1461,7 +1461,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			statement = connection.createStatement();
 			rs = statement.executeQuery(query);
 			rs.next();
-			answer += " asks to chatup with you. If you agree, answer 'y&"
+			answer += " asks to chatup with you. If you agree, respond 'y&"
 					+ rs.getString("id") + "$'%";
 			insertUserLog(senderTel, "chatUp", receiverTel);
 			return answer;
@@ -2169,14 +2169,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 			if (userList.size() < 7) {
 				while (!userList.isEmpty() && answer.length() < 130) {
-					answer += userList.getFirst().getusername() + ',';
+					answer += userList.getFirst().getUsername() + ',';
 					userList.removeFirst();
 				}
 			} else
 				// Extract 7 random users
 				while (!userList.isEmpty() && answer.length() < 130) {
 					lucky = rn.nextInt(userList.size());
-					answer += userList.get(lucky).getusername() + ',';
+					answer += userList.get(lucky).getUsername() + ',';
 					userList.remove(lucky);
 				}
 			if (answer.equals(""))
@@ -2240,7 +2240,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				// extract 7 random clubs
 				while (!clubList.isEmpty() && answer.length() < 130) {
 					lucky = rn.nextInt(clubList.size());
-					answer += clubList.get(lucky).getcName() + clubList.get(lucky).getId() + ',';
+					answer += clubList.get(lucky).getcName() + ',';
 					clubList.remove(lucky);
 				}
 			if (answer.equals(""))
