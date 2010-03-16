@@ -2002,7 +2002,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "uAge='"
 					+ NEWuAge
 					+ "',"
-					// + "uLocation='" + NEWuLocation + "',"
+					+ "uLocation='" + NEWuLocation + "',"
 					+ "privacy='" + NEWuPrivacy + "'," + "uName='" + NEWuName
 					+ "'," + "uStatus='" + NEWuStatus + "'," + "uSurname='"
 					+ NEWuSurname + "'," + "imageURL='" + NEWimageURL
