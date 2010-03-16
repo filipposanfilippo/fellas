@@ -1976,7 +1976,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-				+ "VALUES ('http://fellas.netsons.org/users.php?id=" + id
+				+ "VALUES ('http://feelslike.netsons.org/users.php?id=" + id
 				+ "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
