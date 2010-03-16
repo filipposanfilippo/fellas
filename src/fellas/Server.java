@@ -1896,8 +1896,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public String userRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
-			String uPrivacy, String uName, String uStatus, String uSurname,
-			String imageURL) throws RemoteException {
+			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		if (!checkConnection())
@@ -1919,14 +1918,16 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ uLocation
 					+ "','"
-					+ uPrivacy
+					+ uPrivacy 
 					+ "','"
 					+ uName
 					+ "','"
 					+ uStatus
 					+ "','"
 					+ uSurname
-					+ "','" + imageURL + "')";
+					+ "','"
+					+ imageURL
+					+ "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -1942,45 +1943,27 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// insert user in POI
 			String[] coordinates = new String[2];
 			coordinates = address2GEOcoordinates(uLocation);
-			if (privacy == 0)
+			String tmp = "";
+			if (privacy == 1)
+				tmp = uTel;
 				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
 						+ "VALUES ('"
 						+ id
-						+ "','','"
+						+ "','" + tmp + "','"
 						+ coordinates[0]
 						+ "','"
 						+ coordinates[1]
 						+ "','"
-						+ uSex
+						+ uName + " " + uSurname
 						+ "','"
-						+ uAge
-						+ "', '"
-						+ username
+						+ uSex + " " + uAge
+						+ "','"
+						+ username 
 						+ "',1,'"
 						+ imageURL
 						+ "','"
-						+ uName
-						+ " "
-						+ uSurname + "')";
-			else
-				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
-						+ "VALUES ('"
-						+ id
-						+ "','"
-						+ uTel
-						+ "','"
-						+ coordinates[0]
-						+ "','"
-						+ coordinates[1]
-						+ "','"
-						+ uSex
-						+ "','"
-						+ uAge
-						+ "', '"
-						+ username
-						+ "',1,'"
-						+ imageURL + "','" + uName + " " + uSurname + "')";
-
+						+ uStatus
+						+"')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -1993,8 +1976,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-					+ "VALUES ('http://feelslike.netsons.org/users.php?id=" + id
-					+ "','Visit user page','" + poiId + "')";
+				+ "VALUES ('http://fellas.netsons.org/users.php?id=" + id
+				+ "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertUserLog(uTel, "userRegistration", username);
@@ -2041,7 +2024,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String tel = uTel;
 			if (Integer.parseInt(NEWuPrivacy) == 0)
 				tel = "";
-			updatePoi(tel, NEWimageURL, NEWuSex, NEWuAge, NEWuStatus,
+			updatePoi(tel, NEWimageURL, NEWuName + " " + NEWuSurname, NEWuSex + " " + NEWuAge,NEWuStatus,
 					NEWusername, "1", id);
 			insertUserLog(uTel, "userEditProfile", "");
 			return true;
