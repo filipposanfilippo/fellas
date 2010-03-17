@@ -777,7 +777,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			rs = statement.executeQuery(query);
 			rs.next();
 			int eventId = rs.getInt("id");
-
+			// retrieve club name
+			query = "SELECT cName FROM clubs WHERE username='" + username + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			String clubName = rs.getString("cName");
 			if (startDifference < 7 * 60 * 60 * 24 * 1000) {
 				System.out.println("Immediately adding to POI");
 				query = "INSERT INTO POI(idItem,attribution,imageURL,lat,lon,line2,line3,line4,title,type)"
@@ -792,7 +797,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 						+ "','"
 						+ coordinates[1]
 						+ "','"
-						+ eCategory
+						+ clubName
 						+ "','Starts: "
 						+ formattedStartDate
 						+ " "
@@ -824,7 +829,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 				startDifference = startDifference - 7 * 60 * 60 * 24 * 1000;
 				Timer StartTimer = new Timer();
 				StartTimer.schedule(new starterTask(eventId, eInfoTel,
-						eImageURL, eLocation, eCategory, eStartDate,
+						eImageURL, eLocation, clubName, eStartDate,
 						eFinishDate, eStartTime, eFinishTime, eName),
 						startDifference);
 			}
@@ -1191,6 +1196,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			today = new Date();
 			startDifference = dayOfStart.getTime() - today.getTime();
 
+			query = "SELECT cName FROM clubs WHERE username='" + username + "'";
+			statement = connection.createStatement();
+			rs = statement.executeQuery(query);
+			rs.next();
+			String clubName = rs.getString("cName");
 			if (startDifference < 7 * 60 * 60 * 24 * 1000) {
 				// pu� essere che gi� c'� e va aggiornato
 
@@ -1202,7 +1212,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							+ "'," + "imageURL='" + event.geteImageURL() + "',"
 							+ "lat='" + coordinates[0] + "'," + "lon='"
 							+ coordinates[1] + "'," + "line2='"
-							+ event.geteCategory() + "'," + "line3='Starts: "
+							+ clubName + "'," + "line3='Starts: "
 							+ formatDate(event.geteStartDate()) + " "
 							+ event.geteStartTime() + "'," + "line4='Ends: "
 							+ formatDate(event.geteFinishDate()) + " "
@@ -1225,7 +1235,7 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 							+ "','"
 							+ coordinates[1]
 							+ "','"
-							+ event.geteCategory()
+							+ clubName
 							+ "','Starts: "
 							+ formatDate(event.geteStartDate())
 							+ " "
