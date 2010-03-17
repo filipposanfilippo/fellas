@@ -674,7 +674,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		// cImg.setPreferredSize(new Dimension(50, 50));
 		cImg.setHorizontalAlignment(SwingConstants.CENTER);
 		rightProfileP.add(cImg);
-		System.out.println(clubData);
+		
 		cImageURL = new JTextField();
 		cImageURL.setEditable(false);
 		cImageURL.setVisible(true);
