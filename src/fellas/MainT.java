@@ -93,8 +93,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	JTextField eRestriction;
 	JTextField eInfoTel;
 
-	JPanel rightEvP;
-
 	private String eSelectedImage = "";
 	private String ePreviousImage = "";
 	private String eRemoteImage = "";
@@ -169,6 +167,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		this.TITLE = this.TITLE + "(" + currentClub.getClubName() + " Client)";
 	}
 
+	/**
+	 * Creates the menu bar of the frame
+	 * 
+	 * @return JMenuBar menuBar
+	 */
 	private JMenuBar createMenu() {
 		// Create the menu bar
 		JMenuBar menuBar = new JMenuBar();
@@ -220,7 +223,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Message Panel
 	// ******************************************************************************
 
-	private JPanel createMessagePanel(LinkedList<MyEvent> eventsList) {
+	/**
+	 * Create the Message Panel
+	 * 
+	 * @param LinkedList
+	 *            <MyEvent> eventsList
+	 * @return JPanel
+	 */
+	private JPanel createMessagePanel(final LinkedList<MyEvent> eventsList) {
 		JPanel messageP = new JPanel();
 		messageP.setLayout(new BoxLayout(messageP, BoxLayout.Y_AXIS));
 
@@ -265,7 +275,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		sendToAllB.setEnabled(false);
 
 		message = new JTextField("Type here your message...");
-		// message.setBackground(new Color(255, 215, 0));
 		message.setFont(new Font("SansSerif", Font.PLAIN, 16));
 
 		bottomMsgP.add(message);
@@ -284,38 +293,41 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Event Panel
 	// ******************************************************************************
 
-	private JPanel createEventsPanel(LinkedList<MyEvent> eventsList) {
+	/**
+	 * Create the Events Panel.
+	 * 
+	 * @param LinkedList
+	 *            <MyEvent> eventsList
+	 * @return JPanel
+	 */
+	private JPanel createEventsPanel(final LinkedList<MyEvent> eventsList) {
 		JPanel eventsP = new JPanel();
 		eventsP.setLayout(new GridLayout(1, 2));
 
 		// ------------------------ LEFT ------------------------------------
 		JPanel leftEvP = new JPanel();
-		try {
-			leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
-			eventJTable = new JTable(new DefaultTableModel() {
-				private static final long serialVersionUID = 1L;
 
-				@Override
-				public boolean isCellEditable(int row, int column) {
-					return false;
-				}
-			});
-			eventJTable.setAutoCreateRowSorter(true);
-			eventJTable.setRowSelectionAllowed(true);
-			eventJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
+		eventJTable = new JTable(new DefaultTableModel() {
+			private static final long serialVersionUID = 1L;
 
-			populateTab(eventsList, eventJTable);
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		});
+		eventJTable.setAutoCreateRowSorter(true);
+		eventJTable.setRowSelectionAllowed(true);
+		eventJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			eventJTable.getSelectionModel().addListSelectionListener(this);
-			leftEvP.add(new JScrollPane(eventJTable));
-			eventJTable.setFillsViewportHeight(true);
-		} catch (Exception e) {
-			// visualizzare l'errore ed uscire dalla grafica
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		populateTab(eventsList, eventJTable);
+
+		eventJTable.getSelectionModel().addListSelectionListener(this);
+		leftEvP.add(new JScrollPane(eventJTable));
+		eventJTable.setFillsViewportHeight(true);
+
 		// ------------------------ RIGHT ------------------------------------
-		rightEvP = new JPanel(new SpringLayout());
+		JPanel rightEvP = new JPanel(new SpringLayout());
 
 		rightEvP.add(new JLabel("Event Name:", JLabel.TRAILING));
 		eName = new JTextField();
@@ -425,7 +437,14 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Old Event Panel
 	// ******************************************************************************
 
-	private JPanel createOldEventsPanel(LinkedList<MyEvent> oldEventsList) {
+	/**
+	 * Create the Old Events Panel.
+	 * 
+	 * @param LinkedList
+	 *            <MyEvent> oldEventsList
+	 * @return JPanel
+	 */
+	private JPanel createOldEventsPanel(final LinkedList<MyEvent> oldEventsList) {
 		JPanel oldEventsP = new JPanel();
 		oldEventsP.setLayout(new GridLayout(1, 2));
 
@@ -533,6 +552,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Club Profile Panel
 	// ******************************************************************************
 
+	/**
+	 * Create the Club Profile Panel.
+	 * 
+	 * @param Club
+	 *            clubData
+	 * @return JPanel
+	 */
 	private JPanel createProfilePanel(final Club clubData) {
 		JPanel profileP = new JPanel();
 		profileP.setLayout(new BoxLayout(profileP, BoxLayout.X_AXIS));
@@ -664,7 +690,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// ******************************************************************************
 	// Utility
 	// ******************************************************************************
-	private void refreshImage(JLabel imglabel, String imgURL) {
+	/**
+	 * Perform the refresh of the passed image with the give file.
+	 * 
+	 * @param JLabel
+	 *            imglabel
+	 * @param String
+	 *            imgURL
+	 */
+	private void refreshImage(final JLabel imglabel, final String imgURL) {
 		try {
 			if (imgURL.equals("") || imgURL.equals(_URL)) {
 				imglabel.setIcon(new ImageIcon("default.jpg"));
@@ -672,14 +706,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 				if (imgURL.startsWith("C:")) {
 					imglabel.setIcon(new ImageIcon(imgURL));
 				} else {
-					URL url = new URL(imgURL);// TODO check url
+					URL url = new URL(imgURL);
 					ImageIcon ic = new ImageIcon(ImageIO.read(url));
 					imglabel.setIcon(ic);
 				}
 			}
 		} catch (IOException e) {
 			imglabel.setIcon(new ImageIcon("default.jpg"));
-			// e.printStackTrace();
 		}
 	}
 
@@ -703,16 +736,19 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		}
 	}
 
-	private Vector<Vector<String>> getUsersVector(int eventId) {
+	/**
+	 * Returns a vector of vectors containing all users.
+	 * 
+	 * @param int eventId
+	 * @return Vector<Vector<String>>
+	 * @throws RemoteException
+	 */
+	private Vector<Vector<String>> getUsersVector(int eventId)
+			throws RemoteException {
 		Vector<Vector<String>> usersVector = new Vector<Vector<String>>();
 
 		LinkedList<User> usersList = new LinkedList<User>();
-		try {
-			usersList = currentClub.getEventUsersList(eventId);
-		} catch (Exception ex) {
-			// TODO add error alert
-			ex.printStackTrace();
-		}
+		usersList = currentClub.getEventUsersList(eventId);
 		if (usersList != null) {
 			for (User u : usersList) {
 				Vector<String> v = new Vector<String>();
@@ -729,7 +765,15 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		return null;
 	}
 
-	private void populateTab(LinkedList<MyEvent> list, JTable table) {
+	/**
+	 * Performs the given JTable population with given data.
+	 * 
+	 * @param LinkedList
+	 *            <MyEvent> list
+	 * @param JTable
+	 *            table
+	 */
+	private void populateTab(final LinkedList<MyEvent> list, final JTable table) {
 		Vector<String> columnNames = new Vector<String>();
 		columnNames.addElement("ID");
 		columnNames.addElement("Event Name");
@@ -748,14 +792,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		DefaultTableModel tm = (DefaultTableModel) table.getModel();
 		tm.setDataVector(eventsVector, columnNames);
 		tm.fireTableDataChanged();
-		eventJTable.getColumnModel().getColumn(0).setPreferredWidth(0);
-		// table.setBackground(new Color(153, 204, 255));
-		// table.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		table.getColumnModel().getColumn(0).setPreferredWidth(0);
 	}
 
+	/**
+	 * Clears all data.
+	 */
 	private void cleanBoxes() {
-		// rightEvP.setVisible(false); // TODO ho messo globale il right per
-		// vedere se spostare il new..se tolgo questo metto locale il rightEvP
 		eName.setText("");
 		eShortDescription.setText("");
 		eLongDescription.setText("");
@@ -781,11 +824,19 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 			populateTab(currentClub.getClubEventsList(), eventJTable);
 			populateTab(currentClub.getOldClubEventsList(), oldEventJTable);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane
+					.showMessageDialog(
+							null,
+							"An Error Occurred while trying to build Tables.\nPlease contact DB Administrator.\nError n: 101",
+							"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
+	/**
+	 * Checks if the new event has got errors
+	 * 
+	 * @return boolean
+	 */
 	private boolean checkEvErrors() {
 		String errMsg = "";
 		Date dayOfStart = null;
@@ -832,7 +883,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		return flag;
 	}
 
-	private void setEventEditable(boolean flag) {
+	/**
+	 * Sets weather an event is editable or not according to the flag.
+	 * 
+	 * @param boolean flag
+	 */
+	private void setEventEditable(final boolean flag) {
 		eFinishDate.setEnabled(flag);
 		eName.setEditable(flag);
 		if (!flag) {
@@ -880,16 +936,19 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 			tabPanel.add("Message", createMessagePanel(eventsClubList));
 			tabPanel.add("Profile", createProfilePanel(currentClub.getClub()));
 		} catch (Exception e) {
-			// TODO: handle exception
+			JOptionPane
+					.showMessageDialog(
+							null,
+							"An error occurred while trying to build Tables.\nPlease contact DB Administrator.\nError n: 102",
+							"Fatal Error", JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
 		}
 
 		// mainFrame.setPreferredSize(new Dimension(1024, 730));
+		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
-
 		mainFrame.pack();
-
-		// mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setVisible(true);
 	}
 
@@ -933,8 +992,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 							+ message.getText(), criterion.substring(0,
 							criterion.length() - 3));
 				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"An error occurred while trying to send Message.\nError n: 103",
+									"Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -988,8 +1050,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 					new Thread(new LoginT()).start();
 				}
 			} catch (RemoteException e1) {
-				// TODO add error message
-				e1.printStackTrace();
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"An error occurred while trying unregister user.\nPlease contact DB Administrator.\nError n: 104",
+								"Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		if (event == selectEImgB) {
@@ -1147,7 +1212,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 					JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				try {
-					mainFrame.setVisible(false); // TODO review
+					mainFrame.setVisible(false);
 					new Thread(new LoginT()).start();
 				} catch (RemoteException e1) {
 					System.exit(0);
@@ -1163,21 +1228,29 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getSource() == messageEventJTable.getSelectionModel()
 				&& messageEventJTable.getRowSelectionAllowed()) {
+			try {
+				Vector<String> columnNames = new Vector<String>();
+				columnNames.addElement("ID");
+				columnNames.addElement("Username");
+				columnNames.addElement("Nome");
+				columnNames.addElement("Cognome");
+				columnNames.addElement("Età");
+				columnNames.addElement("Sesso");
 
-			Vector<String> columnNames = new Vector<String>();
-			columnNames.addElement("ID");
-			columnNames.addElement("Username");
-			columnNames.addElement("Nome");
-			columnNames.addElement("Cognome");
-			columnNames.addElement("Età");
-			columnNames.addElement("Sesso");
+				sendMessB.setEnabled(true);
+				sendToAllB.setEnabled(true);
+				int sel = Integer.parseInt(messageEventJTable.getValueAt(
+						messageEventJTable.getSelectedRow(), 0).toString());
 
-			sendMessB.setEnabled(true);
-			sendToAllB.setEnabled(true);
-			int sel = Integer.parseInt(messageEventJTable.getValueAt(
-					messageEventJTable.getSelectedRow(), 0).toString());
-			((DefaultTableModel) usersJTable.getModel()).setDataVector(
-					getUsersVector(sel), columnNames);
+				((DefaultTableModel) usersJTable.getModel()).setDataVector(
+						getUsersVector(sel), columnNames);
+			} catch (RemoteException e1) {
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"An Error Occurred while trying to load users.\nPlease contact DB Administrator.",
+								"Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		if (e.getSource() == eventJTable.getSelectionModel()
 				&& eventJTable.getRowSelectionAllowed()) {
@@ -1218,10 +1291,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 					else
 						setEventEditable(true);
 				} catch (Exception e1) {
-					// TODO add error messaggio che dice che
-					// l'evento è stato
-					// eliminato da qualcuno
-					e1.printStackTrace();
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"Selected event is not fresh.\nThe required event has already been modified/moved/deleted by someone.\nPlease press the refresh button on file menu\nError n: 106",
+									"Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -1249,8 +1323,11 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 					refreshImage(eOImg, event.geteImageURL());
 					eOLongDescription.setText(event.geteLongDescription());
 				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"Selected event is not fresh.\nThe required event has already been modified/moved/deleted by someone.\nPlease press the refresh button on file menu\nError n: 108",
+									"Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
