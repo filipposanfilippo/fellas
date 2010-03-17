@@ -11,7 +11,7 @@ import java.util.LinkedList;
 
 public class ClientClub extends UnicastRemoteObject {
 	private ServerInterface server;
-	private String host = "localhost";
+	private String host = "localhost";	//server ip
 	private Club clubLogged;
 
 	final String _URL = "http://feelslike.netsons.org/";
