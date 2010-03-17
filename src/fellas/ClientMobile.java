@@ -82,7 +82,7 @@ class ClientMobile extends UnicastRemoteObject {
 					// invoke remote method
 					serverAnswer = server.userRegistration(keyword, uTel,
 							username, psw, uSex, uAge, uLocation, uPrivacy, "",
-							"Appena iscritto in fellas", "", "");
+							"Appena iscritto in fellas", "", "http://feelslike.netsons.org/users/default.jpg");
 
 					served = true;
 					break;
