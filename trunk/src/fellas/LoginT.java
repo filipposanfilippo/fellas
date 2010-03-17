@@ -61,6 +61,12 @@ public class LoginT implements Runnable, ActionListener {
 
 	// ------------------- RIGHT PANEL (Login) ---------------------------
 
+	/**
+	 * Default Constructor that starts the RMI connection defining a new
+	 * ClientClub.
+	 * 
+	 * @throws RemoteException
+	 */
 	public LoginT() throws RemoteException {
 		try {
 			currentClub = new ClientClub();
@@ -71,18 +77,20 @@ public class LoginT implements Runnable, ActionListener {
 		}
 	}
 
+	/**
+	 * Creates the right Login panel.
+	 * 
+	 * @return JPanel
+	 */
 	private JPanel createRightPanel() {
 		JPanel rightP = new JPanel();
 		rightP.setLayout(new BoxLayout(rightP, BoxLayout.Y_AXIS));
 
 		JPanel loginP = new JPanel(new SpringLayout());
 		loginP.setBorder(BorderFactory.createTitledBorder("Login"));
-		// loginP.setLayout(new BoxLayout(loginP, BoxLayout.Y_AXIS));
 
 		userL = new JTextField();
-		// userL.setPreferredSize(new Dimension(20, 20));
 		pwdL = new JPasswordField();
-		// pwdL.setPreferredSize(new Dimension(20, 20));
 
 		loginB = new JButton("Login");
 		loginB.addActionListener(this);
@@ -108,7 +116,6 @@ public class LoginT implements Runnable, ActionListener {
 		// -------------- BOTTOM PANEL (Club Image) ------------------------
 
 		JPanel imgP = new JPanel();
-		// imgP.setLayout(new BoxLayout(imgP, BoxLayout.Y_AXIS));
 		imgP.setBorder(BorderFactory.createTitledBorder("Club Image"));
 
 		img = new JLabel(new ImageIcon("default.jpg"));
@@ -132,6 +139,11 @@ public class LoginT implements Runnable, ActionListener {
 
 	// -------------- LEFT PANEL (Registration) ----------------------------
 
+	/**
+	 * Creates the Left Login Panel.
+	 * 
+	 * @return JPanel
+	 */
 	private JPanel createLeftPanel() {
 		JPanel leftP = new JPanel();
 		leftP.setLayout(new GridLayout(11, 2));
@@ -297,7 +309,13 @@ public class LoginT implements Runnable, ActionListener {
 		}
 	}
 
-	private void updateImage(String imgURL) {
+	/**
+	 * Updates the image visualization when the selection changes.
+	 * 
+	 * @param String
+	 *            imgURL
+	 */
+	private void updateImage(final String imgURL) {
 		if (imgURL.equals("")) {
 			img.setIcon(new ImageIcon("default.jpg"));
 		} else {
