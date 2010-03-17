@@ -16,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
@@ -56,10 +57,10 @@ import java.util.StringTokenizer;
  */
 public class FTPConnection extends Object {
 
-	final String _HOST = "diana.netsons.org";
-	final String _USERNAME = "diananet";
-	final String _PASSWORD = "password1234";
-	final String _URL = "http://diana.netsons.org/";
+	final String _HOST = "ftp.feelslike.netsons.org";
+	final String _USERNAME = "banana@feelslike.netsons.org";
+	final String _PASSWORD = "banana";
+	final String _URL = "http://feelslike.netsons.org/";
 
 	/**
 	 * If this flag is on, we print out debugging information to stdout during
@@ -340,8 +341,9 @@ public class FTPConnection extends Object {
 	public boolean uploadFile(String serverPath, String localPath)
 			throws IOException {
 		try {
-			URL url = new URL("ftp://" + _USERNAME + ":" + _PASSWORD + "@"
-					+ _HOST + "/" + serverPath + ";type=i");
+			URL url = new URL("ftp://" + URLEncoder.encode(_USERNAME, "UTF-8")
+					+ ":" + URLEncoder.encode(_PASSWORD, "UTF-8") + "@" + _HOST
+					+ "/" + serverPath + ";type=i");
 			URLConnection m_client = url.openConnection();
 
 			InputStream is = new FileInputStream(localPath);
@@ -395,31 +397,6 @@ public class FTPConnection extends Object {
 		} while (!(Character.isDigit(reply.charAt(0))
 				&& Character.isDigit(reply.charAt(1))
 				&& Character.isDigit(reply.charAt(2)) && reply.charAt(3) == ' '));
-
-		return reply;
-	}
-
-	/**
-	 * Added by Julian: Returns the last line of the server reply, but also
-	 * returns the full multi-line reply in a StringBuffer parameter.
-	 */
-	private String getFullServerReply(StringBuffer fullReply)
-			throws IOException {
-		String reply;
-		fullReply.setLength(0);
-
-		do {
-			reply = inputStream.readLine();
-			debugPrint(reply);
-			fullReply.append(reply + lineTerm);
-		} while (!(Character.isDigit(reply.charAt(0))
-				&& Character.isDigit(reply.charAt(1))
-				&& Character.isDigit(reply.charAt(2)) && reply.charAt(3) == ' '));
-
-		// remove any trailing line terminators from the fullReply
-		if (fullReply.length() > 0) {
-			fullReply.setLength(fullReply.length() - lineTerm.length());
-		}
 
 		return reply;
 	}
@@ -722,7 +699,6 @@ public class FTPConnection extends Object {
 		if (restartPoint != 0) {
 			outputStream.println("rest " + restartPoint);
 			restartPoint = 0;
-			// TODO: Interpret server response here
 			getServerReply();
 		}
 
@@ -790,20 +766,6 @@ public class FTPConnection extends Object {
 	 */
 	private boolean isPositiveCompleteResponse(int response) {
 		return (response >= 200 && response < 300);
-	}
-
-	/**
-	 * True if the given response code is in the 400-499 range.
-	 */
-	private boolean isTransientNegativeResponse(int response) {
-		return (response >= 400 && response < 500);
-	}
-
-	/**
-	 * True if the given response code is in the 500-599 range.
-	 */
-	private boolean isPermanentNegativeResponse(int response) {
-		return (response >= 500 && response < 600);
 	}
 
 	/**
