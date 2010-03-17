@@ -36,12 +36,6 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 	private static String keyword = "perorapassworddiprova";
 	private ResultSet primaryRs = null;
 
-	// __FTP access
-	final String _HOST = "diana.netsons.org";
-	final String _USERNAME = "diananet";
-	final String _PASSWORD = "password1234";
-	final String _URL = "http://diana.netsons.org/";
-
 	// ___DB access
 	final String dbUser = "diana";
 	final String dbPass = "password1234";
@@ -134,15 +128,15 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			// create id table on events folder
 			FTPConnection ftpConn = new FTPConnection();
 			try {
-				if (ftpConn.connect(_HOST)) {
-					if (ftpConn.login(_USERNAME, _PASSWORD)) {
-						ftpConn.changeDirectory("www/events");
+				if (ftpConn.connect(ftpConn._HOST)) {
+					if (ftpConn.login(ftpConn._USERNAME, ftpConn._PASSWORD)) {
+						ftpConn.changeDirectory("events");
 						ftpConn.makeDirectory("" + clubId);
 					}
 					ftpConn.disconnect();
 				}
 			} catch (IOException e) {
-				// TODO handle I/O exception
+				e.printStackTrace();
 			}
 			String[] geo = new String[2];
 			geo = address2GEOcoordinates(cAddress);
@@ -1896,7 +1890,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 
 	public String userRegistration(String key, String uTel, String username,
 			String psw, String uSex, String uAge, String uLocation,
-			String uPrivacy, String uName, String uStatus, String uSurname, String imageURL) throws RemoteException {
+			String uPrivacy, String uName, String uStatus, String uSurname,
+			String imageURL) throws RemoteException {
 		if (!keyword.equals(key))
 			return "You are not authorized";
 		if (!checkConnection())
@@ -1918,16 +1913,14 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 					+ "','"
 					+ uLocation
 					+ "','"
-					+ uPrivacy 
+					+ uPrivacy
 					+ "','"
 					+ uName
 					+ "','"
 					+ uStatus
 					+ "','"
 					+ uSurname
-					+ "','"
-					+ imageURL
-					+ "')";
+					+ "','" + imageURL + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -1946,24 +1939,28 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String tmp = "";
 			if (privacy == 1)
 				tmp = uTel;
-				query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
-						+ "VALUES ('"
-						+ id
-						+ "','" + tmp + "','"
-						+ coordinates[0]
-						+ "','"
-						+ coordinates[1]
-						+ "','"
-						+ uName + " " + uSurname
-						+ "','"
-						+ uSex + " " + uAge
-						+ "','"
-						+ username 
-						+ "',1,'"
-						+ imageURL
-						+ "','"
-						+ uStatus
-						+"')";
+			query = "INSERT INTO POI (idItem,attribution,lat,lon,line2,line3,title,type,imageURL,line4)"
+					+ "VALUES ('"
+					+ id
+					+ "','"
+					+ tmp
+					+ "','"
+					+ coordinates[0]
+					+ "','"
+					+ coordinates[1]
+					+ "','"
+					+ uName
+					+ " "
+					+ uSurname
+					+ "','"
+					+ uSex
+					+ " "
+					+ uAge
+					+ "','"
+					+ username
+					+ "',1,'"
+					+ imageURL
+					+ "','" + uStatus + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 
@@ -1976,8 +1973,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			int poiId = rs.getInt("id");
 
 			query = "INSERT INTO Action (uri,label,poiId)"
-				+ "VALUES ('http://feelslike.netsons.org/users.php?id=" + id
-				+ "','Visit user page','" + poiId + "')";
+					+ "VALUES ('http://feelslike.netsons.org/users.php?id="
+					+ id + "','Visit user page','" + poiId + "')";
 			statement = connection.createStatement();
 			statement.execute(query);
 			insertUserLog(uTel, "userRegistration", username);
@@ -1999,14 +1996,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 		try {
 			query = "UPDATE users SET " + "username='" + NEWusername + "',"
 					+ "psw='" + NEWpsw + "'," + "uSex='" + NEWuSex + "',"
-					+ "uAge='"
-					+ NEWuAge
-					+ "',"
-					+ "uLocation='" + NEWuLocation + "',"
-					+ "privacy='" + NEWuPrivacy + "'," + "uName='" + NEWuName
-					+ "'," + "uStatus='" + NEWuStatus + "'," + "uSurname='"
-					+ NEWuSurname + "'," + "imageURL='" + NEWimageURL
-					+ "' WHERE uTel='" + uTel + "'";
+					+ "uAge='" + NEWuAge + "'," + "uLocation='" + NEWuLocation
+					+ "'," + "privacy='" + NEWuPrivacy + "'," + "uName='"
+					+ NEWuName + "'," + "uStatus='" + NEWuStatus + "',"
+					+ "uSurname='" + NEWuSurname + "'," + "imageURL='"
+					+ NEWimageURL + "' WHERE uTel='" + uTel + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 			// update new location
@@ -2024,8 +2018,8 @@ public class Server extends UnicastRemoteObject implements ServerInterface {
 			String tel = uTel;
 			if (Integer.parseInt(NEWuPrivacy) == 0)
 				tel = "";
-			updatePoi(tel, NEWimageURL, NEWuName + " " + NEWuSurname, NEWuSex + " " + NEWuAge,NEWuStatus,
-					NEWusername, "1", id);
+			updatePoi(tel, NEWimageURL, NEWuName + " " + NEWuSurname, NEWuSex
+					+ " " + NEWuAge, NEWuStatus, NEWusername, "1", id);
 			insertUserLog(uTel, "userEditProfile", "");
 			return true;
 		} catch (SQLException e) {

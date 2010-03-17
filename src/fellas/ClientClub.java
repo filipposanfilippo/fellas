@@ -14,10 +14,7 @@ public class ClientClub extends UnicastRemoteObject {
 	private String host = "localhost";
 	private Club clubLogged;
 
-	final String _HOST = "fellas.netsons.org";
-	final String _USERNAME = "fellasne@fellas.netsons.org";
-	final String _PASSWORD = "mxYuHCg7dB";
-	final String _URL = "http://fellas.netsons.org/";
+	final String _URL = "http://feelslike.netsons.org/";
 
 	public ClientClub() throws RemoteException, MalformedURLException,
 			NotBoundException {
@@ -44,7 +41,7 @@ public class ClientClub extends UnicastRemoteObject {
 			imgRemoteURL = _URL + "clubs/" + username + "." + ext;
 			FTPConnection connection = new FTPConnection();
 			try {
-				connection.uploadFile("www/clubs/" + username + "." + ext,
+				connection.uploadFile(imgRemoteURL.replace(_URL, ""),
 						imgLocalURL);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -75,16 +72,17 @@ public class ClientClub extends UnicastRemoteObject {
 				cAddress, cTel, cEMail, cType, cName, username, psw,
 				imgRemoteURL);
 
-		if (server.updateClubData(clubLogged.getUsername(), clubLogged.getPsw(),
-				tempClub)) {
+		if (server.updateClubData(clubLogged.getUsername(),
+				clubLogged.getPsw(), tempClub)) {
 			clubLogged = tempClub;
 			if (!imgLocalURL.equals("")) {
 				FTPConnection connection = new FTPConnection();
 				try {
-					connection.uploadFile("www/clubs/" + username + "." + ext,
+					connection.uploadFile(imgRemoteURL.replace(_URL, ""),
 							imgLocalURL);
-				} catch (Exception e) {
-					// TODO handle I/O exception
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 			return true;

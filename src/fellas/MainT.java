@@ -60,10 +60,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	String TITLE = "FELLAS: Feel Like Doing... ";
 	final String VERSION = " v.1.0";
 
-	final String _HOST = "fellas.netsons.org";
-	final String _USERNAME = "fellasne@fellas.netsons.org";
-	final String _PASSWORD = "mxYuHCg7dB";
-	final String _URL = "http://fellas.netsons.org/";
+	final String _URL = "http://feelslike.netsons.org/";
 
 	// --------------Default Operations
 	JFrame mainFrame;
@@ -238,6 +235,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		populateTab(eventsList, messageEventJTable);
 
 		usersJTable = new JTable(new DefaultTableModel() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -294,6 +293,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		try {
 			leftEvP.setLayout(new BoxLayout(leftEvP, BoxLayout.Y_AXIS));
 			eventJTable = new JTable(new DefaultTableModel() {
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public boolean isCellEditable(int row, int column) {
 					return false;
@@ -433,6 +434,8 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		leftOldEvP.setLayout(new BoxLayout(leftOldEvP, BoxLayout.Y_AXIS));
 
 		oldEventJTable = new JTable(new DefaultTableModel() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -530,7 +533,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	// Club Profile Panel
 	// ******************************************************************************
 
-	private JPanel createProfilePanel() {
+	private JPanel createProfilePanel(final Club clubData) {
 		JPanel profileP = new JPanel();
 		profileP.setLayout(new BoxLayout(profileP, BoxLayout.X_AXIS));
 
@@ -541,13 +544,6 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		JPanel dataP = new JPanel(new SpringLayout());
 		JPanel buttonsP = new JPanel();
 		JPanel statusP = new JPanel();
-		Club clubData = new Club();
-
-		try {
-			clubData = currentClub.getClub();
-		} catch (Exception ex) {
-			// TODO add error alert
-		}
 
 		Color color = new Color(255, 215, 0);
 		Color colorEnf = new Color(255, 255, 100);
@@ -652,13 +648,13 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		// cImg.setPreferredSize(new Dimension(50, 50));
 		cImg.setHorizontalAlignment(SwingConstants.CENTER);
 		rightProfileP.add(cImg);
-
-		cImageURL = new JTextField(clubData.getcImageURL());
+		System.out.println(clubData);
+		cImageURL = new JTextField();
 		cImageURL.setEditable(false);
-		cImageURL.setVisible(false);
+		cImageURL.setVisible(true);
 		rightProfileP.add(cImageURL);
 
-		refreshImage(cImg, cImageURL.getText());
+		refreshImage(cImg, clubData.getcImageURL());
 
 		profileP.add(leftProfileP);
 		profileP.add(rightProfileP);
@@ -688,6 +684,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 	}
 
 	public class JTextFieldLimit extends PlainDocument {
+		private static final long serialVersionUID = 1L;
 		private int limit;
 
 		JTextFieldLimit(int limit) {
@@ -876,13 +873,12 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		try {
 			LinkedList<MyEvent> eventsClubList = currentClub
 					.getClubEventsList();
-			LinkedList<MyEvent> oldEventsClubList = currentClub
-					.getOldClubEventsList();
 
 			tabPanel.add("Events", createEventsPanel(eventsClubList));
-			tabPanel.add("Old Events", createOldEventsPanel(oldEventsClubList));
+			tabPanel.add("Old Events", createOldEventsPanel(currentClub
+					.getOldClubEventsList()));
 			tabPanel.add("Message", createMessagePanel(eventsClubList));
-			tabPanel.add("Profile", createProfilePanel());
+			tabPanel.add("Profile", createProfilePanel(currentClub.getClub()));
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -1039,8 +1035,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 
 					if (!eSelectedImage.equals("")) {
 						FTPConnection connection = new FTPConnection();
-						connection.uploadFile("www/"
-								+ eRemoteImage.replace(_URL, ""),
+						connection.uploadFile(eRemoteImage.replace(_URL, ""),
 								eSelectedImage);
 					}
 
@@ -1089,8 +1084,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 
 					if (!eSelectedImage.equals("")) {
 						FTPConnection connection = new FTPConnection();
-						connection.uploadFile("www/"
-								+ eRemoteImage.replace(_URL, ""),
+						connection.uploadFile(eRemoteImage.replace(_URL, ""),
 								eSelectedImage);
 					}
 					JOptionPane.showMessageDialog(mainFrame,
