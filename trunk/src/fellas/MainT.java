@@ -677,7 +677,7 @@ public class MainT implements Runnable, ActionListener, ListSelectionListener {
 		
 		cImageURL = new JTextField();
 		cImageURL.setEditable(false);
-		cImageURL.setVisible(true);
+		cImageURL.setVisible(false);
 		rightProfileP.add(cImageURL);
 
 		refreshImage(cImg, clubData.getcImageURL());
