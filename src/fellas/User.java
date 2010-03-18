@@ -3,18 +3,20 @@ package fellas;
 import java.io.Serializable;
 
 public class User implements Serializable {
-	int id;
-	String uTel;
-	String uName;
-	String uAge;
-	String uSex;
-	String uStatus;
-	String username;
-	String psw;
-	String uSurname;
-	String uLocation;
-	String uImageURL;
-	int privacy;
+	private static final long serialVersionUID = 1L;
+
+	private int id;
+	private String uTel;
+	private String uName;
+	private String uAge;
+	private String uSex;
+	private String uStatus;
+	private String username;
+	private String psw;
+	private String uSurname;
+	private String uLocation;
+	private String uImageURL;
+	private int privacy;
 
 	public User(int id, String uTel, String uName, String uAge, String uSex,
 			String uStatus, String username, String psw, String uSurname,

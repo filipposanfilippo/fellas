@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class MyEvent implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private int id;
 	private int cId;
 	private String eName;
